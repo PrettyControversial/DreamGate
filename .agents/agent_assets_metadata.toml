@@ -1,0 +1,10 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "82NoIeY7oa2TK6j8rxplu"
+uri = "file://attached_assets/generated_audio/dreamgate_celestial_intro_ambient.mp3"
+type = "audio"
+title = "dreamgate celestial intro ambient"
+description = "Generated music: A very subtle 5-second instrumental ambient sound bed for a mystical dream journal app intro. Ethereal celestial atmosphere, soft warm analog pad, airy resonance, delicate crystallin…"
+logical_id = "37e8f18a-b7cb-4da3-bfef-e90a3ebb8714"

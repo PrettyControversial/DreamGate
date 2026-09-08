@@ -1,0 +1,15 @@
+- [Managed AI completion shape](managed-ai-completion-shape.md) — reserve reasoning budget and normalize alternate JSON shapes; never replace decode failures with generic success content.
+- [DreamGate visual source of truth](dreamgate-visual-system.md) — Discover defines authenticated-app styling; keep Welcome and the post-login intro visually isolated.
+- [DreamGate intro playback](dreamgate-intro-playback.md) — play the pre-home animation once per auth session and again during logout, not on every Home mount.
+- [Psyra interpretation metadata](psyra-interpretation-metadata.md) — keep archetype analysis inside the saved interpretation envelope so old dreams remain readable and profiles aggregate without rereading dream text.
+- [Psyra+ access boundaries](psyra-plus-access-boundaries.md) — keep paywall UI, entitlements, and purchase providers separate; development premium state must never unlock production.
+- [Clerk transport by platform](clerk-platform-auth-transport.md) — browsers use Clerk session cookies; native Capacitor webviews use bearer tokens for API requests.
+- [Managed Clerk environment sync](clerk-managed-env-sync.md) — resync managed Clerk keys for session redirect loops; never hand-edit the coordinated secrets.
+- [DreamGate sign-in methods](clerk-sign-in-methods.md) — keep the embedded Clerk sign-in email/password only; social controls stay hidden.
+- [Mobile asset budget](mobile-asset-budget.md) — keep bundled images near 500 KB and long meditation audio near 2–3 MB; preserve import paths during optimization.
+- [Product analytics boundaries](product-analytics-boundaries.md) — track only confirmed actions with controlled metadata; keep content/identity out and expire cross-route attribution.
+- [Native dream reminders](native-dream-reminders.md) — fixed morning/evening prompts use per-user Capacitor local schedules; web must not claim closed-browser delivery.
+- [Lunar astronomy source](lunar-astronomy-source.md) — use one local astronomy model with explicit UTC instants and tropical longitudes; never merge rough math with network calendars.
+- [Moon calendar module boundary](moon-calendar-source-boundary.md) — keep one complete page module; duplicated imports appended after JSX prevent Vite from starting.
+- [DreamGate response budget](dreamgate-response-budget.md) — keep the first usable screen under two seconds; decorative media must never block interaction.
+- [Autoscale startup readiness](autoscale-startup-readiness.md) — bind the HTTP port before async app setup so root health probes do not fail during cold starts.
