@@ -23,6 +23,8 @@ import { useHashLocation } from "wouter/use-hash-location";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   CircleHelp,
+  Eye,
+  EyeOff,
   LogOut,
   Menu,
 } from "lucide-react";
@@ -179,9 +181,13 @@ const clerkAppearance = {
     alertText: "text-[#f8f4fa]",
     logoBox: "h-16",
     logoImage: "h-14 w-auto",
-    formButtonPrimary: "bg-[#d9d7e6] text-[#171517] hover:bg-[#f1eff7] font-semibold",
+    formButtonPrimary:
+      "bg-[#d9d7e6] text-[#171517] hover:bg-[#f1eff7] font-semibold disabled:cursor-not-allowed disabled:opacity-45",
     formFieldInput:
       "border-[#45414e] bg-[#111116] text-[#f8f4fa] focus:border-[#d9d7e6]",
+    formFieldInputShowPasswordButton:
+      "text-[#f0d48a] hover:text-white focus-visible:text-white",
+    formFieldInputShowPasswordIcon: "text-[#f0d48a]",
     footerAction: "bg-transparent",
     dividerLine: "bg-[#45414e]",
     alert: "border-[#5a5663] bg-[#111116]",
@@ -214,6 +220,52 @@ function ClerkQueryClientCacheInvalidator() {
   }, [activeQueryClient, addListener]);
 
   return null;
+}
+
+function PasswordField({
+  label,
+  value,
+  onChange,
+  autoComplete,
+  minLength,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  autoComplete: string;
+  minLength?: number;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <label className="block text-sm">
+      <span>{label}</span>
+      <span className="relative mt-2 block">
+        <input
+          type={isVisible ? "text" : "password"}
+          autoComplete={autoComplete}
+          required
+          minLength={minLength}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 pr-12 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+        />
+        <button
+          type="button"
+          onClick={() => setIsVisible((current) => !current)}
+          aria-label={isVisible ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
+          title={isVisible ? "Hide password" : "Show password"}
+          className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#f0d48a] transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0d48a] focus-visible:ring-inset"
+        >
+          {isVisible ? (
+            <EyeOff className="h-5 w-5" aria-hidden="true" />
+          ) : (
+            <Eye className="h-5 w-5" aria-hidden="true" />
+          )}
+        </button>
+      </span>
+    </label>
+  );
 }
 
 function SignInPage() {
@@ -288,17 +340,12 @@ function SignInPage() {
               className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
             />
           </label>
-          <label className="block text-sm">
-            <span>Password</span>
-            <input
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
-            />
-          </label>
+          <PasswordField
+            label="Password"
+            autoComplete="current-password"
+            value={password}
+            onChange={setPassword}
+          />
           {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
           <button
             type="submit"
@@ -333,6 +380,8 @@ function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const passwordCanBeUpdated =
+    newPassword.length >= 15 && newPassword === confirmPassword;
 
   const clerkErrorMessage = (caughtError: unknown) => {
     const response = caughtError as {
@@ -410,6 +459,10 @@ function ForgotPasswordPage() {
 
     setError("");
     setMessage("");
+    if (newPassword.length < 15) {
+      setError("Your password must contain 15 or more characters.");
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError("Your passwords do not match.");
       return;
@@ -497,33 +550,25 @@ function ForgotPasswordPage() {
           </form>
         ) : step === "password" ? (
           <form onSubmit={updatePassword} className="mt-7 space-y-5">
-            <label className="block text-sm">
-              <span>New password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                required
-                value={newPassword}
-                onChange={(event) => setNewPassword(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
-              />
-            </label>
-            <label className="block text-sm">
-              <span>Confirm new password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
-              />
-            </label>
+            <PasswordField
+              label="New password"
+              autoComplete="new-password"
+              minLength={15}
+              value={newPassword}
+              onChange={setNewPassword}
+            />
+            <PasswordField
+              label="Confirm new password"
+              autoComplete="new-password"
+              minLength={15}
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+            />
             {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
+              disabled={isSubmitting || !passwordCanBeUpdated}
+              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isSubmitting ? "Updating password…" : "Update password"}
             </button>
@@ -560,6 +605,8 @@ function SignUpPage() {
   const sawSignedOut = useRef(false);
   const trackedCompletion = useRef(false);
   const isSubmitting = fetchStatus === "fetching";
+  const canCreateAccount =
+    password.length >= 15 && password === confirmPassword;
 
   const clerkErrorMessage = (caughtError: unknown) => {
     const response = caughtError as {
@@ -581,6 +628,10 @@ function SignUpPage() {
     setError("");
     setMessage("");
 
+    if (password.length < 15) {
+      setError("Your password must contain 15 or more characters.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Your passwords do not match.");
       return;
@@ -690,34 +741,26 @@ function SignUpPage() {
                 className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
               />
             </label>
-            <label className="block text-sm">
-              <span>Password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
-              />
-            </label>
-            <label className="block text-sm">
-              <span>Confirm password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
-              />
-            </label>
+            <PasswordField
+              label="Password"
+              autoComplete="new-password"
+              minLength={15}
+              value={password}
+              onChange={setPassword}
+            />
+            <PasswordField
+              label="Confirm password"
+              autoComplete="new-password"
+              minLength={15}
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+            />
             <div id="clerk-captcha" />
             {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
+              disabled={isSubmitting || !canCreateAccount}
+              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isSubmitting ? "Creating account…" : "Create account"}
             </button>

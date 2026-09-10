@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep password visibility controls legible on the dark authentication cards. */
+.glam-auth-video-shell button[aria-label*="show password" i],
+.glam-auth-video-shell button[aria-label*="hide password" i] {
+  color: #f0d48a !important;
+  opacity: 1 !important;
+}
+
+.glam-auth-video-shell button[aria-label*="show password" i]:hover,
+.glam-auth-video-shell button[aria-label*="hide password" i]:hover {
+  color: #ffffff !important;
+}
+
 /* LIGHT MODE - Warm cream aesthetic inspired by wellness design */
 :root {
   --button-outline: rgba(0,0,0, .08);
