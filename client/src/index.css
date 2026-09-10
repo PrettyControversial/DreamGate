@@ -2819,8 +2819,20 @@
 }
 
 .home-greeting-hero {
+  isolation: isolate;
   min-height: 12rem;
   background: #0e0c06;
+}
+
+.home-greeting-hero::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(5, 8, 7, 0.72), rgba(5, 8, 7, 0.2) 68%, rgba(5, 8, 7, 0.38)),
+    linear-gradient(180deg, rgba(5, 8, 7, 0.2), rgba(5, 8, 7, 0.45));
+  content: "";
+  pointer-events: none;
 }
 
 .home-greeting-video,

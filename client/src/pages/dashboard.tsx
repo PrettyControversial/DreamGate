@@ -24,6 +24,7 @@ import nightMapImage from "@assets/dreamgate_cards/night-map.webp";
 import dreamJournalAwaitsIcon from "@assets/dreamgate_icons/dream-journal-icon.webp";
 import mirrorPortalImage from "@assets/night-map-portal.webp";
 import greetingVideo from "@assets/dreamgate_backgrounds/good-evening-video.mp4";
+import afternoonBackgroundImage from "@assets/dreamgate_backgrounds/good-afternoon.webp";
 import tarotSymbol from "@assets/dreamgate_symbols/footer/54.webp";
 import {
   DreamGateFunctionSymbol,
@@ -409,18 +410,29 @@ function HeroSection({ celestial, isLoading, stats, currentStreak, longestStreak
   return (
     <div className="space-y-4">
       <div className="home-greeting-hero relative overflow-hidden rounded-2xl p-6">
-        <video
-          className="home-greeting-video"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          poster={mirrorPortalImage}
-          aria-hidden="true"
-        >
-          <source src={greetingVideo} type="video/mp4" />
-        </video>
+        {greeting === "Good afternoon" ? (
+          <img
+            className="home-greeting-image"
+            src={afternoonBackgroundImage}
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            fetchPriority="high"
+          />
+        ) : (
+          <video
+            className="home-greeting-video"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            poster={mirrorPortalImage}
+            aria-hidden="true"
+          >
+            <source src={greetingVideo} type="video/mp4" />
+          </video>
+        )}
         <div className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
