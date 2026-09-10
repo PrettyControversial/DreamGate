@@ -91,8 +91,8 @@ const allContent: ContentCard[] = [
   },
   {
     id: "meditation",
-    title: "Sound Healing",
-    description: "Binaural beats & frequencies",
+    title: "Guided Journey",
+    description: "Guided meditations for lucid dreaming, sleep, and emotional calm",
     icon: <DreamGateFunctionSymbol kind="sound-healing" className="h-7 w-7 brightness-0 invert" />,
     href: "/meditation",
     category: "Wellness",
