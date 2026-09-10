@@ -1,6 +1,11 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { Capacitor } from "@capacitor/core";
 
+// Native builds run from capacitor://localhost, so relative API requests would
+// otherwise be sent to the on-device WebView instead of the deployed backend.
+// Keep the environment variable as an override for staging or future domains.
+export const DEFAULT_NATIVE_API_BASE_URL = "https://dream-gate.replit.app";
+
 const rawConfiguredApiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").trim();
 let apiBaseConfigurationError = false;
 let configuredApiBaseUrl = "";
@@ -20,7 +25,9 @@ if (rawConfiguredApiBaseUrl) {
 }
 const isNativePlatform = Capacitor.isNativePlatform();
 export const API_BASE_URL = isNativePlatform
-  ? configuredApiBaseUrl
+  ? apiBaseConfigurationError
+    ? ""
+    : configuredApiBaseUrl || DEFAULT_NATIVE_API_BASE_URL
   : window.location.origin.replace(/\/+$/, "");
 type AuthTokenProvider = () => Promise<string | null>;
 let authTokenProvider: AuthTokenProvider | null = null;

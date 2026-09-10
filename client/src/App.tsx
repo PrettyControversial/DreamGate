@@ -3,11 +3,10 @@ import { Capacitor } from "@capacitor/core";
 import {
   ClerkProvider,
   Show,
-  SignIn,
-  SignUp,
   useAuth,
   useClerk,
   useSignIn,
+  useSignUp,
   useUser,
 } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
@@ -20,13 +19,18 @@ import {
   Link,
   useLocation,
 } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   CircleHelp,
   LogOut,
   Menu,
 } from "lucide-react";
-import { queryClient, setAuthTokenProvider } from "./lib/queryClient";
+import {
+  API_BASE_URL,
+  queryClient,
+  setAuthTokenProvider,
+} from "./lib/queryClient";
 import { trackEvent } from "@/lib/analytics";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -78,12 +82,33 @@ const Discover = lazy(() => import("@/pages/discover"));
 const Psyche = lazy(() => import("@/pages/psyche"));
 const HelpFaq = lazy(() => import("@/pages/help-faq"));
 
-const clerkPubKey = publishableKeyFromHost(
-  window.location.hostname,
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
+const isNativePlatform = Capacitor.isNativePlatform();
+const configuredClerkPubKey = (
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ?? ""
+).trim();
+const configuredClerkProxyUrl = (
+  import.meta.env.VITE_CLERK_PROXY_URL ?? ""
+).trim();
 
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+// A Capacitor app is served from capacitor://localhost. Deriving Clerk's key
+// from that hostname points ClerkJS at the nonexistent clerk.localhost host.
+// Native builds instead identify the Clerk instance by the deployed API host
+// and use its absolute Frontend API proxy. Both remain configurable for other
+// environments without requiring a local secret file for the production app.
+const nativeApiUrl = isNativePlatform && API_BASE_URL
+  ? new URL(API_BASE_URL)
+  : null;
+const clerkPubKey = isNativePlatform
+  ? configuredClerkPubKey || publishableKeyFromHost(nativeApiUrl?.hostname ?? "")
+  : publishableKeyFromHost(
+      window.location.hostname,
+      configuredClerkPubKey || undefined,
+    );
+const clerkProxyUrl = configuredClerkProxyUrl || (
+  nativeApiUrl
+    ? new URL("/api/__clerk", nativeApiUrl).toString().replace(/\/$/, "")
+    : undefined
+);
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function stripBase(path: string): string {
@@ -96,6 +121,9 @@ function normalizeClerkRoute(path: string): string {
   if (Capacitor.isNativePlatform() && /^capacitor:/i.test(path)) {
     try {
       const nativeUrl = new URL(path);
+      if (nativeUrl.hash.startsWith("#/")) {
+        return stripBase(nativeUrl.hash.slice(1));
+      }
       return stripBase(
         `${nativeUrl.pathname}${nativeUrl.search}${nativeUrl.hash}` || "/",
       );
@@ -520,9 +548,107 @@ function ForgotPasswordPage() {
 }
 
 function SignUpPage() {
+  const { signUp, fetchStatus } = useSignUp();
   const { isLoaded, isSignedIn } = useAuth();
+  const [step, setStep] = useState<"details" | "verification">("details");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const sawSignedOut = useRef(false);
   const trackedCompletion = useRef(false);
+  const isSubmitting = fetchStatus === "fetching";
+
+  const clerkErrorMessage = (caughtError: unknown) => {
+    const response = caughtError as {
+      longMessage?: string;
+      message?: string;
+      errors?: Array<{ longMessage?: string; message?: string }>;
+    };
+    return (
+      response.longMessage ||
+      response.message ||
+      response.errors?.[0]?.longMessage ||
+      response.errors?.[0]?.message ||
+      "We couldn't complete that request. Please try again."
+    );
+  };
+
+  const createAccount = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (password !== confirmPassword) {
+      setError("Your passwords do not match.");
+      return;
+    }
+
+    try {
+      const created = await signUp.password({ emailAddress, password });
+      if (created.error) {
+        setError(clerkErrorMessage(created.error));
+        return;
+      }
+
+      if (signUp.status === "complete") {
+        const finalized = await signUp.finalize();
+        if (finalized.error) setError(clerkErrorMessage(finalized.error));
+        return;
+      }
+
+      const sent = await signUp.verifications.sendEmailCode();
+      if (sent.error) {
+        setError(clerkErrorMessage(sent.error));
+        return;
+      }
+
+      setStep("verification");
+      setMessage("Check your email for a six-digit verification code.");
+    } catch (caughtError) {
+      setError(clerkErrorMessage(caughtError));
+    }
+  };
+
+  const verifyEmail = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+
+    try {
+      const verified = await signUp.verifications.verifyEmailCode({ code });
+      if (verified.error) {
+        setError(clerkErrorMessage(verified.error));
+        return;
+      }
+
+      if (signUp.status !== "complete") {
+        const missing = signUp.missingFields
+          .map((field) => field.replaceAll("_", " "))
+          .join(", ");
+        setError(
+          missing
+            ? `Your email was verified, but Clerk still needs: ${missing}.`
+            : "Your email was verified, but the account could not be completed.",
+        );
+        return;
+      }
+
+      const finalized = await signUp.finalize();
+      if (finalized.error) setError(clerkErrorMessage(finalized.error));
+    } catch (caughtError) {
+      setError(clerkErrorMessage(caughtError));
+    }
+  };
+
+  const restartSignUp = async () => {
+    await signUp.reset();
+    setStep("details");
+    setCode("");
+    setError("");
+    setMessage("");
+  };
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -540,11 +666,103 @@ function SignUpPage() {
 
   return (
     <AuthPageLayout>
-      <SignUp
-        routing="path"
-        path={`${basePath}/sign-up`}
-        signInUrl={`${basePath}/sign-in`}
-      />
+      <div className="auth-video-card mx-auto w-[440px] max-w-full overflow-hidden p-8 text-[#f8f4fa]">
+        <img src={dreamgateLogo} alt="DreamGate" className="mx-auto h-14 w-auto" />
+        <div className="mt-6 text-center">
+          <h1 className="font-display text-2xl">Begin your DreamGate journey</h1>
+          <p className="mt-1 text-sm text-[#aca8b4]">
+            {step === "details"
+              ? "Create an account to keep your reflections private"
+              : `Enter the code sent to ${emailAddress}`}
+          </p>
+        </div>
+
+        {step === "details" ? (
+          <form onSubmit={createAccount} className="mt-7 space-y-5">
+            <label className="block text-sm">
+              <span>Email address</span>
+              <input
+                type="email"
+                autoComplete="email"
+                required
+                value={emailAddress}
+                onChange={(event) => setEmailAddress(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+              />
+            </label>
+            <label className="block text-sm">
+              <span>Password</span>
+              <input
+                type="password"
+                autoComplete="new-password"
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+              />
+            </label>
+            <label className="block text-sm">
+              <span>Confirm password</span>
+              <input
+                type="password"
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+              />
+            </label>
+            <div id="clerk-captcha" />
+            {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
+            >
+              {isSubmitting ? "Creating account…" : "Create account"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={verifyEmail} className="mt-7 space-y-5">
+            <label className="block text-sm">
+              <span>Verification code</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                required
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-center tracking-[0.35em] text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+              />
+            </label>
+            {message && <p className="text-sm text-emerald-300" role="status">{message}</p>}
+            {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
+            >
+              {isSubmitting ? "Verifying…" : "Verify email"}
+            </button>
+            <button
+              type="button"
+              onClick={restartSignUp}
+              disabled={isSubmitting}
+              className="w-full text-sm text-[#d9d7e6] disabled:opacity-60"
+            >
+              Use a different email
+            </button>
+          </form>
+        )}
+
+        <div className="mt-6 text-center text-sm text-[#aca8b4]">
+          Already have an account?{" "}
+          <Link href="/sign-in" className="text-[#d9d7e6]">
+            Sign in
+          </Link>
+        </div>
+      </div>
     </AuthPageLayout>
   );
 }
@@ -869,6 +1087,7 @@ function ClerkProviderWithRoutes() {
     <ClerkProvider
       publishableKey={clerkPubKey}
       proxyUrl={clerkProxyUrl}
+      standardBrowser={!isNativePlatform}
       appearance={clerkAppearance}
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
@@ -901,7 +1120,6 @@ function ClerkProviderWithRoutes() {
 
 function AuthenticatedQueryProvider() {
   const { getToken, isLoaded } = useAuth();
-  const isNativePlatform = Capacitor.isNativePlatform();
   const [authTransportReady, setAuthTransportReady] = useState(!isNativePlatform);
 
   useEffect(() => {
@@ -942,7 +1160,10 @@ function AuthenticatedQueryProvider() {
 
 function App() {
   return (
-    <WouterRouter base={basePath}>
+    <WouterRouter
+      base={basePath}
+      hook={isNativePlatform ? useHashLocation : undefined}
+    >
       <ClerkProviderWithRoutes />
     </WouterRouter>
   );
