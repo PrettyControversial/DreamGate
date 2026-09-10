@@ -597,7 +597,7 @@ export default function Dashboard() {
     { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar" },
     { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot" },
     { title: "Night Map", subtitle: "Track patterns", image: nightMapImage, href: "/night-map", testId: "card-night-map" },
-    { title: "Rest & Restore", subtitle: "Sound healing", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
+    { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
   ];
 
   const dreamsCards = [
@@ -608,7 +608,7 @@ export default function Dashboard() {
 
   const wellnessCards = [
     { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot-2" },
-    { title: "Rest & Restore", subtitle: "Sound healing", image: restRestoreImage, href: "/meditation", testId: "card-meditation-2" },
+    { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation-2" },
   ];
 
   const exploreCards = [
