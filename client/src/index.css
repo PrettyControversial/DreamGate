@@ -795,6 +795,332 @@
   }
 }
 
+.dream-journey-page {
+  --journey-line: color-mix(in srgb, var(--meditation-ink) 22%, transparent);
+  --journey-accent: hsl(var(--gold));
+}
+
+.dream-journey-header {
+  margin-bottom: 2.75rem;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.dream-journey-headphones {
+  color: var(--meditation-ink);
+}
+
+.dream-journey-path {
+  position: relative;
+  padding-left: 2.45rem;
+}
+
+.dream-journey-path::before {
+  position: absolute;
+  top: 0.6rem;
+  bottom: 0.85rem;
+  left: 0.58rem;
+  width: 1px;
+  background: var(--journey-line);
+  content: "";
+}
+
+.dream-journey-step {
+  position: relative;
+  margin-bottom: 2.9rem;
+}
+
+.dream-journey-step:last-child {
+  margin-bottom: 0;
+}
+
+.dream-journey-marker {
+  position: absolute;
+  top: 0.05rem;
+  left: -2.45rem;
+  z-index: 1;
+  display: inline-flex;
+  width: 1.2rem;
+  height: 1.2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--meditation-ink);
+  border-radius: 999px;
+  background: #f6f3ec;
+  color: var(--journey-accent);
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.dream-journey-marker span {
+  display: block;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: var(--meditation-muted);
+}
+
+.dream-journey-marker svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  stroke-width: 2.5;
+}
+
+.dream-journey-step.is-complete .dream-journey-marker {
+  border-color: var(--journey-accent);
+  background: color-mix(in srgb, var(--journey-accent) 13%, #f6f3ec);
+}
+
+.dream-journey-step.is-complete .dream-journey-eyebrow,
+.dream-journey-step.is-complete .dream-journey-step-title {
+  color: var(--journey-accent);
+}
+
+.dream-journey-eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--meditation-muted);
+  font-family: var(--font-accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dream-journey-step-title {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.dream-journey-description {
+  max-width: 42rem;
+  margin: 0 0 1rem;
+  color: var(--meditation-muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.dream-journey-reflection {
+  max-width: 32rem;
+}
+
+.dream-journey-reflection label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--meditation-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dream-journey-reflection input {
+  width: 100%;
+  min-height: 2.65rem;
+  border: 1px solid color-mix(in srgb, var(--meditation-ink) 28%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--meditation-ink) 4%, transparent);
+  padding: 0.7rem 0.8rem;
+  color: var(--meditation-ink);
+  font: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.dream-journey-reflection input::placeholder {
+  color: var(--meditation-muted);
+}
+
+.dream-journey-reflection input:focus {
+  border-color: var(--journey-accent);
+  background: transparent;
+}
+
+.dream-journey-audio {
+  max-width: 38rem;
+  border-top: 1px solid color-mix(in srgb, var(--meditation-ink) 22%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--meditation-ink) 22%, transparent);
+  padding: 0.8rem 0;
+}
+
+.dream-journey-audio__header,
+.dream-journey-audio__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dream-journey-audio__header {
+  justify-content: space-between;
+  color: var(--meditation-muted);
+  font-size: 0.78rem;
+}
+
+.dream-journey-audio__controls {
+  margin-top: 0.65rem;
+}
+
+.dream-journey-play {
+  display: inline-flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--meditation-ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--meditation-ink);
+  cursor: pointer;
+}
+
+.dream-journey-play:hover,
+.dream-journey-play:focus-visible {
+  border-color: var(--journey-accent);
+  color: var(--journey-accent);
+}
+
+.dream-journey-play svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.dream-journey-audio__range {
+  width: 100%;
+  accent-color: var(--journey-accent);
+}
+
+.dream-journey-audio__time {
+  min-width: 2.4rem;
+  color: var(--meditation-muted);
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.dream-journey-breath {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 28rem;
+  padding: 1.25rem 0 0.25rem;
+}
+
+.dream-journey-breath__shape {
+  display: flex;
+  width: 7rem;
+  height: 7rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--journey-accent);
+  border-radius: 1rem;
+  color: var(--meditation-ink);
+  transform: scale(0.72);
+  transition: transform 4s linear, border-color 4s linear;
+}
+
+.dream-journey-breath__shape.is-expanded {
+  border-color: var(--journey-accent);
+  transform: scale(1);
+}
+
+.dream-journey-breath__shape span {
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.dream-journey-breath__count {
+  margin: 0.4rem 0 0.9rem;
+  color: var(--meditation-muted);
+  font-size: 0.76rem;
+}
+
+.dream-journey-secondary-button,
+.dream-journey-reset {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--meditation-ink) 38%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.55rem 1.1rem;
+  color: var(--meditation-ink);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.dream-journey-secondary-button:hover,
+.dream-journey-secondary-button:focus-visible,
+.dream-journey-reset:hover,
+.dream-journey-reset:focus-visible {
+  border-color: var(--journey-accent);
+  color: var(--journey-accent);
+}
+
+.dream-journey-secondary-button svg,
+.dream-journey-reset svg,
+.dream-journey-save-note svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.dream-journey-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.15rem;
+  border-top: 1px solid var(--journey-line);
+  margin-top: 2.5rem;
+  padding: 1.5rem 0 1rem;
+  text-align: center;
+}
+
+.dream-journey-save-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--meditation-muted);
+  font-size: 0.76rem;
+}
+
+.dream-journey-reset {
+  border-color: var(--journey-line);
+  color: var(--meditation-muted);
+}
+
+@media (max-width: 480px) {
+  .dream-journey-page {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+
+  .dream-journey-header {
+    margin-bottom: 2.25rem;
+  }
+
+  .dream-journey-path {
+    padding-left: 2rem;
+  }
+
+  .dream-journey-marker {
+    left: -2rem;
+  }
+
+  .dream-journey-audio__controls {
+    gap: 0.55rem;
+  }
+
+  .dream-journey-audio__time {
+    min-width: 2.1rem;
+  }
+}
+
 /* Shared Discover-derived system for every authenticated DreamGate surface.
    Welcome/auth media and the post-login intro intentionally live outside these rules. */
 .dreamgate-app-shell {
