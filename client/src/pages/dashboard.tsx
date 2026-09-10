@@ -409,7 +409,11 @@ function HeroSection({ celestial, isLoading, stats, currentStreak, longestStreak
   
   return (
     <div className="space-y-4">
-      <div className="home-greeting-hero relative overflow-hidden rounded-2xl p-6">
+      <div
+        className={`home-greeting-hero relative overflow-hidden rounded-2xl p-6${
+          greeting === "Good afternoon" ? " home-greeting-hero--afternoon" : ""
+        }`}
+      >
         {greeting === "Good afternoon" ? (
           <img
             className="home-greeting-image"

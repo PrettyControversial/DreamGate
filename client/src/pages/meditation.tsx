@@ -7,10 +7,9 @@ import {
   trackEvent,
 } from "@/lib/analytics";
 
-import dreamSymbolVideo from "@assets/dreamgate_meditations/meeting-the-dream-symbol.mp4";
-import shadowSelfVideo from "@assets/dreamgate_meditations/meeting-the-shadow-self.mp4";
-import guideVideo from "@assets/dreamgate_meditations/meeting-your-guide.mp4";
-import releasingDayVideo from "@assets/dreamgate_meditations/releasing-the-day.mp4";
+import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.mp3";
+import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.mp3";
+import guideAudio from "@assets/dreamgate_meditations/meeting-your-guide.mp3";
 import meditationSymbolRelief from "@assets/meditation-symbol-relief.webp";
 
 interface MeditationTrack {
@@ -18,7 +17,7 @@ interface MeditationTrack {
   title: string;
   description: string;
   duration: string;
-  videoFile: string;
+  audioFile: string;
   icon: typeof Moon;
 }
 
@@ -27,39 +26,31 @@ const meditations: MeditationTrack[] = [
     id: "meeting-the-dream-symbol",
     title: "Meeting the Dream Symbol",
     description: "A guided journey for listening to the symbols that visit your dreams.",
-    duration: "9:14",
-    videoFile: dreamSymbolVideo,
+    duration: "9:10",
+    audioFile: dreamSymbolAudio,
     icon: Heart,
   },
   {
     id: "meeting-the-shadow-self",
     title: "Meeting the Shadow Self",
     description: "A gentle practice for meeting hidden feelings with curiosity and care.",
-    duration: "5:04",
-    videoFile: shadowSelfVideo,
+    duration: "5:00",
+    audioFile: shadowSelfAudio,
     icon: Sparkles,
   },
   {
     id: "meeting-your-guide",
     title: "Meeting Your Guide",
     description: "A guided meditation for connecting with your inner wisdom and intuition.",
-    duration: "10:04",
-    videoFile: guideVideo,
+    duration: "10:00",
+    audioFile: guideAudio,
     icon: Waves,
-  },
-  {
-    id: "releasing-the-day",
-    title: "Releasing the Day",
-    description: "A calming evening journey for letting go, settling down, and resting deeply.",
-    duration: "7:06",
-    videoFile: releasingDayVideo,
-    icon: Moon,
   },
 ];
 
 export default function Meditation() {
   const [activeMeditationId, setActiveMeditationId] = useState<string | null>(null);
-  const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     return () => {
@@ -68,11 +59,11 @@ export default function Meditation() {
   }, []);
 
   const stopMeditation = () => {
-    Object.values(videoRefs.current).forEach((video) => {
-      if (!video) return;
-      video.pause();
-      video.currentTime = 0;
-    });
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
     setActiveMeditationId(null);
   };
 
@@ -84,34 +75,41 @@ export default function Meditation() {
 
     stopMeditation();
 
-    const video = videoRefs.current[meditation.id];
-    if (!video) return;
-
+    const audio = new Audio(meditation.audioFile);
+    audio.preload = "metadata";
+    audio.onended = () => {
+      trackEvent("meditation_completed", {
+        meditation_id: meditation.id,
+        tool_id: "meditation",
+      });
+      trackDiscoverToolCompleted(
+        ["meditation", "meditation-101"],
+        "meditation_completed",
+      );
+      audioRef.current = null;
+      setActiveMeditationId(null);
+    };
+    audio.onerror = () => {
+      audioRef.current = null;
+      setActiveMeditationId(null);
+    };
+    audioRef.current = audio;
     setActiveMeditationId(meditation.id);
 
-    void video
+    void audio
       .play()
       .then(() => {
-        trackEvent("meditation_started", {
-          meditation_id: meditation.id,
-          tool_id: "meditation",
-        });
+        if (audioRef.current === audio) {
+          trackEvent("meditation_started", {
+            meditation_id: meditation.id,
+            tool_id: "meditation",
+          });
+        }
       })
       .catch(() => {
+        audioRef.current = null;
         setActiveMeditationId(null);
       });
-  };
-
-  const handleMeditationEnded = (meditation: MeditationTrack) => {
-    trackEvent("meditation_completed", {
-      meditation_id: meditation.id,
-      tool_id: "meditation",
-    });
-    trackDiscoverToolCompleted(
-      ["meditation", "meditation-101"],
-      "meditation_completed",
-    );
-    setActiveMeditationId(null);
   };
 
   return (
@@ -159,18 +157,6 @@ export default function Meditation() {
                   className="meditation-text-panel overflow-hidden"
                   data-testid={`card-meditation-${meditation.id}`}
                 >
-                  <video
-                    ref={(video) => {
-                      videoRefs.current[meditation.id] = video;
-                    }}
-                    className="aspect-video w-full bg-black object-cover"
-                    controls
-                    playsInline
-                    preload="none"
-                    src={meditation.videoFile}
-                    onEnded={() => handleMeditationEnded(meditation)}
-                    aria-label={`${meditation.title} video`}
-                  />
                   <CardContent className="flex h-full items-stretch p-0">
                     <div className="meditation-panel-icon flex w-16 shrink-0 items-center justify-center">
                       <Icon className="h-5 w-5" />

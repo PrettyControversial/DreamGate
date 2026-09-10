@@ -2835,6 +2835,12 @@
   pointer-events: none;
 }
 
+.home-greeting-hero--afternoon::after {
+  background:
+    linear-gradient(90deg, rgba(5, 8, 7, 0.38), rgba(5, 8, 7, 0.08) 68%, rgba(5, 8, 7, 0.18)),
+    linear-gradient(180deg, rgba(5, 8, 7, 0.04), rgba(5, 8, 7, 0.2));
+}
+
 .home-greeting-video,
 .home-greeting-image {
   position: absolute;
@@ -2844,6 +2850,11 @@
   object-fit: cover;
   object-position: center 47%;
   pointer-events: none;
+}
+
+.home-greeting-hero--afternoon .home-greeting-image {
+  object-position: center 30%;
+  filter: brightness(1.12) saturate(0.94) contrast(0.96);
 }
 
 .home-dashboard .home-capsule-button,
