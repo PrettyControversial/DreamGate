@@ -706,7 +706,7 @@ export default function Dashboard() {
                       <DreamGateFunctionSymbol kind="home" className="h-7 w-7" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground">Daily Meditation</h3>
+                    <h3 className="font-semibold text-foreground">Guided Journey</h3>
                     <p className="text-sm text-muted-foreground">5 min sound healing session</p>
                   </div>
                 </div>

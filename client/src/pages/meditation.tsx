@@ -121,7 +121,7 @@ export default function Meditation() {
               Rest & Restore
             </p>
             <h1 className="font-display text-4xl tracking-tight md:text-5xl">
-              Daily Meditation
+              Guided Journey
             </h1>
             <p className="meditation-muted text-sm">
               Choose a practice and make room for what is beneath the noise.
