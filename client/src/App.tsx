@@ -199,11 +199,13 @@ function PasswordField({
   value,
   onChange,
   autoComplete,
+  minLength,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   autoComplete: string;
+  minLength?: number;
 }) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -215,6 +217,7 @@ function PasswordField({
           type={isVisible ? "text" : "password"}
           autoComplete={autoComplete}
           required
+          minLength={minLength}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           className="w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 pr-12 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
@@ -349,6 +352,8 @@ function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const passwordCanBeUpdated =
+    newPassword.length >= 15 && newPassword === confirmPassword;
 
   const clerkErrorMessage = (caughtError: unknown) => {
     const response = caughtError as {
@@ -426,6 +431,10 @@ function ForgotPasswordPage() {
 
     setError("");
     setMessage("");
+    if (newPassword.length < 15) {
+      setError("Your password must contain 15 or more characters.");
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError("Your passwords do not match.");
       return;
@@ -513,28 +522,25 @@ function ForgotPasswordPage() {
           </form>
         ) : step === "password" ? (
           <form onSubmit={updatePassword} className="mt-7 space-y-5">
-            <label className="block text-sm">
-              <span>New password</span>
-              <PasswordField
-                label="New password"
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={setNewPassword}
-              />
-            </label>
-            <label className="block text-sm">
-              <PasswordField
-                label="Confirm new password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={setConfirmPassword}
-              />
-            </label>
+            <PasswordField
+              label="New password"
+              autoComplete="new-password"
+              minLength={15}
+              value={newPassword}
+              onChange={setNewPassword}
+            />
+            <PasswordField
+              label="Confirm new password"
+              autoComplete="new-password"
+              minLength={15}
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+            />
             {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
+              disabled={isSubmitting || !passwordCanBeUpdated}
+              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isSubmitting ? "Updating password…" : "Update password"}
             </button>
@@ -579,7 +585,28 @@ function SignUpPage() {
 
   return (
     <AuthPageLayout>
-      <div className="glam-signup-password-guard">
+      <div
+        className="glam-signup-password-guard"
+        onSubmitCapture={(event) => {
+          if (!isClerkSignUpStepValid(event.currentTarget)) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
+        onClickCapture={(event) => {
+          const button = (event.target as HTMLElement).closest("button");
+          if (!button) return;
+
+          const label = button.getAttribute("aria-label")?.toLowerCase() ?? "";
+          const isPasswordToggle =
+            label.includes("show password") || label.includes("hide password");
+
+          if (!isPasswordToggle && !isClerkSignUpStepValid(event.currentTarget)) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
+      >
         <SignUp
           routing="path"
           path={`${basePath}/sign-up`}
@@ -591,22 +618,66 @@ function SignUpPage() {
   );
 }
 
+function isClerkSignUpStepValid(container: Element) {
+  const emailInputs = Array.from(
+    container.querySelectorAll<HTMLInputElement>('input[type="email"]'),
+  );
+  const passwordInputs = Array.from(
+    new Set(
+      container.querySelectorAll<HTMLInputElement>(
+        'input[type="password"], input[name="password"], input[autocomplete="new-password"]',
+      ),
+    ),
+  );
+
+  const emailsAreValid =
+    emailInputs.length === 0 ||
+    emailInputs.every(
+      (input) => input.value.trim().length > 0 && input.checkValidity(),
+    );
+  const passwordsAreValid =
+    passwordInputs.length === 0 ||
+    passwordInputs.every(
+      (input) => input.value.length >= 15 && input.checkValidity(),
+    );
+
+  return emailsAreValid && passwordsAreValid;
+}
+
 function ClerkPasswordValidationGuard() {
   useEffect(() => {
     const updatePasswordButtonState = () => {
-      document.querySelectorAll("form").forEach((form) => {
+      document
+        .querySelectorAll<HTMLElement>(".glam-signup-password-guard")
+        .forEach((container) => {
         const passwordInputs = Array.from(
-          form.querySelectorAll<HTMLInputElement>('input[type="password"]'),
+          container.querySelectorAll<HTMLInputElement>(
+            'input[type="password"], input[name="password"], input[autocomplete="new-password"]',
+          ),
         );
-        const submitButton = form.querySelector<HTMLButtonElement>(
-          'button[type="submit"]',
-        );
+        const submitButton =
+          container.querySelector<HTMLButtonElement>(
+            'button[type="submit"], button[data-localization-key^="formButtonPrimary"], .cl-formButtonPrimary',
+          ) ??
+          Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find(
+            (button) => {
+              const label = button.getAttribute("aria-label")?.toLowerCase() ?? "";
+              return (
+                !label.includes("show password") &&
+                !label.includes("hide password")
+              );
+            },
+          );
 
-        if (!passwordInputs.length || !submitButton) return;
+        if (!passwordInputs.length) {
+          container.dataset.stepValid = "true";
+          return;
+        }
 
-        const passwordIsValid = passwordInputs.every(
-          (input) => input.value.length >= 15 && input.checkValidity(),
-        );
+        const passwordIsValid = isClerkSignUpStepValid(container);
+        container.dataset.stepValid = passwordIsValid ? "true" : "false";
+
+        if (!submitButton) return;
 
         if (!passwordIsValid) {
           submitButton.disabled = true;
@@ -617,7 +688,7 @@ function ClerkPasswordValidationGuard() {
           delete submitButton.dataset.dreamgatePasswordGuard;
           submitButton.removeAttribute("aria-disabled");
         }
-      });
+        });
     };
 
     const observer = new MutationObserver(updatePasswordButtonState);
