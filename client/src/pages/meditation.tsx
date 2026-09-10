@@ -126,6 +126,9 @@ export default function Meditation() {
             <p className="meditation-muted text-sm">
               Choose a practice and make room for what is beneath the noise.
             </p>
+            <p className="meditation-muted text-sm font-medium">
+              Headphones are recommended for maximum benefit.
+            </p>
           </div>
           <img
             className="meditation-header__object"
