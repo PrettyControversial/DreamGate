@@ -6,6 +6,8 @@ import { trackDiscoverToolCompleted, trackEvent } from "@/lib/analytics";
 import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.mp3";
 import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.mp3";
 import deepReturnAudio from "@assets/dreamgate_meditations/the-deep-return.mp3";
+import settleBreathAudio from "@assets/dreamgate_meditations/settle-the-breath.mp3";
+import meditationSymbolRelief from "@assets/meditation-symbol-relief.webp";
 
 type JourneyStepId = "guide" | "shadow" | "symbol" | "breath";
 
@@ -61,6 +63,9 @@ const journeySteps: JourneyStep[] = [
     title: "Settle the Breath",
     description:
       "Inhale for four. Hold for four. Exhale for four. Hold for four. Let the shape guide the pace.",
+    audioFile: settleBreathAudio,
+    audioLabel: "Settle the Breath",
+    duration: "6:04",
   },
 ];
 
@@ -221,17 +226,25 @@ export default function Meditation() {
   return (
     <main className="meditation-page dream-journey-page min-h-screen px-4 py-8 md:px-8 md:py-10">
       <div className="mx-auto max-w-3xl">
-        <header className="meditation-header dream-journey-header space-y-3">
-          <p className="meditation-kicker text-xs uppercase tracking-[0.28em]">Guided Journey</p>
-          <h1 className="font-display text-4xl tracking-tight md:text-5xl">Dream Journey</h1>
-          <p className="meditation-muted max-w-xl text-sm leading-relaxed">
-            A short practice for the space between waking and sleep — a guide, a shadow, a symbol,
-            and a way to settle the breath.
-          </p>
-          <p className="dream-journey-headphones text-sm font-medium">
-            <Headphones aria-hidden="true" className="mr-2 inline-block h-4 w-4" />
-            Headphones are recommended for maximum benefit.
-          </p>
+        <header className="meditation-header meditation-header--object dream-journey-header">
+          <div className="meditation-header__copy space-y-3">
+            <p className="meditation-kicker text-xs uppercase tracking-[0.28em]">Guided Journey</p>
+            <h1 className="font-display text-4xl tracking-tight md:text-5xl">Dream Journey</h1>
+            <p className="meditation-muted max-w-xl text-sm leading-relaxed">
+              A short practice for the space between waking and sleep — a guide, a shadow, a symbol,
+              and a way to settle the breath.
+            </p>
+            <p className="dream-journey-headphones text-sm font-medium">
+              <Headphones aria-hidden="true" className="mr-2 inline-block h-4 w-4" />
+              Headphones are recommended for maximum benefit.
+            </p>
+          </div>
+          <img
+            className="meditation-header__object"
+            src={meditationSymbolRelief}
+            alt=""
+            aria-hidden="true"
+          />
         </header>
 
         <section className="dream-journey-path" aria-label="Dream Journey steps">
