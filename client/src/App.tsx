@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import {
   ClerkProvider,
@@ -22,6 +22,8 @@ import {
 import { useHashLocation } from "wouter/use-hash-location";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
+  AlertCircle,
+  CheckCircle2,
   CircleHelp,
   Eye,
   EyeOff,
@@ -49,6 +51,10 @@ import {
   deactivateLunarNotificationUser,
   supportsLunarNotifications,
 } from "@/lib/lunar-notifications";
+import {
+  persistSecureClerkClientToken,
+  readSecureClerkClientToken,
+} from "@/lib/clerk-secure-storage";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -85,6 +91,82 @@ const Psyche = lazy(() => import("@/pages/psyche"));
 const HelpFaq = lazy(() => import("@/pages/help-faq"));
 
 const isNativePlatform = Capacitor.isNativePlatform();
+
+type ClerkNativeRequestInit = {
+  credentials?: RequestCredentials;
+  headers?: HeadersInit;
+  url?: URL;
+};
+
+type ClerkNativeResponse = {
+  headers?: Headers;
+};
+
+type ClerkNativeHookWindow = Window & {
+  __internal_onBeforeRequest?: (
+    request: ClerkNativeRequestInit,
+  ) => boolean | void | Promise<boolean | void>;
+  __internal_onAfterResponse?: (
+    request: ClerkNativeRequestInit,
+    response: ClerkNativeResponse,
+  ) => boolean | void | Promise<boolean | void>;
+};
+
+// Clerk's non-browser mode deliberately skips browser CAPTCHA rendering. Its
+// Native API still needs each request identified as native and authenticated
+// with the rotating client token returned in the Authorization response
+// header. @clerk/expo normally installs these hooks; Capacitor uses
+// @clerk/react, so the WebView must install the equivalent transport adapter.
+// Persist the rotating client token in the iOS Keychain. This lets Clerk
+// restore both the session and the device-trust state after a cold launch
+// without exposing the credential to localStorage or the bundled web assets.
+let clerkClientToken = "";
+const clerkNativeTokenReady = isNativePlatform
+  ? readSecureClerkClientToken()
+      .then((storedToken) => {
+        clerkClientToken = storedToken;
+      })
+      .catch((error) => {
+        console.warn("Unable to restore the secure Clerk session.", error);
+      })
+  : Promise.resolve();
+
+if (isNativePlatform) {
+  const clerkWindow = window as ClerkNativeHookWindow;
+  const previousBeforeRequest = clerkWindow.__internal_onBeforeRequest;
+  const previousAfterResponse = clerkWindow.__internal_onAfterResponse;
+
+  clerkWindow.__internal_onBeforeRequest = async (request) => {
+    await clerkNativeTokenReady;
+
+    const previousResult = await previousBeforeRequest?.(request);
+    if (previousResult === false) return false;
+
+    request.credentials = "omit";
+    request.url?.searchParams.set("_is_native", "1");
+
+    const headers = new Headers(request.headers);
+    headers.set("authorization", clerkClientToken);
+    headers.set("x-mobile", "1");
+    headers.set("x-capacitor-platform", Capacitor.getPlatform());
+    request.headers = headers;
+  };
+
+  clerkWindow.__internal_onAfterResponse = async (request, response) => {
+    const nextClientToken = response.headers?.get("authorization");
+    if (nextClientToken && nextClientToken !== clerkClientToken) {
+      clerkClientToken = nextClientToken;
+      try {
+        await persistSecureClerkClientToken(nextClientToken);
+      } catch (error) {
+        console.warn("Unable to persist the secure Clerk session.", error);
+      }
+    }
+
+    return previousAfterResponse?.(request, response);
+  };
+}
+
 const configuredClerkPubKey = (
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ?? ""
 ).trim();
@@ -228,141 +310,393 @@ function PasswordField({
   onChange,
   autoComplete,
   minLength,
+  feedback,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   autoComplete: string;
   minLength?: number;
+  feedback?: {
+    message: string;
+    tone: "neutral" | "error" | "success";
+  };
 }) {
   const [isVisible, setIsVisible] = useState(false);
+  const fieldId = useId();
+  const feedbackId = `${fieldId}-feedback`;
+  const hasError = feedback?.tone === "error";
+  const hasSuccess = feedback?.tone === "success";
 
   return (
-    <label className="block text-sm">
-      <span>{label}</span>
+    <div className="block text-sm">
+      <label htmlFor={fieldId}>{label}</label>
       <span className="relative mt-2 block">
         <input
+          id={fieldId}
           type={isVisible ? "text" : "password"}
           autoComplete={autoComplete}
+          autoCapitalize="none"
+          spellCheck={false}
           required
           minLength={minLength}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 pr-12 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+          aria-describedby={feedback ? feedbackId : undefined}
+          aria-invalid={hasError || undefined}
+          className={`w-full rounded-xl border bg-[#111116] px-4 py-3 pr-14 text-[#f8f4fa] outline-none transition-colors ${
+            hasError
+              ? "border-red-400 focus:border-red-300"
+              : hasSuccess
+                ? "border-emerald-500 focus:border-emerald-400"
+                : "border-[#45414e] focus:border-[#d9d7e6]"
+          }`}
         />
         <button
           type="button"
           onClick={() => setIsVisible((current) => !current)}
           aria-label={isVisible ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
+          aria-pressed={isVisible}
           title={isVisible ? "Hide password" : "Show password"}
-          className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#f0d48a] transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0d48a] focus-visible:ring-inset"
+          className="absolute inset-y-0 right-2 flex w-10 items-center justify-center bg-transparent text-[#77727f] transition-colors hover:text-[#d9d7e6] focus-visible:outline-none focus-visible:text-[#d9d7e6]"
         >
           {isVisible ? (
-            <EyeOff className="h-5 w-5" aria-hidden="true" />
+            <EyeOff className="h-4 w-4" aria-hidden="true" />
           ) : (
-            <Eye className="h-5 w-5" aria-hidden="true" />
+            <Eye className="h-4 w-4" aria-hidden="true" />
           )}
         </button>
       </span>
-    </label>
+      {feedback && (
+        <p
+          id={feedbackId}
+          className={`mt-2 flex items-start gap-2 text-sm ${
+            hasError
+              ? "text-red-400"
+              : hasSuccess
+                ? "text-emerald-400"
+                : "text-[#aca8b4]"
+          }`}
+          role={hasError ? "alert" : "status"}
+        >
+          {hasError ? (
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          ) : hasSuccess ? (
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          ) : (
+            <CircleHelp className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          )}
+          <span>{feedback.message}</span>
+        </p>
+      )}
+    </div>
   );
 }
 
 function SignInPage() {
   const { signIn, fetchStatus } = useSignIn();
+  const { isLoaded, isSignedIn } = useAuth();
+  const [, setLocation] = useLocation();
+  const [step, setStep] = useState<"credentials" | "verification">(
+    "credentials",
+  );
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationStrategy, setVerificationStrategy] = useState<
+    "email_code" | "phone_code" | null
+  >(null);
+  const [verificationDestination, setVerificationDestination] = useState("");
+  const [verificationPurpose, setVerificationPurpose] = useState<
+    "device" | "account"
+  >("device");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const isSubmitting = fetchStatus === "fetching";
+
+  const clerkErrorMessage = (caughtError: unknown) => {
+    const response = caughtError as {
+      longMessage?: string;
+      message?: string;
+      errors?: Array<{ longMessage?: string; message?: string }>;
+    };
+    return (
+      response.longMessage ||
+      response.errors?.[0]?.longMessage ||
+      response.message ||
+      response.errors?.[0]?.message ||
+      "We couldn't complete sign-in. Please try again."
+    );
+  };
+
+  const finalizeCurrentSignIn = async () => {
+    if (signIn.status !== "complete" || !signIn.createdSessionId) {
+      setError("Sign-in verification was not completed. Please try again.");
+      return;
+    }
+
+    const finalized = await signIn.finalize();
+    if (finalized.error) {
+      setError(clerkErrorMessage(finalized.error));
+      return;
+    }
+
+    setLocation("/user-portal", { replace: true });
+  };
+
+  const beginAdditionalVerification = async (
+    purpose: "device" | "account",
+  ) => {
+    const emailFactor = signIn.supportedSecondFactors.find(
+      (factor) => factor.strategy === "email_code",
+    );
+    const phoneFactor = signIn.supportedSecondFactors.find(
+      (factor) => factor.strategy === "phone_code",
+    );
+
+    const strategy = emailFactor
+      ? "email_code"
+      : phoneFactor
+        ? "phone_code"
+        : null;
+
+    if (!strategy) {
+      setError(
+        purpose === "device"
+          ? "This device requires verification, but no email or phone verification method is available for this account."
+          : "This account requires a verification method that is not available on this screen.",
+      );
+      return;
+    }
+
+    const sent = strategy === "email_code"
+      ? await signIn.mfa.sendEmailCode()
+      : await signIn.mfa.sendPhoneCode();
+
+    if (sent.error) {
+      setError(clerkErrorMessage(sent.error));
+      return;
+    }
+
+    const destination = strategy === "email_code"
+      ? emailFactor?.safeIdentifier || emailAddress
+      : phoneFactor?.safeIdentifier || "your phone";
+
+    setVerificationStrategy(strategy);
+    setVerificationDestination(destination);
+    setVerificationPurpose(purpose);
+    setVerificationCode("");
+    setPassword("");
+    setStep("verification");
+    setMessage(`We sent a six-digit code to ${destination}.`);
+  };
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    setMessage("");
 
     try {
       const result = await signIn.password({ emailAddress, password });
       if (result.error) {
-        setError(result.error.longMessage || result.error.message);
+        setError(clerkErrorMessage(result.error));
         return;
       }
 
-      if (signIn.status !== "complete" || !signIn.createdSessionId) {
-        if (signIn.status === "needs_second_factor") {
-          setError(
-            "This account requires an additional verification step that is not enabled on this screen.",
-          );
-        } else if (signIn.status === "needs_client_trust") {
-          setError(
-            "This device needs to be verified before you can sign in. Please try again from the sign-in page.",
-          );
-        } else {
-          setError(
-            "Your password was accepted, but Clerk did not create a session. Please try signing in again.",
-          );
-        }
+      if (signIn.status === "complete") {
+        await finalizeCurrentSignIn();
         return;
       }
 
-      await signIn.finalize();
-    } catch (caughtError) {
-      const response = caughtError as {
-        longMessage?: string;
-        message?: string;
-        errors?: Array<{ longMessage?: string; message?: string }>;
-      };
+      if (signIn.status === "needs_client_trust") {
+        await beginAdditionalVerification("device");
+        return;
+      }
+
+      if (signIn.status === "needs_second_factor") {
+        await beginAdditionalVerification("account");
+        return;
+      }
+
       setError(
-        response.longMessage ||
-          response.errors?.[0]?.longMessage ||
-          response.message ||
-          response.errors?.[0]?.message ||
-          "We couldn't complete sign-in. Please try again.",
+        "Your password was accepted, but Clerk did not create a session. Please try signing in again.",
       );
+    } catch (caughtError) {
+      setError(clerkErrorMessage(caughtError));
     }
   };
+
+  const verifyAdditionalCode = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    if (!verificationStrategy) return;
+
+    setError("");
+    setMessage("");
+
+    try {
+      const verified = verificationStrategy === "email_code"
+        ? await signIn.mfa.verifyEmailCode({ code: verificationCode })
+        : await signIn.mfa.verifyPhoneCode({ code: verificationCode });
+
+      if (verified.error) {
+        setError(clerkErrorMessage(verified.error));
+        return;
+      }
+
+      await finalizeCurrentSignIn();
+    } catch (caughtError) {
+      setError(clerkErrorMessage(caughtError));
+    }
+  };
+
+  const resendAdditionalCode = async () => {
+    if (!verificationStrategy) return;
+
+    setError("");
+    setMessage("");
+
+    try {
+      const sent = verificationStrategy === "email_code"
+        ? await signIn.mfa.sendEmailCode()
+        : await signIn.mfa.sendPhoneCode();
+
+      if (sent.error) {
+        setError(clerkErrorMessage(sent.error));
+        return;
+      }
+
+      setMessage(`A new six-digit code was sent to ${verificationDestination}.`);
+    } catch (caughtError) {
+      setError(clerkErrorMessage(caughtError));
+    }
+  };
+
+  const restartSignIn = async () => {
+    await signIn.reset();
+    setStep("credentials");
+    setPassword("");
+    setVerificationCode("");
+    setVerificationStrategy(null);
+    setVerificationDestination("");
+    setError("");
+    setMessage("");
+  };
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      // Custom Clerk flows activate the session without changing Wouter's
+      // current route. This also recovers an already-completed sign-in.
+      setLocation("/user-portal", { replace: true });
+    }
+  }, [isLoaded, isSignedIn, setLocation]);
 
   return (
     <AuthPageLayout>
       <div className="auth-video-card mx-auto w-[440px] max-w-full overflow-hidden p-8 text-[#f8f4fa]">
         <img src={dreamgateLogo} alt="DreamGate" className="mx-auto h-14 w-auto" />
         <div className="mt-6 text-center">
-          <h1 className="font-display text-2xl">Welcome back to DreamGate</h1>
-          <p className="mt-1 text-sm text-[#aca8b4]">Sign in to continue your dream practice</p>
+          <h1 className="font-display text-2xl">
+            {step === "credentials"
+              ? "Welcome back to DreamGate"
+              : verificationPurpose === "device"
+                ? "Verify this device"
+                : "Verify your account"}
+          </h1>
+          <p className="mt-1 text-sm text-[#aca8b4]">
+            {step === "credentials"
+              ? "Sign in to continue your dream practice"
+              : `Enter the code sent to ${verificationDestination}`}
+          </p>
         </div>
-        <form onSubmit={submit} className="mt-7 space-y-5">
-          <label className="block text-sm">
-            <span>Email address</span>
-            <input
-              type="email"
-              autoComplete="email"
-              required
-              value={emailAddress}
-              onChange={(event) => setEmailAddress(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
-            />
-          </label>
-          <PasswordField
-            label="Password"
-            autoComplete="current-password"
-            value={password}
-            onChange={setPassword}
-          />
-          {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
-          >
-            {isSubmitting ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
-        <div className="mt-5 flex items-center justify-between text-sm">
-          <Link href="/sign-in/forgot-password" className="text-[#d9d7e6]">
-            Forgot password?
-          </Link>
-          <Link href="/sign-up" className="text-[#d9d7e6]">
-            Create account
-          </Link>
-        </div>
+        {step === "credentials" ? (
+          <>
+            <form onSubmit={submit} className="mt-7 space-y-5">
+              <label className="block text-sm">
+                <span>Email address</span>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={emailAddress}
+                  onChange={(event) => setEmailAddress(event.target.value)}
+                  className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+                />
+              </label>
+              <PasswordField
+                label="Password"
+                autoComplete="current-password"
+                value={password}
+                onChange={setPassword}
+              />
+              {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
+              >
+                {isSubmitting ? "Signing in…" : "Sign in"}
+              </button>
+            </form>
+            <div className="mt-5 flex items-center justify-between text-sm">
+              <Link href="/sign-in/forgot-password" className="text-[#d9d7e6]">
+                Forgot password?
+              </Link>
+              <Link href="/sign-up" className="text-[#d9d7e6]">
+                Create account
+              </Link>
+            </div>
+          </>
+        ) : (
+          <form onSubmit={verifyAdditionalCode} className="mt-7 space-y-5">
+            <label className="block text-sm">
+              <span>Verification code</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]*"
+                maxLength={6}
+                required
+                value={verificationCode}
+                onChange={(event) =>
+                  setVerificationCode(
+                    event.target.value.replace(/\D/g, "").slice(0, 6),
+                  )
+                }
+                className="mt-2 w-full rounded-xl border border-[#45414e] bg-[#111116] px-4 py-3 text-center tracking-[0.35em] text-[#f8f4fa] outline-none focus:border-[#d9d7e6]"
+              />
+            </label>
+            {message && <p className="text-sm text-emerald-300" role="status">{message}</p>}
+            {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
+            <button
+              type="submit"
+              disabled={isSubmitting || verificationCode.length !== 6}
+              className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
+            >
+              {isSubmitting ? "Verifying…" : "Verify and sign in"}
+            </button>
+            <div className="flex items-center justify-between text-sm">
+              <button
+                type="button"
+                onClick={resendAdditionalCode}
+                disabled={isSubmitting}
+                className="text-[#d9d7e6] disabled:opacity-60"
+              >
+                Resend code
+              </button>
+              <button
+                type="button"
+                onClick={restartSignIn}
+                disabled={isSubmitting}
+                className="text-[#d9d7e6] disabled:opacity-60"
+              >
+                Start over
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </AuthPageLayout>
   );
@@ -370,6 +704,8 @@ function SignInPage() {
 
 function ForgotPasswordPage() {
   const { signIn } = useSignIn();
+  const { isLoaded, isSignedIn } = useAuth();
+  const [, setLocation] = useLocation();
   const [step, setStep] = useState<"email" | "code" | "password" | "complete">(
     "email",
   );
@@ -475,16 +811,37 @@ function ForgotPasswordPage() {
       });
       if (result.error) {
         setError(clerkErrorMessage(result.error));
-      } else {
-        setStep("complete");
-        setMessage("Your password has been updated. You can sign in now.");
+        return;
       }
+
+      if (signIn.status !== "complete" || !signIn.createdSessionId) {
+        setStep("complete");
+        setMessage(
+          "Your password has been updated. Return to sign in with your new password.",
+        );
+        return;
+      }
+
+      const finalized = await signIn.finalize();
+      if (finalized.error) {
+        setError(clerkErrorMessage(finalized.error));
+        return;
+      }
+
+      setLocation("/user-portal", { replace: true });
     } catch (caughtError) {
       setError(clerkErrorMessage(caughtError));
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      // Password reset completion creates the same active session as sign-in.
+      setLocation("/user-portal", { replace: true });
+    }
+  }, [isLoaded, isSignedIn, setLocation]);
 
   return (
     <AuthPageLayout>
@@ -595,6 +952,7 @@ function ForgotPasswordPage() {
 function SignUpPage() {
   const { signUp, fetchStatus } = useSignUp();
   const { isLoaded, isSignedIn } = useAuth();
+  const [, setLocation] = useLocation();
   const [step, setStep] = useState<"details" | "verification">("details");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -607,6 +965,25 @@ function SignUpPage() {
   const isSubmitting = fetchStatus === "fetching";
   const canCreateAccount =
     password.length >= 15 && password === confirmPassword;
+  const passwordFeedback = password.length === 0
+    ? {
+        message: "Your password must contain 15 or more characters.",
+        tone: "neutral" as const,
+      }
+    : password.length >= 15
+      ? {
+          message: "Your password meets all the necessary requirements.",
+          tone: "success" as const,
+        }
+      : {
+          message: "Your password must contain 15 or more characters.",
+          tone: "error" as const,
+        };
+  const confirmPasswordFeedback = confirmPassword.length === 0
+    ? undefined
+    : password === confirmPassword
+      ? { message: "Your passwords match.", tone: "success" as const }
+      : { message: "Your passwords do not match.", tone: "error" as const };
 
   const clerkErrorMessage = (caughtError: unknown) => {
     const response = caughtError as {
@@ -646,7 +1023,11 @@ function SignUpPage() {
 
       if (signUp.status === "complete") {
         const finalized = await signUp.finalize();
-        if (finalized.error) setError(clerkErrorMessage(finalized.error));
+        if (finalized.error) {
+          setError(clerkErrorMessage(finalized.error));
+          return;
+        }
+        setLocation("/user-portal", { replace: true });
         return;
       }
 
@@ -687,7 +1068,12 @@ function SignUpPage() {
       }
 
       const finalized = await signUp.finalize();
-      if (finalized.error) setError(clerkErrorMessage(finalized.error));
+      if (finalized.error) {
+        setError(clerkErrorMessage(finalized.error));
+        return;
+      }
+
+      setLocation("/user-portal", { replace: true });
     } catch (caughtError) {
       setError(clerkErrorMessage(caughtError));
     }
@@ -713,7 +1099,11 @@ function SignUpPage() {
       trackedCompletion.current = true;
       trackEvent("account_creation_completed");
     }
-  }, [isLoaded, isSignedIn]);
+
+    // finalize() activates the new session but does not navigate custom UI.
+    // This also recovers if the session became active before navigation ran.
+    setLocation("/user-portal", { replace: true });
+  }, [isLoaded, isSignedIn, setLocation]);
 
   return (
     <AuthPageLayout>
@@ -747,6 +1137,7 @@ function SignUpPage() {
               minLength={15}
               value={password}
               onChange={setPassword}
+              feedback={passwordFeedback}
             />
             <PasswordField
               label="Confirm password"
@@ -754,8 +1145,13 @@ function SignUpPage() {
               minLength={15}
               value={confirmPassword}
               onChange={setConfirmPassword}
+              feedback={confirmPasswordFeedback}
             />
-            <div id="clerk-captcha" />
+            <div
+              id="clerk-captcha"
+              data-cl-theme="dark"
+              data-cl-size="flexible"
+            />
             {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
             <button
               type="submit"
@@ -1075,6 +1471,7 @@ function AuthenticatedApp() {
           <main className="relative z-10 min-h-0 flex-1">
             <AppRoutes />
           </main>
+          <div className="dreamgate-bottom-nav-spacer shrink-0" aria-hidden="true" />
           <BottomNav />
           <PsyraPaywall
             open={paywallRequest !== null}
@@ -1202,6 +1599,31 @@ function AuthenticatedQueryProvider() {
 }
 
 function App() {
+  const [nativeTokenReady, setNativeTokenReady] = useState(!isNativePlatform);
+
+  useEffect(() => {
+    if (!isNativePlatform) return;
+
+    let mounted = true;
+    void clerkNativeTokenReady.finally(() => {
+      if (mounted) setNativeTokenReady(true);
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (!nativeTokenReady) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">
+          Opening your private dream space…
+        </p>
+      </div>
+    );
+  }
+
   return (
     <WouterRouter
       base={basePath}

@@ -33,11 +33,11 @@ export function BottomNav() {
   return (
     <nav 
       className={cn(
-        "dreamgate-night-footer relative z-20 w-full shrink-0 border-t safe-area-inset-bottom",
+        "dreamgate-night-footer fixed inset-x-0 bottom-0 z-40 w-full shrink-0 border-t",
         (location === "/dream" || location.startsWith("/dream/") || location.startsWith("/decoder")) &&
           "dream-decoder-bottom-nav"
       )}
-      style={{ height: "80px" }}
+      aria-label="Primary navigation"
       data-testid="nav-bottom"
     >
       <div className="flex items-center justify-around h-full max-w-lg mx-auto px-2">
