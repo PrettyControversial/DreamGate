@@ -119,6 +119,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  deleteUserData(userId: string): Promise<void>;
   
   getDreams(userId: string): Promise<Dream[]>;
   getDream(userId: string, id: string): Promise<Dream | undefined>;
@@ -721,6 +722,14 @@ export class MemStorage implements IStorage {
     return user;
   }
 
+  async deleteUserData(userId: string): Promise<void> {
+    this.users.delete(userId);
+    this.dreams.delete(userId);
+    this.numerologyProfiles.delete(userId);
+    this.moodEntries.delete(userId);
+    this.sleepIntentions.delete(userId);
+  }
+
   private getDreamStore(userId: string): Map<string, Dream> {
     let dreams = this.dreams.get(userId);
     if (!dreams) {
@@ -1178,6 +1187,11 @@ const dreamSymbolsData: DreamSymbol[] = [
 ];
 
 class DatabaseStorage extends MemStorage {
+  async deleteUserData(userId: string): Promise<void> {
+    await db.delete(dreamsTable).where(eq(dreamsTable.userId, userId));
+    await super.deleteUserData(userId);
+  }
+
   async getDreams(userId: string): Promise<Dream[]> {
     return db
       .select()

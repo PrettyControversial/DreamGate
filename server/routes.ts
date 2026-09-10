@@ -1,6 +1,6 @@
 import type { Express, NextFunction, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { getAuth } from "@clerk/express";
+import { clerkClient, getAuth } from "@clerk/express";
 import { storage } from "./storage";
 import { 
   insertDreamSchema, 
@@ -38,6 +38,19 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   app.use("/api", requireAuth);
+
+  app.delete("/api/account", async (_req, res) => {
+    const userId = currentUserId(res);
+
+    try {
+      await storage.deleteUserData(userId);
+      await clerkClient.users.deleteUser(userId);
+      res.status(204).send();
+    } catch (error) {
+      console.error(`Account deletion failed for ${userId}:`, error);
+      res.status(500).json({ error: "Failed to delete account" });
+    }
+  });
   
   app.get("/api/dreams", async (req, res) => {
     try {

@@ -27,8 +27,10 @@ import {
   CircleHelp,
   Eye,
   EyeOff,
+  Loader2,
   LogOut,
   Menu,
+  Trash2,
 } from "lucide-react";
 import {
   API_BASE_URL,
@@ -37,6 +39,7 @@ import {
 } from "./lib/queryClient";
 import { trackEvent } from "@/lib/analytics";
 import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PsyraPaywall } from "@/components/psyra-paywall";
@@ -65,6 +68,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import authBackgroundVideo from "@assets/Heading_(2)_1788379592807.mp4";
 import dreamgateLogo from "@assets/dreamgate_brand/dreamgate-logo.webp";
 import statsSymbol from "@assets/dreamgate_symbols/footer/139.webp";
@@ -1226,7 +1240,15 @@ function AuthPageLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AccountControls({ onSignOut }: { onSignOut: () => void }) {
+function AccountControls({
+  onSignOut,
+  onDeleteAccount,
+  isDeletingAccount,
+}: {
+  onSignOut: () => void;
+  onDeleteAccount: () => void;
+  isDeletingAccount: boolean;
+}) {
   const { user } = useUser();
   const [location] = useLocation();
   const label =
@@ -1351,6 +1373,51 @@ function AccountControls({ onSignOut }: { onSignOut: () => void }) {
               <span>Sign out</span>
             </button>
           </SheetClose>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                type="button"
+                className="dreamgate-drawer-link dreamgate-drawer-link--danger w-full"
+                data-testid="button-delete-account"
+                disabled={isDeletingAccount}
+              >
+                <Trash2 className="h-7 w-7 stroke-[1.3]" />
+                <span>Delete account</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="border-[#171513]/20 bg-[#f6f3ec] text-[#171513]">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-display text-2xl font-normal">
+                  Delete your account?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-[#77716a]">
+                  This permanently deletes your DreamGate account and all saved
+                  dreams, interpretations, and private journal data. This cannot
+                  be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel
+                  disabled={isDeletingAccount}
+                  className="border-[#171513]/20 bg-transparent text-[#171513] hover:bg-[#171513]/5"
+                >
+                  Keep my account
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  type="button"
+                  disabled={isDeletingAccount}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    onDeleteAccount();
+                  }}
+                  className="bg-red-700 text-white hover:bg-red-800 focus:ring-red-700"
+                >
+                  {isDeletingAccount && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isDeletingAccount ? "Deleting…" : "Delete permanently"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </nav>
 
         <div className="relative z-10 mx-7 mb-[max(1.75rem,env(safe-area-inset-bottom))] mt-4 border-t border-[#171513]/15 pt-5">
@@ -1422,7 +1489,9 @@ function AuthenticatedApp() {
   const [location] = useLocation();
   const { signOut } = useClerk();
   const { user } = useUser();
+  const { toast } = useToast();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const { paywallRequest, closePaywall } = useSubscription();
   const isDiscover = location === "/discover";
 
@@ -1450,6 +1519,36 @@ function AuthenticatedApp() {
       }
     })();
   };
+  const handleDeleteAccount = () => {
+    if (isDeletingAccount || !user?.id) return;
+
+    setIsDeletingAccount(true);
+    void (async () => {
+      try {
+        if (supportsLunarNotifications()) {
+          await deactivateLunarNotificationUser(user.id);
+        }
+        await apiRequest("DELETE", "/api/account");
+        try {
+          localStorage.removeItem("dreamstate_streak");
+          localStorage.removeItem("tarot_history");
+          localStorage.removeItem("tarotReadings");
+          sessionStorage.removeItem("dreamgate-intro-seen-v3");
+        } catch {
+          // Account deletion should still complete if browser storage is unavailable.
+        }
+        await signOut({ redirectUrl: basePath || "/" });
+      } catch (error) {
+        console.error("Unable to delete account:", error);
+        setIsDeletingAccount(false);
+        toast({
+          title: "Account could not be deleted",
+          description: "Please try again. Your account is still active.",
+          variant: "destructive",
+        });
+      }
+    })();
+  };
 
   return (
     <>
@@ -1464,7 +1563,11 @@ function AuthenticatedApp() {
                   DreamGate
                 </h1>
               </Link>
-            <AccountControls onSignOut={handleSignOut} />
+            <AccountControls
+              onSignOut={handleSignOut}
+              onDeleteAccount={handleDeleteAccount}
+              isDeletingAccount={isDeletingAccount}
+            />
           </header>
           <LunarNotificationSync />
           <DreamGateSymbolBackground />

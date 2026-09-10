@@ -2760,6 +2760,16 @@
   color: #6d5050;
 }
 
+.dreamgate-drawer-link--danger {
+  color: #9a4d4d;
+}
+
+.dreamgate-drawer-link--danger:hover,
+.dreamgate-drawer-link--danger:focus-visible {
+  background: rgba(154, 77, 77, 0.08);
+  color: #7e3030;
+}
+
 .dreamgate-drawer-divider {
   height: 1px;
   margin: 0.75rem 0.8rem;
