@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@clerk/react";
-import { Check, Headphones, Pause, Play, RotateCcw, Sparkles, Wind } from "lucide-react";
+import { Check, Headphones, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
 import { trackDiscoverToolCompleted, trackEvent } from "@/lib/analytics";
 
 import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.mp3";
 import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.mp3";
-import deepReturnAudio from "@assets/dreamgate_meditations/the-deep-return.mp3";
-import settleBreathAudio from "@assets/dreamgate_meditations/settle-the-breath.mp3";
+import guideAudio from "@assets/dreamgate_meditations/meeting-your-guide.mp3";
+import groundingBoxAudio from "@assets/dreamgate_meditations/the-grounding-box.mp3";
 import meditationSymbolRelief from "@assets/meditation-symbol-relief.webp";
 
 type JourneyStepId = "guide" | "shadow" | "symbol" | "breath";
+type ReflectionStepId = Exclude<JourneyStepId, "breath">;
 
 interface JourneyStep {
   id: JourneyStepId;
@@ -23,7 +24,7 @@ interface JourneyStep {
 
 interface JourneyState {
   completed: Record<JourneyStepId, boolean>;
-  reflections: Record<"guide" | "shadow" | "symbol", string>;
+  reflections: Record<ReflectionStepId, string>;
 }
 
 const journeySteps: JourneyStep[] = [
@@ -33,9 +34,9 @@ const journeySteps: JourneyStep[] = [
     title: "Meet Your Guide",
     description:
       "Picture a doorway. Something is waiting on the other side of it — a person, an animal, a shape, or a voice. Do not decide what it is in advance; let it arrive. Ask it one question and notice what it shows you.",
-    audioFile: deepReturnAudio,
-    audioLabel: "The Deep Return",
-    duration: "6:00",
+    audioFile: guideAudio,
+    audioLabel: "Meeting Your Guide",
+    duration: "11:40",
   },
   {
     id: "shadow",
@@ -63,9 +64,9 @@ const journeySteps: JourneyStep[] = [
     title: "Settle the Breath",
     description:
       "Inhale for four. Hold for four. Exhale for four. Hold for four. Let the shape guide the pace.",
-    audioFile: settleBreathAudio,
-    audioLabel: "Settle the Breath",
-    duration: "6:04",
+    audioFile: groundingBoxAudio,
+    audioLabel: "The Grounding Box",
+    duration: "8:00",
   },
 ];
 
@@ -74,7 +75,6 @@ const emptyJourneyState: JourneyState = {
   reflections: { guide: "", shadow: "", symbol: "" },
 };
 
-const breathPhases = ["Inhale", "Hold", "Exhale", "Hold"] as const;
 const journeyDate = () => new Date().toISOString().slice(0, 10);
 
 function formatAudioTime(seconds: number) {
@@ -91,9 +91,10 @@ export default function Meditation() {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [audioTime, setAudioTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
-  const [breathRunning, setBreathRunning] = useState(false);
-  const [breathIndex, setBreathIndex] = useState(0);
+  const [reflectionDrafts, setReflectionDrafts] = useState(emptyJourneyState.reflections);
+  const [savedReflectionId, setSavedReflectionId] = useState<ReflectionStepId | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const savedNoteTimerRef = useRef<number | null>(null);
   const storageKey = `dreamgate:dream-journey:${user?.id ?? "guest"}:${journeyDate()}`;
 
   useEffect(() => {
@@ -101,15 +102,19 @@ export default function Meditation() {
       const saved = window.localStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<JourneyState>;
-        setJourneyState({
+        const nextJourneyState = {
           completed: { ...emptyJourneyState.completed, ...parsed.completed },
           reflections: { ...emptyJourneyState.reflections, ...parsed.reflections },
-        });
+        };
+        setJourneyState(nextJourneyState);
+        setReflectionDrafts(nextJourneyState.reflections);
       } else {
         setJourneyState(emptyJourneyState);
+        setReflectionDrafts(emptyJourneyState.reflections);
       }
     } catch {
       setJourneyState(emptyJourneyState);
+      setReflectionDrafts(emptyJourneyState.reflections);
     }
   }, [storageKey]);
 
@@ -124,21 +129,9 @@ export default function Meditation() {
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
+      if (savedNoteTimerRef.current) window.clearTimeout(savedNoteTimerRef.current);
     };
   }, []);
-
-  useEffect(() => {
-    if (!breathRunning) return;
-    const timer = window.setTimeout(() => {
-      if (breathIndex >= 15) {
-        setBreathRunning(false);
-        markStepComplete("breath", true);
-      } else {
-        setBreathIndex((current) => current + 1);
-      }
-    }, 4000);
-    return () => window.clearTimeout(timer);
-  }, [breathIndex, breathRunning]);
 
   const markStepComplete = (id: JourneyStepId, completed: boolean) => {
     setJourneyState((current) => ({
@@ -198,30 +191,23 @@ export default function Meditation() {
     setAudioTime(value);
   };
 
-  const startBreathing = () => {
-    if (breathRunning) {
-      setBreathRunning(false);
-      return;
-    }
-    if (journeyState.completed.breath) setBreathIndex(0);
-    setBreathRunning(true);
-    markStepComplete("breath", false);
+  const saveJourneyNote = (id: ReflectionStepId) => {
+    setJourneyState((current) => ({
+      ...current,
+      reflections: { ...current.reflections, [id]: reflectionDrafts[id].trim() },
+    }));
+    setSavedReflectionId(id);
+    if (savedNoteTimerRef.current) window.clearTimeout(savedNoteTimerRef.current);
+    savedNoteTimerRef.current = window.setTimeout(() => setSavedReflectionId(null), 2200);
   };
 
   const startNewJourney = () => {
     if (!window.confirm("Clear this journey and start fresh?")) return;
     stopAudio();
-    setBreathRunning(false);
-    setBreathIndex(0);
     setJourneyState(emptyJourneyState);
+    setReflectionDrafts(emptyJourneyState.reflections);
+    setSavedReflectionId(null);
   };
-
-  const currentBreathPhase = breathRunning
-    ? breathPhases[breathIndex % breathPhases.length]
-    : journeyState.completed.breath
-      ? "Complete"
-      : "Ready";
-  const currentBreathRound = Math.min(4, Math.floor(breathIndex / 4) + 1);
 
   return (
     <main className="meditation-page dream-journey-page min-h-screen px-4 py-8 md:px-8 md:py-10">
@@ -251,7 +237,6 @@ export default function Meditation() {
           {journeySteps.map((step) => {
             const completed = journeyState.completed[step.id];
             const isActiveAudio = activeAudioId === step.id;
-            const isBreathStep = step.id === "breath";
 
             return (
               <article
@@ -310,46 +295,20 @@ export default function Meditation() {
                   </div>
                 )}
 
-                {isBreathStep && (
-                  <div className="dream-journey-breath">
-                    <div
-                      className={`dream-journey-breath__shape${
-                        breathRunning && breathIndex % 4 < 2 ? " is-expanded" : ""
-                      }`}
-                    >
-                      <span>{currentBreathPhase}</span>
-                    </div>
-                    <p className="dream-journey-breath__count">
-                      {breathRunning ? `Round ${currentBreathRound} of 4` : "4 rounds"}
-                    </p>
-                    <button
-                      type="button"
-                      className="dream-journey-secondary-button"
-                      onClick={startBreathing}
-                      data-testid="button-begin-breathing"
-                    >
-                      <Wind aria-hidden="true" />
-                      {breathRunning ? "Pause" : journeyState.completed.breath ? "Begin again" : "Begin"}
-                    </button>
-                  </div>
-                )}
-
                 {step.id !== "breath" && (
                   <div className="dream-journey-reflection">
-                    <label htmlFor={`journey-reflection-${step.id}`}>Reflection</label>
+                    <label htmlFor={`journey-reflection-${step.id}`}>Journey Note</label>
                     <input
                       id={`journey-reflection-${step.id}`}
                       type="text"
-                      value={journeyState.reflections[step.id]}
-                      onChange={(event) =>
-                        setJourneyState((current) => ({
+                      value={reflectionDrafts[step.id]}
+                      onChange={(event) => {
+                        setReflectionDrafts((current) => ({
                           ...current,
-                          reflections: {
-                            ...current.reflections,
-                            [step.id]: event.target.value,
-                          },
-                        }))
-                      }
+                          [step.id]: event.target.value,
+                        }));
+                        if (savedReflectionId === step.id) setSavedReflectionId(null);
+                      }}
                       placeholder={
                         step.id === "guide"
                           ? "Who or what showed up?"
@@ -358,6 +317,26 @@ export default function Meditation() {
                             : "The symbol you keep returning to."
                       }
                     />
+                    <div className="dream-journey-reflection__actions">
+                      <button
+                        type="button"
+                        className="dream-journey-note-save"
+                        onClick={() => saveJourneyNote(step.id)}
+                        disabled={
+                          !reflectionDrafts[step.id].trim() ||
+                          reflectionDrafts[step.id].trim() === journeyState.reflections[step.id]
+                        }
+                        data-testid={`button-save-journey-note-${step.id}`}
+                      >
+                        Save Journey Note
+                      </button>
+                      {savedReflectionId === step.id && (
+                        <span className="dream-journey-note-saved">
+                          <Check aria-hidden="true" />
+                          Journey note saved
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
               </article>
@@ -368,7 +347,7 @@ export default function Meditation() {
         <div className="dream-journey-footer">
           <p className="dream-journey-save-note">
             <Sparkles aria-hidden="true" />
-            Your reflections and completed steps are saved for today.
+            Completed steps and saved journey notes are kept for today.
           </p>
           <button
             type="button"
