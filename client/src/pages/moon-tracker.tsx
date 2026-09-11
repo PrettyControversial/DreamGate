@@ -8,6 +8,7 @@ import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.mp3";
 import nightMapPaperTexture from "@assets/night-map-paper-texture.webp";
 import nightMapHeaderRelief from "@assets/night-map-stone-cutout.png";
+import nightMapPortal from "@assets/night-map-portal.webp";
 import nightMapIvy from "@assets/night-map-ivy.webp";
 import nightMapStoneSteps from "@assets/night-map-stone-steps.webp";
 
