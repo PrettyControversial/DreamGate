@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { BookOpen, Check, Eye, Feather, Headphones, Heart, Pause, Play, Sparkles } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 import type { MoodEntry, SleepIntention } from "@shared/schema";
 import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.mp3";
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.mp3";
@@ -134,6 +135,7 @@ export default function MoonTracker() {
     setNightMeditationDuration(track.durationSeconds);
 
     const audio = new Audio(track.audioFile);
+    setMeditationMediaSession(track.title);
     audio.preload = "metadata";
     audio.ontimeupdate = () => setNightMeditationCurrentTime(audio.currentTime);
     audio.onloadedmetadata = () =>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useUser } from "@clerk/react";
 import { Check, Headphones, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
 import { trackDiscoverToolCompleted, trackEvent } from "@/lib/analytics";
+import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 
 import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.mp3";
 import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.mp3";
@@ -162,6 +163,7 @@ export default function Meditation() {
 
     stopAudio();
     const audio = new Audio(step.audioFile);
+    setMeditationMediaSession(step.audioLabel ?? step.title);
     audio.preload = "metadata";
     audio.onloadedmetadata = () => setAudioDuration(audio.duration);
     audio.ontimeupdate = () => setAudioTime(audio.currentTime);
