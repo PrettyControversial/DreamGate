@@ -6919,3 +6919,117 @@
     padding: 1.25rem;
   }
 }
+
+/* Match Tarot typography exactly: Raleway for copy and Playfair Display for headings. */
+.night-map-page,
+.night-map-page button,
+.night-map-page input,
+.night-map-page textarea,
+.night-map-page summary {
+  font-family: var(--font-sans);
+}
+
+.night-map-page h1,
+.night-map-page h2,
+.night-map-page h3 {
+  font-family: var(--font-display);
+}
+
+.night-map-meditation-list {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.night-map-meditation-track {
+  min-width: 0;
+  border: 1px solid var(--night-map-line);
+  border-radius: 0.2rem;
+  background: rgba(14, 12, 6, 0.025);
+  padding: 1.25rem;
+}
+
+.night-map-meditation-track__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.night-map-page .night-map-meditation-track__heading p {
+  margin: 0 !important;
+  color: var(--night-map-muted) !important;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.night-map-meditation-track__heading h3 {
+  margin: 0.35rem 0 0;
+  color: var(--night-map-ink);
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.08;
+}
+
+.night-map-meditation-track__heading > span {
+  flex: 0 0 auto;
+  color: var(--night-map-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.night-map-meditation-track .night-map-audio-player {
+  margin-top: 1.2rem;
+}
+
+.night-map-page .night-map-meditation-track__guidance {
+  margin: 1rem 0 0 !important;
+  color: var(--night-map-muted) !important;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.night-map-page .night-map-complete > * {
+  min-width: 0;
+}
+
+.night-map-page .night-map-complete__button {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  gap: 1rem;
+  border-radius: 0.2rem !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  text-align: left;
+}
+
+@media (max-width: 767px) {
+  .night-map-meditation-list {
+    grid-template-columns: 1fr;
+  }
+
+  .night-map-page .night-map-complete {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .night-map-page .night-map-complete__button {
+    padding-inline: 1rem;
+  }
+}
+
+/* Keep Journey audio controls circular while using Home's button system. */
+.meditation-page .dream-journey-play.home-capsule-button {
+  width: 3.25rem;
+  height: 3.25rem;
+  min-height: 3.25rem;
+  padding: 0;
+}

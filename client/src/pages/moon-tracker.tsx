@@ -4,7 +4,8 @@ import { BookOpen, Check, Eye, Feather, Headphones, Heart, Pause, Play, Sparkles
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { MoodEntry, SleepIntention } from "@shared/schema";
-import nightMeditationAudio from "@assets/dreamgate_meditations/432hz-meditation.mp3";
+import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.mp3";
+import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.mp3";
 import nightMapPaperTexture from "@assets/night-map-paper-texture.webp";
 import nightMapSymbolCrow from "@assets/night-map-symbol-crow.webp";
 import nightMapHeaderRelief from "@assets/night-map-stone-cutout.png";
@@ -20,21 +21,44 @@ const moodOptions = [
   { value: 5, label: "Energized" },
 ];
 
+const lucidMeditations = [
+  {
+    id: "reality-check",
+    practiceId: "reality-check",
+    title: "Reality Check Meditation",
+    subtitle: "Senses Initiated Lucid Dream",
+    durationLabel: "8:35",
+    durationSeconds: 515,
+    audioFile: sensesInitiatedAudio,
+    guidance: "Move slowly through each sense and practice noticing what changes when attention returns.",
+  },
+  {
+    id: "dream-cue",
+    practiceId: "mild",
+    title: "Lucid Dreaming Rehearsal",
+    subtitle: "Theta Realm",
+    durationLabel: "8:25",
+    durationSeconds: 505,
+    audioFile: thetaRealmAudio,
+    guidance: "Rehearse recognizing a familiar dream sign while your body settles toward sleep.",
+  },
+];
+
 const lucidPractices = [
   {
     id: "reality-check",
     icon: Eye,
-    eyebrow: "Daytime practice · 2 min",
-    title: "Reality checks",
-    description: "Teach your attention to question the moment gently, so the habit can follow you into a dream.",
+    eyebrow: "Guided practice · 9 min",
+    title: "Reality Check Meditation",
+    description: "Use your senses to question the moment gently, so the habit can follow you into a dream.",
     steps: ["Pause and notice three details around you.", "Ask: “Am I dreaming?” without rushing the answer.", "Read a line of text or look at your hands, then look away and back."],
   },
   {
     id: "mild",
     icon: Sparkles,
-    eyebrow: "Bedtime practice · 5 min",
-    title: "Set the dream cue",
-    description: "Use a quiet intention to recognize the dream when it begins to shift.",
+    eyebrow: "Guided practice · 8 min",
+    title: "Theta Realm Rehearsal",
+    description: "Rehearse a quiet intention to recognize the dream when it begins to shift.",
     steps: ["Remember a recent dream or imagine a familiar dream sign.", "Picture yourself noticing it and becoming calm and lucid.", "Repeat: “When I dream tonight, I will remember that I am dreaming.”"],
   },
   {
@@ -46,12 +70,12 @@ const lucidPractices = [
     steps: ["Keep your eyes closed for a few breaths when you wake.", "Follow the last feeling, image, or person back through the dream.", "Write three words before you reach for your phone."],
   },
   {
-    id: "meditation",
+    id: "intention",
     icon: Headphones,
-    eyebrow: "Bedtime practice · 5 min",
-    title: "Lucid dream meditation",
-    description: "Settle the nervous system while keeping one quiet thread of awareness as you move toward sleep.",
-    steps: ["Put on headphones and lower the lights.", "Let your body soften without forcing sleep.", "Hold one simple intention: “I will notice when I begin to dream.”"],
+    eyebrow: "Bedtime practice · 2 min",
+    title: "Set a Dream Intention",
+    description: "Give the dreaming mind one clear instruction to carry across the threshold of sleep.",
+    steps: ["Choose one short intention you can remember easily.", "Write it below before getting into bed.", "Repeat it slowly three times with your eyes closed."],
   },
 ];
 
@@ -61,9 +85,10 @@ export default function MoonTracker() {
   const [dailyIntention, setDailyIntention] = useState("");
   const [moodSaved, setMoodSaved] = useState(false);
   const [intentionSaved, setIntentionSaved] = useState(false);
+  const [activeMeditationId, setActiveMeditationId] = useState<string | null>(null);
   const [nightMeditationPlaying, setNightMeditationPlaying] = useState(false);
   const [nightMeditationCurrentTime, setNightMeditationCurrentTime] = useState(0);
-  const [nightMeditationDuration, setNightMeditationDuration] = useState(309);
+  const [nightMeditationDuration, setNightMeditationDuration] = useState(0);
   const [ritualComplete, setRitualComplete] = useState(false);
   const nightMeditationRef = useRef<HTMLAudioElement | null>(null);
   const { data: recentMoods } = useQuery<MoodEntry[]>({ queryKey: ["/api/moods"] });
@@ -93,9 +118,9 @@ export default function MoonTracker() {
     };
   }, []);
 
-  const toggleNightMeditation = () => {
+  const toggleNightMeditation = (track: (typeof lucidMeditations)[number]) => {
     const activeAudio = nightMeditationRef.current;
-    if (activeAudio) {
+    if (activeAudio && activeMeditationId === track.id) {
       if (nightMeditationPlaying) {
         activeAudio.pause();
         setNightMeditationPlaying(false);
@@ -105,26 +130,39 @@ export default function MoonTracker() {
       return;
     }
 
-    const audio = new Audio(nightMeditationAudio);
+    activeAudio?.pause();
+    setNightMeditationCurrentTime(0);
+    setNightMeditationDuration(track.durationSeconds);
+
+    const audio = new Audio(track.audioFile);
     audio.preload = "metadata";
     audio.ontimeupdate = () => setNightMeditationCurrentTime(audio.currentTime);
-    audio.onloadedmetadata = () => setNightMeditationDuration(Number.isFinite(audio.duration) ? audio.duration : 309);
+    audio.onloadedmetadata = () =>
+      setNightMeditationDuration(
+        Number.isFinite(audio.duration) ? audio.duration : track.durationSeconds,
+      );
+    audio.onplay = () => setNightMeditationPlaying(true);
+    audio.onpause = () => setNightMeditationPlaying(false);
     audio.onended = () => {
       nightMeditationRef.current = null;
+      setActiveMeditationId(null);
       setNightMeditationPlaying(false);
       setNightMeditationCurrentTime(0);
       setCompletedPractices((current) =>
-        current.includes("meditation") ? current : [...current, "meditation"],
+        current.includes(track.practiceId) ? current : [...current, track.practiceId],
       );
     };
     audio.onerror = () => {
       nightMeditationRef.current = null;
+      setActiveMeditationId(null);
       setNightMeditationPlaying(false);
     };
     nightMeditationRef.current = audio;
+    setActiveMeditationId(track.id);
     setNightMeditationPlaying(true);
     void audio.play().catch(() => {
       nightMeditationRef.current = null;
+      setActiveMeditationId(null);
       setNightMeditationPlaying(false);
     });
   };
@@ -223,8 +261,11 @@ export default function MoonTracker() {
                   <ol>
                     {practice.steps.map((step) => <li key={step}>{step}</li>)}
                   </ol>
-                  {practice.id === "meditation" && (
+                  {(practice.id === "reality-check" || practice.id === "mild") && (
                     <a href="#night-meditation" className="night-map-checklist-link">Open meditation <span aria-hidden="true">↓</span></a>
+                  )}
+                  {practice.id === "intention" && (
+                    <a href="#night-reflection" className="night-map-checklist-link">Set intention <span aria-hidden="true">↓</span></a>
                   )}
                 </article>
               );
@@ -239,15 +280,28 @@ export default function MoonTracker() {
           <div className="night-map-object-stage night-map-object-stage--ivy" aria-hidden="true">
             <img src={nightMapIvy} alt="" />
           </div>
-          <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">03 / Meditation</p><h2 id="night-map-meditation-title">Lucid dream meditation</h2><span>5 min · 432 Hz</span></div>
-          <div className="night-map-audio-player">
-            <button type="button" onClick={toggleNightMeditation} className="night-map-audio-player__play" data-testid="button-night-meditation" aria-label={nightMeditationPlaying ? "Pause meditation" : "Play meditation"}>{nightMeditationPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}</button>
-            <div className="night-map-audio-player__track">
-              <div className="night-map-audio-player__times"><span>{formatAudioTime(nightMeditationCurrentTime)}</span><span>{formatAudioTime(nightMeditationDuration)}</span></div>
-              <input type="range" min="0" max={nightMeditationDuration || 309} step="0.1" value={Math.min(nightMeditationCurrentTime, nightMeditationDuration)} onChange={(event) => { const nextTime = Number(event.target.value); setNightMeditationCurrentTime(nextTime); if (nightMeditationRef.current) nightMeditationRef.current.currentTime = nextTime; }} aria-label="Meditation progress" />
-            </div>
+          <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">03 / Meditation</p><h2 id="night-map-meditation-title">Lucid dream meditations</h2><span>Headphones recommended</span></div>
+          <div className="night-map-meditation-list">
+            {lucidMeditations.map((track) => {
+              const isActive = activeMeditationId === track.id;
+              return (
+                <article className="night-map-meditation-track" key={track.id}>
+                  <div className="night-map-meditation-track__heading">
+                    <div><p>{track.subtitle}</p><h3>{track.title}</h3></div>
+                    <span>{track.durationLabel}</span>
+                  </div>
+                  <div className="night-map-audio-player">
+                    <button type="button" onClick={() => toggleNightMeditation(track)} className="night-map-audio-player__play" data-testid={`button-night-meditation-${track.id}`} aria-label={isActive && nightMeditationPlaying ? `Pause ${track.title}` : `Play ${track.title}`}>{isActive && nightMeditationPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}</button>
+                    <div className="night-map-audio-player__track">
+                      <div className="night-map-audio-player__times"><span>{isActive ? formatAudioTime(nightMeditationCurrentTime) : "0:00"}</span><span>{track.durationLabel}</span></div>
+                      <input type="range" min="0" max={isActive ? nightMeditationDuration || track.durationSeconds : track.durationSeconds} step="0.1" value={isActive ? Math.min(nightMeditationCurrentTime, nightMeditationDuration || track.durationSeconds) : 0} onChange={(event) => { if (!isActive) return; const nextTime = Number(event.target.value); setNightMeditationCurrentTime(nextTime); if (nightMeditationRef.current) nightMeditationRef.current.currentTime = nextTime; }} aria-label={`${track.title} progress`} />
+                    </div>
+                  </div>
+                  <p className="night-map-meditation-track__guidance">{track.guidance}</p>
+                </article>
+              );
+            })}
           </div>
-          <details className="night-map-details"><summary>What to listen for</summary><p>Let your weight settle, soften the edges of the day, and keep one small thread of awareness as you rest.</p></details>
         </section>
 
         <section id="night-reflection" className="night-map-reflection" aria-labelledby="night-map-reflection-title">

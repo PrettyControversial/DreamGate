@@ -267,7 +267,7 @@ export default function Meditation() {
                     <div className="dream-journey-audio__controls">
                       <button
                         type="button"
-                        className="dream-journey-play"
+                        className="dream-journey-play home-capsule-button home-capsule-button--solid no-default-hover-elevate no-default-active-elevate"
                         onClick={() => toggleAudio(step)}
                         aria-label={`${isActiveAudio && isAudioPlaying ? "Pause" : "Play"} ${step.title}`}
                         data-testid={`button-journey-audio-${step.id}`}
@@ -320,7 +320,7 @@ export default function Meditation() {
                     <div className="dream-journey-reflection__actions">
                       <button
                         type="button"
-                        className="dream-journey-note-save"
+                        className="dream-journey-note-save home-capsule-button home-capsule-button--outline no-default-hover-elevate no-default-active-elevate"
                         onClick={() => saveJourneyNote(step.id)}
                         disabled={
                           !reflectionDrafts[step.id].trim() ||
@@ -351,7 +351,7 @@ export default function Meditation() {
           </p>
           <button
             type="button"
-            className="dream-journey-reset"
+            className="dream-journey-reset home-capsule-button home-capsule-button--outline no-default-hover-elevate no-default-active-elevate"
             onClick={startNewJourney}
             data-testid="button-start-new-journey"
           >
