@@ -968,6 +968,8 @@
 .dream-journey-page {
   --journey-line: color-mix(in srgb, var(--meditation-ink) 22%, transparent);
   --journey-accent: hsl(var(--gold));
+  background-color: transparent;
+  background-image: none;
 }
 
 .dream-journey-header {
