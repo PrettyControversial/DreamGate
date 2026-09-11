@@ -990,7 +990,7 @@
   top: 0.6rem;
   bottom: 0.85rem;
   left: 0.58rem;
-  width: 1px;
+  width: 2px;
   background: var(--journey-line);
   content: "";
 }
@@ -1014,7 +1014,7 @@
   height: 1.2rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--meditation-ink);
+  border: 2px solid var(--meditation-ink);
   border-radius: 999px;
   background: #f6f3ec;
   color: var(--journey-accent);
@@ -1089,7 +1089,7 @@
 .dream-journey-reflection input {
   width: 100%;
   min-height: 2.65rem;
-  border: 1px solid color-mix(in srgb, var(--meditation-ink) 28%, transparent);
+  border: 2px solid color-mix(in srgb, var(--meditation-ink) 42%, transparent);
   border-radius: 0.35rem;
   background: color-mix(in srgb, var(--meditation-ink) 4%, transparent);
   padding: 0.7rem 0.8rem;
@@ -1156,8 +1156,8 @@
 
 .dream-journey-audio {
   max-width: 38rem;
-  border-top: 1px solid color-mix(in srgb, var(--meditation-ink) 22%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--meditation-ink) 22%, transparent);
+  border-top: 2px solid color-mix(in srgb, var(--meditation-ink) 30%, transparent);
+  border-bottom: 2px solid color-mix(in srgb, var(--meditation-ink) 30%, transparent);
   padding: 0.8rem 0;
 }
 
@@ -1249,7 +1249,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1.15rem;
-  border-top: 1px solid var(--journey-line);
+  border-top: 2px solid var(--journey-line);
   margin-top: 2.5rem;
   padding: 1.5rem 0 1rem;
   text-align: center;
@@ -7043,4 +7043,23 @@
   height: 3.25rem;
   min-height: 3.25rem;
   padding: 0;
+}
+
+/* Guided Journey uses the same emphatic lines and readable button labels as Home. */
+.dream-journey-page .dream-journey-marker {
+  border-width: 2px;
+}
+
+.dream-journey-page .dream-journey-note-save,
+.dream-journey-page .dream-journey-reset {
+  min-height: 3.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.dream-journey-page .dream-journey-note-save {
+  border-width: 2px;
 }

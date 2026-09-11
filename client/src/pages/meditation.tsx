@@ -33,7 +33,7 @@ const journeySteps: JourneyStep[] = [
     eyebrow: "Meditation · eyes closed",
     title: "Meet Your Guide",
     description:
-      "Picture a doorway. Something is waiting on the other side of it — a person, an animal, a shape, or a voice. Do not decide what it is in advance; let it arrive. Ask it one question and notice what it shows you.",
+      "Picture a doorway. Something is waiting on the other side: a person, an animal, a shape, or a voice. Do not decide what it is in advance. Let it arrive. Ask it one question and notice what it shows you.",
     audioFile: guideAudio,
     audioLabel: "Meeting Your Guide",
     duration: "11:40",
@@ -217,8 +217,8 @@ export default function Meditation() {
             <p className="meditation-kicker text-xs uppercase tracking-[0.28em]">Guided Journey</p>
             <h1 className="font-display text-4xl tracking-tight md:text-5xl">Dream Journey</h1>
             <p className="meditation-muted max-w-xl text-sm leading-relaxed">
-              A short practice for the space between waking and sleep — a guide, a shadow, a symbol,
-              and a way to settle the breath.
+              A gentle practice for the space between waking and sleep. Meet a guide, sit with a shadow,
+              welcome a symbol, and settle the breath.
             </p>
             <p className="dream-journey-headphones text-sm font-medium">
               <Headphones aria-hidden="true" className="mr-2 inline-block h-4 w-4" />
