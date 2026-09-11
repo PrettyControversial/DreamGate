@@ -588,6 +588,176 @@
   }
 }
 
+/* The Descent: square Tarot-style panels and a visible lucid-dream checklist. */
+.night-map-page .night-map-content > .night-map-compact-section,
+.night-map-page .night-map-content > .night-map-meditation-compact,
+.night-map-page .night-map-content > .night-map-reflection,
+.night-map-page .night-map-content > .night-map-complete,
+.night-map-page .night-map-section-nav,
+.night-map-page .night-map-ritual-steps,
+.night-map-page .night-map-reflection__grid > div {
+  border-radius: 0.2rem !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-content > .night-map-compact-section,
+.night-map-page .night-map-content > .night-map-reflection {
+  border: 1px solid var(--night-map-line);
+  margin-top: 1rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.night-map-page .night-map-practices-compact {
+  display: block;
+}
+
+.night-map-page .night-map-checklist-intro {
+  max-width: 38rem;
+  margin: 0.8rem 0 0 !important;
+  color: var(--night-map-muted) !important;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.night-map-lucid-checklist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.night-map-checklist-card {
+  position: relative;
+  display: flex;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--night-map-line);
+  border-radius: 0.2rem;
+  background: rgba(14, 12, 6, 0.025);
+  padding: clamp(1.15rem, 2.4vw, 1.6rem);
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.night-map-checklist-card.is-complete {
+  border-color: rgba(14, 12, 6, 0.62);
+  background: rgba(14, 12, 6, 0.055);
+}
+
+.night-map-checklist-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid var(--night-map-line);
+  border-radius: 0.15rem;
+  background: transparent;
+  color: var(--night-map-ink);
+  cursor: pointer;
+}
+
+.night-map-checklist-toggle:hover,
+.night-map-checklist-toggle:focus-visible,
+.night-map-checklist-card.is-complete .night-map-checklist-toggle {
+  border-color: var(--night-map-ink);
+  background: var(--night-map-ink);
+  color: var(--night-map-panel);
+}
+
+.night-map-checklist-toggle svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.night-map-page .night-map-checklist-number {
+  margin: 0 !important;
+  color: var(--night-map-faint) !important;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.night-map-checklist-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 1.4rem;
+  color: var(--night-map-ink);
+  stroke-width: 1.35;
+}
+
+.night-map-page .night-map-checklist-eyebrow {
+  margin: 0.8rem 3rem 0 0 !important;
+  color: var(--night-map-muted) !important;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.night-map-checklist-card h3 {
+  margin: 0.45rem 3rem 0 0;
+  color: var(--night-map-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.night-map-page .night-map-checklist-description {
+  margin: 0.8rem 0 0 !important;
+  color: var(--night-map-muted) !important;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.night-map-checklist-card ol {
+  margin: 0.9rem 0 0;
+  padding-left: 1rem;
+}
+
+.night-map-page .night-map-checklist-card li {
+  padding-left: 0.15rem;
+  color: var(--night-map-muted) !important;
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.night-map-page .night-map-checklist-card li + li {
+  margin-top: 0.3rem;
+}
+
+.night-map-checklist-link {
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 0.8rem;
+  border-bottom: 1px solid var(--night-map-line);
+  color: var(--night-map-ink);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+  .night-map-page .night-map-content > .night-map-compact-section,
+  .night-map-page .night-map-content > .night-map-reflection {
+    padding: 1.25rem;
+  }
+
+  .night-map-lucid-checklist {
+    grid-template-columns: 1fr;
+  }
+
+  .night-map-checklist-card {
+    aspect-ratio: auto;
+    min-height: 20rem;
+  }
+}
+
 /* Discover uses the supplied editorial panel treatment without changing
    the interaction model or content of the section. */
 .discover-page {
@@ -6717,5 +6887,35 @@
     left: -6rem;
     width: 11rem;
     height: 13rem;
+  }
+}
+
+/* Final shape rules for The Descent override the earlier rounded Night Map treatment. */
+.night-map-page .night-map-practices-compact {
+  display: block !important;
+}
+
+.night-map-page .night-map-content > .night-map-compact-section,
+.night-map-page .night-map-content > .night-map-meditation-compact,
+.night-map-page .night-map-content > .night-map-reflection,
+.night-map-page .night-map-content > .night-map-complete,
+.night-map-page .night-map-section-nav,
+.night-map-page .night-map-ritual-steps,
+.night-map-page .night-map-reflection__grid > div {
+  border-radius: 0.2rem !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-content > .night-map-compact-section,
+.night-map-page .night-map-content > .night-map-reflection {
+  border: 1px solid var(--night-map-line) !important;
+  margin-top: 1rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+@media (max-width: 767px) {
+  .night-map-page .night-map-content > .night-map-compact-section,
+  .night-map-page .night-map-content > .night-map-reflection {
+    padding: 1.25rem;
   }
 }

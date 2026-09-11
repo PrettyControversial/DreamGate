@@ -70,7 +70,7 @@ const menuItems: SidebarItem[] = [
 
 const trackerItems: SidebarItem[] = [
   {
-    title: "Night Map",
+    title: "The Descent",
     url: "/night-map",
     symbol: "night-map",
   },

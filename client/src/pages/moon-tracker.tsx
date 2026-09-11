@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { BookOpen, Check, CheckCircle2, Eye, Feather, Heart, Pause, Play, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { BookOpen, Check, Eye, Feather, Headphones, Heart, Pause, Play, Sparkles } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { MoodEntry, SleepIntention } from "@shared/schema";
@@ -46,10 +45,17 @@ const lucidPractices = [
     description: "Lucid dreaming begins with remembering. Capture fragments before the waking world takes over.",
     steps: ["Keep your eyes closed for a few breaths when you wake.", "Follow the last feeling, image, or person back through the dream.", "Write three words before you reach for your phone."],
   },
+  {
+    id: "meditation",
+    icon: Headphones,
+    eyebrow: "Bedtime practice · 5 min",
+    title: "Lucid dream meditation",
+    description: "Settle the nervous system while keeping one quiet thread of awareness as you move toward sleep.",
+    steps: ["Put on headphones and lower the lights.", "Let your body soften without forcing sleep.", "Hold one simple intention: “I will notice when I begin to dream.”"],
+  },
 ];
 
 export default function MoonTracker() {
-  const [activePractice, setActivePractice] = useState(lucidPractices[0].id);
   const [completedPractices, setCompletedPractices] = useState<string[]>([]);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [dailyIntention, setDailyIntention] = useState("");
@@ -107,6 +113,9 @@ export default function MoonTracker() {
       nightMeditationRef.current = null;
       setNightMeditationPlaying(false);
       setNightMeditationCurrentTime(0);
+      setCompletedPractices((current) =>
+        current.includes("meditation") ? current : [...current, "meditation"],
+      );
     };
     audio.onerror = () => {
       nightMeditationRef.current = null;
@@ -126,11 +135,12 @@ export default function MoonTracker() {
     return `${minutes}:${remainder}`;
   };
 
-  const selectedPractice = lucidPractices.find((practice) => practice.id === activePractice) ?? lucidPractices[0];
-  const practiceIndex = lucidPractices.findIndex((practice) => practice.id === selectedPractice.id);
-  const SelectedPracticeIcon = selectedPractice.icon;
-  const togglePractice = (id: string) =>
-    setCompletedPractices((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  const togglePractice = (id: string) => {
+    setRitualComplete(false);
+    setCompletedPractices((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+    );
+  };
 
   return (
     <main
@@ -142,11 +152,11 @@ export default function MoonTracker() {
         <div className="night-map-arrival__copy">
           <div className="night-map-arrival__card">
             <div className="night-map-arrival__card-copy">
-              <h1>Turn inward.<br />The dream is waiting.</h1>
+              <h1>The Descent</h1>
               <p className="night-map-deck">
-                A quiet place to settle, remember, and cross gently into sleep.
+                A nightly checklist for training awareness, preparing for lucid dreams, and crossing gently into sleep.
               </p>
-              <a href="#night-ritual" className="night-map-text-link">Begin tonight&apos;s ritual <span aria-hidden="true">↓</span></a>
+              <a href="#night-ritual" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
             </div>
             <div className="night-map-arrival__mirror" aria-hidden="true">
               <img src={nightMapPortal} alt="" />
@@ -156,7 +166,7 @@ export default function MoonTracker() {
       </header>
 
       <div className="night-map-content">
-        <nav className="night-map-section-nav" aria-label="Night Map sections">
+        <nav className="night-map-section-nav" aria-label="The Descent sections">
           <a href="#night-ritual">01 <span>Descent</span></a>
           <a href="#night-practices">02 <span>Practice</span></a>
           <a href="#night-meditation">03 <span>Sound</span></a>
@@ -166,7 +176,7 @@ export default function MoonTracker() {
 
         <section id="night-ritual" className="night-map-compact-section" aria-labelledby="night-map-ritual-title">
           <div className="night-map-compact-heading">
-            <div><p className="night-map-kicker">01 / The descent</p><h2 id="night-map-ritual-title">Leave the day at the door.</h2><svg className="night-map-squiggle" viewBox="0 0 112 12" role="img" aria-label=""><path d="M2 7.5C10 1 17 11 25 6.5S40 2 48 7s15 5 23 0 15-4 22 0 12 3 17-2" /></svg></div>
+            <div><p className="night-map-kicker">01 / Arrival</p><h2 id="night-map-ritual-title">Leave the day at the door.</h2><svg className="night-map-squiggle" viewBox="0 0 112 12" role="img" aria-label=""><path d="M2 7.5C10 1 17 11 25 6.5S40 2 48 7s15 5 23 0 15-4 22 0 12 3 17-2" /></svg></div>
              <div className="night-map-ritual-heading__aside">
                <img className="night-map-ritual-heading__bird" src={nightMapSymbolCrow} alt="" aria-hidden="true" />
                <span className="night-map-progress">{completedPractices.length}/{lucidPractices.length} complete</span>
@@ -181,29 +191,45 @@ export default function MoonTracker() {
 
         <section id="night-practices" className="night-map-compact-section night-map-practices-compact" aria-labelledby="night-map-practices-title">
           <div className="night-map-compact-heading">
-            <div><p className="night-map-kicker">02 / Night practices</p><h2 id="night-map-practices-title">Choose one to begin.</h2></div>
-            <span className="night-map-progress">No pressure, just repetition.</span>
+            <div><p className="night-map-kicker">02 / Lucid dream training</p><h2 id="night-map-practices-title">Lucid Dream Checklist</h2></div>
+            <span className="night-map-progress">{completedPractices.length}/{lucidPractices.length} complete</span>
           </div>
-          <div className="night-map-practice-index-column">
-            <nav className="night-map-practice-index" aria-label="Choose a night practice">
-              {lucidPractices.map((practice, index) => {
-                const isActive = selectedPractice.id === practice.id;
-                const isComplete = completedPractices.includes(practice.id);
-                return (
-                  <button key={practice.id} type="button" onClick={() => setActivePractice(practice.id)} className={isActive ? "is-active" : ""} aria-pressed={isActive} data-testid={`button-practice-${practice.id}`}>
-                    <span>0{index + 1}</span><strong>{practice.title}</strong>{isComplete && <CheckCircle2 aria-label="Completed" />}
+          <p className="night-map-checklist-intro">Reality checks, intention, meditation, and recall work together. Complete what supports you tonight.</p>
+          <div className="night-map-lucid-checklist" role="list">
+            {lucidPractices.map((practice, index) => {
+              const PracticeIcon = practice.icon;
+              const isComplete = completedPractices.includes(practice.id);
+              return (
+                <article
+                  key={practice.id}
+                  className={`night-map-checklist-card${isComplete ? " is-complete" : ""}`}
+                  role="listitem"
+                >
+                  <button
+                    type="button"
+                    className="night-map-checklist-toggle"
+                    onClick={() => togglePractice(practice.id)}
+                    aria-pressed={isComplete}
+                    aria-label={`${isComplete ? "Uncheck" : "Complete"} ${practice.title}`}
+                    data-testid={`button-practice-${practice.id}`}
+                  >
+                    {isComplete && <Check aria-hidden="true" />}
                   </button>
-                );
-              })}
-            </nav>
+                  <p className="night-map-checklist-number">0{index + 1}</p>
+                  <PracticeIcon className="night-map-checklist-icon" aria-hidden="true" />
+                  <p className="night-map-checklist-eyebrow">{practice.eyebrow}</p>
+                  <h3>{practice.title}</h3>
+                  <p className="night-map-checklist-description">{practice.description}</p>
+                  <ol>
+                    {practice.steps.map((step) => <li key={step}>{step}</li>)}
+                  </ol>
+                  {practice.id === "meditation" && (
+                    <a href="#night-meditation" className="night-map-checklist-link">Open meditation <span aria-hidden="true">↓</span></a>
+                  )}
+                </article>
+              );
+            })}
           </div>
-          <article className="night-map-practice-detail">
-            <div className="night-map-practice-detail__title"><SelectedPracticeIcon aria-hidden="true" /><div><p>{selectedPractice.eyebrow}</p><h3>{selectedPractice.title}</h3></div></div>
-            <p className="night-map-practice-detail__description">{selectedPractice.description}</p>
-            <ol>{selectedPractice.steps.map((step, index) => <li key={step}><span>0{index + 1}</span><p>{step}</p></li>)}</ol>
-            <button type="button" onClick={() => togglePractice(selectedPractice.id)} className="night-map-text-button" data-testid="button-complete-practice"><Check aria-hidden="true" />{completedPractices.includes(selectedPractice.id) ? "Practice complete" : "Mark as practiced"}</button>
-            <p className="night-map-practice-detail__count">Practice {practiceIndex + 1} of {lucidPractices.length}</p>
-          </article>
         </section>
 
         <section id="night-meditation" className="night-map-meditation-compact" data-testid="night-meditation" aria-labelledby="night-map-meditation-title">
@@ -213,7 +239,7 @@ export default function MoonTracker() {
           <div className="night-map-object-stage night-map-object-stage--ivy" aria-hidden="true">
             <img src={nightMapIvy} alt="" />
           </div>
-          <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">03 / Sound healing</p><h2 id="night-map-meditation-title">Dream meditation</h2><span>5 min · 432 Hz</span></div>
+          <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">03 / Meditation</p><h2 id="night-map-meditation-title">Lucid dream meditation</h2><span>5 min · 432 Hz</span></div>
           <div className="night-map-audio-player">
             <button type="button" onClick={toggleNightMeditation} className="night-map-audio-player__play" data-testid="button-night-meditation" aria-label={nightMeditationPlaying ? "Pause meditation" : "Play meditation"}>{nightMeditationPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}</button>
             <div className="night-map-audio-player__track">

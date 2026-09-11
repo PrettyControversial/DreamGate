@@ -115,8 +115,8 @@ const allContent: ContentCard[] = [
   },
   {
     id: "night-map",
-    title: "Night Map",
-    description: "Track sleep patterns",
+    title: "The Descent",
+    description: "A nightly lucid-dream checklist",
     icon: <DreamGateFunctionSymbol kind="night-map" className="h-8 w-8 brightness-0 invert" />,
     href: "/night-map",
     category: "Wellness",

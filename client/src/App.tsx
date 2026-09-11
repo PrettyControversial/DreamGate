@@ -1326,7 +1326,7 @@ function AccountControls({
           <SheetClose asChild>
             <Link href="/night-map" className={drawerLinkClass("/night-map")}>
               <DreamGateFunctionSymbol kind="night-map" className="h-7 w-7" />
-              <span>Night Map</span>
+              <span>The Descent</span>
             </Link>
           </SheetClose>
           <SheetClose asChild>

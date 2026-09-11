@@ -612,7 +612,7 @@ export default function Dashboard() {
     { title: "Ask Psyra", subtitle: "Jungian dream analysis", image: dreamDecoderImage, href: "/decoder", testId: "card-decoder" },
     { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar" },
     { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot" },
-    { title: "Night Map", subtitle: "Track patterns", image: nightMapImage, href: "/night-map", testId: "card-night-map" },
+    { title: "The Descent", subtitle: "Lucid dream preparation", image: nightMapImage, href: "/night-map", testId: "card-night-map" },
     { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
   ];
 
@@ -629,7 +629,7 @@ export default function Dashboard() {
 
   const exploreCards = [
     { title: "Dream Dictionary", subtitle: "Symbol meanings", image: dreamDictionaryImage, href: "/dictionary", testId: "card-dictionary" },
-    { title: "Night Map", subtitle: "Track patterns", image: nightMapImage, href: "/night-map", testId: "card-tracker" },
+    { title: "The Descent", subtitle: "Lucid dream preparation", image: nightMapImage, href: "/night-map", testId: "card-tracker" },
     { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar-2" },
   ];
 
