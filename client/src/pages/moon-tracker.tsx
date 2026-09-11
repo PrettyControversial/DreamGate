@@ -7,9 +7,7 @@ import type { MoodEntry, SleepIntention } from "@shared/schema";
 import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.mp3";
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.mp3";
 import nightMapPaperTexture from "@assets/night-map-paper-texture.webp";
-import nightMapSymbolCrow from "@assets/night-map-symbol-crow.webp";
 import nightMapHeaderRelief from "@assets/night-map-stone-cutout.png";
-import nightMapPortal from "@assets/night-map-portal.webp";
 import nightMapIvy from "@assets/night-map-ivy.webp";
 import nightMapStoneSteps from "@assets/night-map-stone-steps.webp";
 
@@ -194,7 +192,7 @@ export default function MoonTracker() {
               <p className="night-map-deck">
                 A nightly checklist for training awareness, preparing for lucid dreams, and crossing gently into sleep.
               </p>
-              <a href="#night-ritual" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
+              <a href="#night-practices" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
             </div>
             <div className="night-map-arrival__mirror" aria-hidden="true">
               <img src={nightMapPortal} alt="" />
@@ -205,31 +203,15 @@ export default function MoonTracker() {
 
       <div className="night-map-content">
         <nav className="night-map-section-nav" aria-label="The Descent sections">
-          <a href="#night-ritual">01 <span>Descent</span></a>
-          <a href="#night-practices">02 <span>Practice</span></a>
-          <a href="#night-meditation">03 <span>Sound</span></a>
-          <a href="#night-reflection">04 <span>Reflect</span></a>
-          <a href="#night-sleep">05 <span>Sleep</span></a>
+          <a href="#night-practices">01 <span>Practice</span></a>
+          <a href="#night-meditation">02 <span>Sound</span></a>
+          <a href="#night-reflection">03 <span>Reflect</span></a>
+          <a href="#night-sleep">04 <span>Sleep</span></a>
         </nav>
-
-        <section id="night-ritual" className="night-map-compact-section" aria-labelledby="night-map-ritual-title">
-          <div className="night-map-compact-heading">
-            <div><p className="night-map-kicker">01 / Arrival</p><h2 id="night-map-ritual-title">Leave the day at the door.</h2><svg className="night-map-squiggle" viewBox="0 0 112 12" role="img" aria-label=""><path d="M2 7.5C10 1 17 11 25 6.5S40 2 48 7s15 5 23 0 15-4 22 0 12 3 17-2" /></svg></div>
-             <div className="night-map-ritual-heading__aside">
-               <img className="night-map-ritual-heading__bird" src={nightMapSymbolCrow} alt="" aria-hidden="true" />
-               <span className="night-map-progress">{completedPractices.length}/{lucidPractices.length} complete</span>
-             </div>
-          </div>
-          <ol className="night-map-ritual-steps">
-            <li><span>01</span><div><h3>Settle</h3><p>Put the day somewhere outside yourself.</p></div></li>
-            <li><span>02</span><div><h3>Notice</h3><p>Remember what is still moving through you.</p></div></li>
-            <li><span>03</span><div><h3>Enter</h3><p>Let your attention soften toward sleep.</p></div></li>
-          </ol>
-        </section>
 
         <section id="night-practices" className="night-map-compact-section night-map-practices-compact" aria-labelledby="night-map-practices-title">
           <div className="night-map-compact-heading">
-            <div><p className="night-map-kicker">02 / Lucid dream training</p><h2 id="night-map-practices-title">Lucid Dream Checklist</h2></div>
+            <div><p className="night-map-kicker">01 / Lucid dream training</p><h2 id="night-map-practices-title">Lucid Dream Checklist</h2></div>
             <span className="night-map-progress">{completedPractices.length}/{lucidPractices.length} complete</span>
           </div>
           <p className="night-map-checklist-intro">Reality checks, intention, meditation, and recall work together. Complete what supports you tonight.</p>
@@ -280,7 +262,7 @@ export default function MoonTracker() {
           <div className="night-map-object-stage night-map-object-stage--ivy" aria-hidden="true">
             <img src={nightMapIvy} alt="" />
           </div>
-          <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">03 / Meditation</p><h2 id="night-map-meditation-title">Lucid dream meditations</h2><span>Headphones recommended</span></div>
+          <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">02 / Meditation</p><h2 id="night-map-meditation-title">Lucid dream meditations</h2><span>Headphones recommended</span></div>
           <div className="night-map-meditation-list">
             {lucidMeditations.map((track) => {
               const isActive = activeMeditationId === track.id;
@@ -305,7 +287,7 @@ export default function MoonTracker() {
         </section>
 
         <section id="night-reflection" className="night-map-reflection" aria-labelledby="night-map-reflection-title">
-          <div className="night-map-compact-heading"><div><p className="night-map-kicker">04 / Reflection</p><h2 id="night-map-reflection-title">Arrive as you are.</h2></div></div>
+          <div className="night-map-compact-heading"><div><p className="night-map-kicker">03 / Reflection</p><h2 id="night-map-reflection-title">Arrive as you are.</h2></div></div>
           <div className="night-map-reflection__grid">
             <div>
               <div className="night-map-reflection__label"><Heart aria-hidden="true" /><span>How does the body feel?</span></div>
@@ -327,7 +309,7 @@ export default function MoonTracker() {
             <img src={nightMapStoneSteps} alt="" />
           </div>
           <div className="night-map-complete__heading">
-            <p className="night-map-kicker">05 / Sleep</p>
+            <p className="night-map-kicker">04 / Sleep</p>
             <h2>{ritualComplete ? "The night is yours." : "Let the day become a dream."}</h2>
           </div>
           <button type="button" onClick={() => { setCompletedPractices(lucidPractices.map((practice) => practice.id)); setRitualComplete(true); }} className="night-map-complete__button" data-testid="button-complete-ritual">{ritualComplete ? "Ritual complete" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span></button>

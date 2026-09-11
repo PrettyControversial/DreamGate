@@ -6901,16 +6901,27 @@
 .night-map-page .night-map-content > .night-map-complete,
 .night-map-page .night-map-section-nav,
 .night-map-page .night-map-ritual-steps,
-.night-map-page .night-map-reflection__grid > div {
+.night-map-page .night-map-reflection__grid > div,
+.night-map-page .night-map-checklist-card,
+.night-map-page .night-map-meditation-track,
+.night-map-page .night-map-checklist-toggle {
   border-radius: 0.2rem !important;
   box-shadow: none !important;
+  border: 2px solid #0e0c06 !important;
 }
 
 .night-map-page .night-map-content > .night-map-compact-section,
 .night-map-page .night-map-content > .night-map-reflection {
-  border: 1px solid var(--night-map-line) !important;
   margin-top: 1rem;
   padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.night-map-page .night-map-section-nav a {
+  border-right-width: 2px;
+}
+
+.night-map-page .night-map-section-nav a:last-child {
+  border-right-width: 0;
 }
 
 @media (max-width: 767px) {
