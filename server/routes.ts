@@ -6,6 +6,7 @@ import {
   insertDreamSchema, 
   updateDreamSchema, 
   insertWritingPromptSchema,
+  insertSavedWritingPromptSchema,
   insertNumerologySchema,
   insertIntentionSchema,
   updateIntentionSchema,
@@ -165,6 +166,37 @@ export async function registerRoutes(
       res.status(201).json(prompt);
     } catch (error) {
       res.status(500).json({ error: "Failed to create prompt" });
+    }
+  });
+
+  app.get("/api/saved-prompts", async (_req, res) => {
+    try {
+      res.json(await storage.getSavedPrompts(currentUserId(res)));
+    } catch {
+      res.status(500).json({ error: "Failed to fetch saved prompts" });
+    }
+  });
+
+  app.post("/api/saved-prompts", async (req, res) => {
+    const parsed = insertSavedWritingPromptSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.message });
+    }
+    try {
+      const saved = await storage.savePrompt(currentUserId(res), parsed.data);
+      res.status(201).json(saved);
+    } catch {
+      res.status(500).json({ error: "Failed to save prompt" });
+    }
+  });
+
+  app.delete("/api/saved-prompts/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteSavedPrompt(currentUserId(res), req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Saved prompt not found" });
+      res.status(204).send();
+    } catch {
+      res.status(500).json({ error: "Failed to remove saved prompt" });
     }
   });
 

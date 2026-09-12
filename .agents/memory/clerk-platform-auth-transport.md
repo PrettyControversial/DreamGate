@@ -9,6 +9,12 @@ Use Clerk session cookies for browser API requests and Clerk bearer tokens only 
 
 **How to apply:** Keep platform detection at the API-client boundary. Do not add authorization headers to normal web requests, and do not remove native token support when changing Clerk wiring.
 
+Web Clerk provider values must keep the managed canonical shape: derive the publishable key from the browser hostname with the injected key as fallback, and pass the injected proxy URL directly. Branch only the native values.
+
+**Why:** Letting native fallback logic alter browser `publishableKey` or `proxyUrl` can leave the published sign-in screen waiting forever even while development auth works.
+
+**How to apply:** When adding Capacitor support, preserve an explicit web branch that uses the managed environment values verbatim. Put API-host-derived proxy fallback only in the native branch.
+
 Native Capacitor bundles must also be built with `VITE_API_BASE_URL` set to DreamGate's published HTTPS URL; `capacitor://localhost` is the local app shell, not the Express backend.
 
 **Why:** Relative API calls work in the browser because frontend and backend share an origin, but an iOS webview cannot reach the server through its device-local origin.

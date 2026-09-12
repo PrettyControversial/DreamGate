@@ -200,13 +200,15 @@ const clerkPubKey = isNativePlatform
   ? configuredClerkPubKey || publishableKeyFromHost(nativeApiUrl?.hostname ?? "")
   : publishableKeyFromHost(
       window.location.hostname,
-      configuredClerkPubKey || undefined,
+      import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
     );
-const clerkProxyUrl = configuredClerkProxyUrl || (
-  nativeApiUrl
-    ? new URL("/api/__clerk", nativeApiUrl).toString().replace(/\/$/, "")
-    : undefined
-);
+const clerkProxyUrl = isNativePlatform
+  ? configuredClerkProxyUrl || (
+      nativeApiUrl
+        ? new URL("/api/__clerk", nativeApiUrl).toString().replace(/\/$/, "")
+        : undefined
+    )
+  : import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function stripBase(path: string): string {

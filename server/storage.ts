@@ -5,6 +5,8 @@ import {
   type InsertDream,
   type WritingPrompt,
   type InsertWritingPrompt,
+  type SavedWritingPrompt,
+  type InsertSavedWritingPrompt,
   type DreamStats,
   type CelestialData,
   type MoonPhase,
@@ -28,7 +30,7 @@ import OpenAI from "openai";
 import { normalizeArchetypeId } from "@shared/psyra";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db";
-import { dreams as dreamsTable } from "@shared/schema";
+import { dreams as dreamsTable, savedWritingPrompts as savedWritingPromptsTable } from "@shared/schema";
 import {
   getAstronomicalSnapshot,
   getCurrentCelestialData,
@@ -134,6 +136,9 @@ export interface IStorage {
   getPrompt(id: string): Promise<WritingPrompt | undefined>;
   getDailyPrompt(): Promise<WritingPrompt | undefined>;
   createPrompt(prompt: InsertWritingPrompt): Promise<WritingPrompt>;
+  getSavedPrompts(userId: string): Promise<SavedWritingPrompt[]>;
+  savePrompt(userId: string, prompt: InsertSavedWritingPrompt): Promise<SavedWritingPrompt>;
+  deleteSavedPrompt(userId: string, id: string): Promise<boolean>;
   
   getCelestialData(): Promise<CelestialData>;
   getMonthlyLunarCalendar(year: number, month: number): Promise<MonthlyLunarCalendar>;
@@ -687,6 +692,7 @@ export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private dreams: Map<string, Map<string, Dream>>;
   private prompts: Map<string, WritingPrompt>;
+  private savedPrompts: Map<string, SavedWritingPrompt[]>;
   private numerologyProfiles: Map<string, NumerologyProfile>;
   private moodEntries: Map<string, MoodEntry[]>;
   private sleepIntentions: Map<string, SleepIntention[]>;
@@ -695,6 +701,7 @@ export class MemStorage implements IStorage {
     this.users = new Map();
     this.dreams = new Map();
     this.prompts = new Map();
+    this.savedPrompts = new Map();
     this.numerologyProfiles = new Map();
     this.moodEntries = new Map();
     this.sleepIntentions = new Map();
@@ -728,6 +735,7 @@ export class MemStorage implements IStorage {
     this.numerologyProfiles.delete(userId);
     this.moodEntries.delete(userId);
     this.sleepIntentions.delete(userId);
+    this.savedPrompts.delete(userId);
   }
 
   private getDreamStore(userId: string): Map<string, Dream> {
@@ -886,6 +894,33 @@ export class MemStorage implements IStorage {
     const prompt: WritingPrompt = { ...insertPrompt, id, isUsed: false, category: insertPrompt.category || "general" };
     this.prompts.set(id, prompt);
     return prompt;
+  }
+
+  async getSavedPrompts(userId: string): Promise<SavedWritingPrompt[]> {
+    return [...(this.savedPrompts.get(userId) ?? [])].sort(
+      (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
+    );
+  }
+
+  async savePrompt(userId: string, insertPrompt: InsertSavedWritingPrompt): Promise<SavedWritingPrompt> {
+    const saved = this.savedPrompts.get(userId) ?? [];
+    const existing = saved.find((item) => item.prompt === insertPrompt.prompt);
+    if (existing) return existing;
+    const prompt: SavedWritingPrompt = {
+      id: randomUUID(),
+      userId,
+      ...insertPrompt,
+      savedAt: new Date(),
+    };
+    this.savedPrompts.set(userId, [prompt, ...saved]);
+    return prompt;
+  }
+
+  async deleteSavedPrompt(userId: string, id: string): Promise<boolean> {
+    const saved = this.savedPrompts.get(userId) ?? [];
+    const next = saved.filter((prompt) => prompt.id !== id);
+    this.savedPrompts.set(userId, next);
+    return next.length !== saved.length;
   }
 
   async getCelestialData(): Promise<CelestialData> {
@@ -1188,6 +1223,7 @@ const dreamSymbolsData: DreamSymbol[] = [
 
 class DatabaseStorage extends MemStorage {
   async deleteUserData(userId: string): Promise<void> {
+    await db.delete(savedWritingPromptsTable).where(eq(savedWritingPromptsTable.userId, userId));
     await db.delete(dreamsTable).where(eq(dreamsTable.userId, userId));
     await super.deleteUserData(userId);
   }
@@ -1286,6 +1322,47 @@ class DatabaseStorage extends MemStorage {
       topSymbols: topEntries(symbolCounts).map(({ value: symbol, count }) => ({ symbol, count })),
       dreamsByMonth: months.map((month) => ({ month, count: monthCounts[month] || 0 })),
     };
+  }
+
+  async getSavedPrompts(userId: string): Promise<SavedWritingPrompt[]> {
+    return db
+      .select()
+      .from(savedWritingPromptsTable)
+      .where(eq(savedWritingPromptsTable.userId, userId))
+      .orderBy(desc(savedWritingPromptsTable.savedAt));
+  }
+
+  async savePrompt(userId: string, insertPrompt: InsertSavedWritingPrompt): Promise<SavedWritingPrompt> {
+    const [existing] = await db
+      .select()
+      .from(savedWritingPromptsTable)
+      .where(
+        and(
+          eq(savedWritingPromptsTable.userId, userId),
+          eq(savedWritingPromptsTable.prompt, insertPrompt.prompt),
+        ),
+      )
+      .limit(1);
+    if (existing) return existing;
+
+    const [saved] = await db
+      .insert(savedWritingPromptsTable)
+      .values({ userId, ...insertPrompt })
+      .returning();
+    return saved;
+  }
+
+  async deleteSavedPrompt(userId: string, id: string): Promise<boolean> {
+    const deleted = await db
+      .delete(savedWritingPromptsTable)
+      .where(
+        and(
+          eq(savedWritingPromptsTable.userId, userId),
+          eq(savedWritingPromptsTable.id, id),
+        ),
+      )
+      .returning({ id: savedWritingPromptsTable.id });
+    return deleted.length > 0;
   }
 }
 

@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { type WritingPrompt } from "@shared/schema";
-import { ChevronLeft, ChevronRight, PenLine, Shuffle, Sparkles } from "lucide-react";
-
-const WRITING_PROMPT_SESSION_KEY = "dreamgate:writing-prompt:pending";
+import { type SavedWritingPrompt, type WritingPrompt } from "@shared/schema";
+import { Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, PenLine, Shuffle, Sparkles, Trash2 } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 const categories = [
   { id: "all", label: "All Prompts" },
@@ -31,11 +29,26 @@ const formatCategory = (category: string) =>
 export default function WritingPrompts() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
-  const [, navigate] = useLocation();
   const categoryCarouselRef = useRef<HTMLDivElement>(null);
 
   const { data: prompts, isLoading, isError, refetch } = useQuery<WritingPrompt[]>({
     queryKey: ["/api/prompts"],
+  });
+  const { data: savedPrompts = [], isLoading: savedPromptsLoading } = useQuery<SavedWritingPrompt[]>({
+    queryKey: ["/api/saved-prompts"],
+  });
+  const savePromptMutation = useMutation({
+    mutationFn: (prompt: WritingPrompt) =>
+      apiRequest("POST", "/api/saved-prompts", {
+        promptId: prompt.id,
+        prompt: prompt.prompt,
+        category: prompt.category,
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/saved-prompts"] }),
+  });
+  const removePromptMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/saved-prompts/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/saved-prompts"] }),
   });
 
   const filteredPrompts = useMemo(
@@ -100,11 +113,11 @@ export default function WritingPrompts() {
     });
   };
 
-  const startWriting = () => {
+  const saveCurrentPrompt = () => {
     if (!currentPrompt) return;
-    sessionStorage.setItem(WRITING_PROMPT_SESSION_KEY, currentPrompt.prompt);
-    navigate("/decoder");
+    savePromptMutation.mutate(currentPrompt);
   };
+  const currentPromptIsSaved = savedPrompts.some((saved) => saved.prompt === currentPrompt?.prompt);
 
   if (isLoading) {
     return (
@@ -222,11 +235,12 @@ export default function WritingPrompts() {
                 <div className="mt-2 flex w-full justify-center">
                   <Button
                     className="home-capsule-button home-capsule-button--solid writing-prompts-button w-full max-w-xs"
-                    onClick={startWriting}
-                    data-testid="button-start-writing-prompt"
+                    onClick={saveCurrentPrompt}
+                    disabled={currentPromptIsSaved || savePromptMutation.isPending}
+                    data-testid="button-save-writing-prompt"
                   >
-                    <PenLine className="h-4 w-4 mr-1.5" />
-                    Start Writing
+                    {currentPromptIsSaved ? <BookmarkCheck className="h-4 w-4 mr-1.5" /> : <Bookmark className="h-4 w-4 mr-1.5" />}
+                    {currentPromptIsSaved ? "Saved" : savePromptMutation.isPending ? "Saving..." : "Save Prompt"}
                   </Button>
                 </div>
               </div>
@@ -249,6 +263,54 @@ export default function WritingPrompts() {
           <Card>
             <CardContent className="p-8 text-center">
               <p className="text-muted-foreground">No prompts available in this category</p>
+            </CardContent>
+          </Card>
+        )}
+      </section>
+
+      <section className="writing-prompts-saved" aria-labelledby="saved-prompts-title">
+        <div className="flex items-baseline justify-between gap-4 mb-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Your collection</p>
+            <h2 id="saved-prompts-title" className="font-display text-xl font-semibold">Saved Prompts</h2>
+          </div>
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            {savedPrompts.length} saved
+          </p>
+        </div>
+        {savedPromptsLoading ? (
+          <Skeleton className="h-28 w-full" />
+        ) : savedPrompts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {savedPrompts.map((saved) => (
+              <Card key={saved.id} className="writing-prompts-saved-card">
+                <CardContent className="flex h-full flex-col gap-4 p-5">
+                  <blockquote className="font-display text-lg leading-relaxed">“{saved.prompt}”</blockquote>
+                  <div className="mt-auto flex items-center justify-between gap-3">
+                    <Badge variant="outline">{formatCategory(saved.category)}</Badge>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removePromptMutation.mutate(saved.id)}
+                      disabled={removePromptMutation.isPending}
+                      aria-label={`Remove saved prompt: ${saved.prompt}`}
+                      data-testid={`button-remove-saved-prompt-${saved.id}`}
+                    >
+                      <Trash2 className="mr-1.5 h-4 w-4" />
+                      Remove
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="writing-prompts-saved-empty">
+            <CardContent className="p-8 text-center">
+              <Bookmark className="mx-auto mb-3 h-6 w-6 text-muted-foreground" />
+              <p className="font-display text-lg">Your saved prompts will appear here.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Choose a prompt above and save it for later.</p>
             </CardContent>
           </Card>
         )}

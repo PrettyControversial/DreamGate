@@ -21,6 +21,7 @@ import {
 import { formatDate } from "@/lib/utils";
 import { type Dream, type EnhancedDreamInterpretation } from "@shared/schema";
 import dreamDecoderBackground from "@assets/dreamgate_backgrounds/dream-decoder-background.webp";
+import dreamgatePageTexture from "@assets/texture__(3)_1788397809454.jpeg";
 import recordDreamIcon from "@assets/IMG_3506_1788597855389.png";
 import { 
   Sparkles, 
@@ -535,7 +536,10 @@ export default function DreamDecoder() {
   }
 
   return (
-    <div className="decoder-light-surface relative min-h-screen pb-24 bg-background">
+    <div
+      className="decoder-light-surface dream-decoder-light-surface relative min-h-screen pb-24 bg-background"
+      style={{ backgroundImage: `url(${dreamgatePageTexture})` }}
+    >
       <HeroSection />
       <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
@@ -641,8 +645,8 @@ export default function DreamDecoder() {
               <Card className="min-w-0 overflow-hidden bg-card border-border">
                 <CardHeader>
                   <CardTitle className="font-display text-lg flex items-center gap-2">
-                    <Compass className="h-5 w-5 text-secondary" />
-                    <span className="text-secondary">Core Themes</span>
+                    <Compass className="h-5 w-5 text-foreground" />
+                    <span className="text-foreground">Core Themes</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="min-w-0">
