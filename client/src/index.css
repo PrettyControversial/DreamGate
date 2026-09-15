@@ -8915,6 +8915,36 @@
   opacity: 1 !important;
 }
 
+.night-map-page .night-map-recall {
+  max-width: 28rem;
+  margin-top: 1.25rem;
+}
+
+.night-map-page .night-map-recall label {
+  display: block;
+  margin-bottom: 0.55rem;
+  color: #f8f3e9 !important;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.night-map-page .night-map-recall__textarea {
+  min-height: 8.5rem;
+  resize: vertical;
+  border: 1px solid rgba(248, 243, 233, 0.42) !important;
+  border-radius: 0.25rem !important;
+  background: rgba(8, 10, 8, 0.58) !important;
+  color: #f8f3e9 !important;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.night-map-page .night-map-recall__textarea::placeholder {
+  color: #ded7ca !important;
+  opacity: 1 !important;
+}
+
 .night-map-page .night-map-checklist-toggle,
 .night-map-page .night-map-practice-expand,
 .night-map-page .night-map-audio-player__play,

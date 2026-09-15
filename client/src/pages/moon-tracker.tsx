@@ -102,6 +102,7 @@ export default function MoonTracker() {
   const [completedPractices, setCompletedPractices] = useState<string[]>([]);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [openPracticeId, setOpenPracticeId] = useState("reality-check");
+  const [dreamRecall, setDreamRecall] = useState("");
   const [dailyIntention, setDailyIntention] = useState("");
   const [moodSaved, setMoodSaved] = useState(false);
   const [intentionSaved, setIntentionSaved] = useState(false);
@@ -325,6 +326,19 @@ export default function MoonTracker() {
                       })()}
                      {practice.id === "intention" && (
                        <a href="#night-reflection" className="night-map-checklist-link">Set intention <span aria-hidden="true">↓</span></a>
+                     )}
+                     {practice.id === "recall" && (
+                       <div className="night-map-recall">
+                         <label htmlFor="night-recall">Three things that come to mind when you wake</label>
+                         <Textarea
+                           id="night-recall"
+                           value={dreamRecall}
+                           onChange={(event) => setDreamRecall(event.target.value)}
+                           placeholder={"1. A feeling, image, or person\n2. A detail from the dream\n3. What stayed with me"}
+                           className="night-map-recall__textarea"
+                           data-testid="textarea-dream-recall"
+                         />
+                       </div>
                      )}
                      <button
                        type="button"
