@@ -7,6 +7,7 @@ import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 import type { MoodEntry, SleepIntention } from "@shared/schema";
 import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.mp3";
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.mp3";
+import boxBreathingAudio from "@/assets/box-breathing-for-sleep.mp3";
 import nightMapPaperTexture from "@assets/night-map-paper-texture.webp";
 import nightMapHeaderRelief from "@assets/night-map-stone-cutout.png";
 import nightMapPortal from "@assets/night-map-portal.webp";
@@ -41,6 +42,16 @@ const lucidMeditations = [
     durationSeconds: 505,
     audioFile: thetaRealmAudio,
     guidance: "Use this when your body is ready for rest. Rehearse meeting one familiar dream sign with calm attention, then let the scene soften without forcing sleep.",
+  },
+  {
+    id: "box-breathing",
+    practiceId: "box-breathing",
+    title: "Box Breathing for Sleep",
+    subtitle: "Sleep meditation · Headphones recommended",
+    durationLabel: "6:40",
+    durationSeconds: 400,
+    audioFile: boxBreathingAudio,
+    guidance: "A slow four-count rhythm to settle the body and make the transition into sleep feel less effortful.",
   },
 ];
 
@@ -151,7 +162,9 @@ export default function MoonTracker() {
       setNightMeditationPlaying(false);
       setNightMeditationCurrentTime(0);
       setCompletedPractices((current) =>
-        current.includes(track.practiceId) ? current : [...current, track.practiceId],
+        track.practiceId === "box-breathing" || current.includes(track.practiceId)
+          ? current
+          : [...current, track.practiceId],
       );
     };
     audio.onerror = () => {
@@ -197,6 +210,45 @@ export default function MoonTracker() {
               <p className="night-map-deck">
                 A nightly checklist for training awareness, preparing for lucid dreams, and crossing gently into sleep.
               </p>
+              <div className="night-map-headphones-note">
+                <Headphones aria-hidden="true" />
+                <span>Headphones are recommended</span>
+              </div>
+              <div className="night-map-box-breathing">
+                <div className="night-map-box-breathing__copy">
+                  <p>Sleep meditation</p>
+                  <h2>Box Breathing for Sleep</h2>
+                </div>
+                <button
+                  type="button"
+                  className="night-map-box-breathing__play"
+                  onClick={() => toggleNightMeditation(lucidMeditations[2])}
+                  aria-label={activeMeditationId === "box-breathing" && nightMeditationPlaying ? "Pause Box Breathing for Sleep" : "Play Box Breathing for Sleep"}
+                  data-testid="button-box-breathing"
+                >
+                  {activeMeditationId === "box-breathing" && nightMeditationPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
+                </button>
+                <div className="night-map-box-breathing__track">
+                  <div className="night-map-box-breathing__times">
+                    <span>{activeMeditationId === "box-breathing" ? formatAudioTime(nightMeditationCurrentTime) : "0:00"}</span>
+                    <span>6:40</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max={activeMeditationId === "box-breathing" ? nightMeditationDuration || 400 : 400}
+                    step="0.1"
+                    value={activeMeditationId === "box-breathing" ? Math.min(nightMeditationCurrentTime, nightMeditationDuration || 400) : 0}
+                    onChange={(event) => {
+                      if (activeMeditationId !== "box-breathing") return;
+                      const nextTime = Number(event.target.value);
+                      setNightMeditationCurrentTime(nextTime);
+                      if (nightMeditationRef.current) nightMeditationRef.current.currentTime = nextTime;
+                    }}
+                    aria-label="Box Breathing for Sleep progress"
+                  />
+                </div>
+              </div>
               <a href="#night-practices" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
             </div>
             <div className="night-map-arrival__mirror" aria-hidden="true">
