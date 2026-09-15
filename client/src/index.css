@@ -9090,3 +9090,10 @@
   color: #f8f3e9 !important;
 }
 
+.night-map-page .night-map-save-error {
+  margin: 0.8rem 0 0;
+  color: #f8f3e9 !important;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
