@@ -7925,9 +7925,10 @@
 
 .psyra-loading-key img {
   display: block;
-  width: clamp(4.5rem, 12vw, 6.5rem);
+  width: clamp(9rem, 23vw, 14rem);
   height: auto;
   opacity: 0.96;
+  transform-origin: center;
   animation: psyra-key-rotate 2.8s linear infinite;
 }
 
