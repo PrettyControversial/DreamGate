@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import introImage from "@assets/Copy_of_Holistic_Coach_Instagram_Kit_(Square_Posts)_1788595169788.png";
-import loadingKey from "@assets/dreamgate-loading-key.webp";
 
 interface DreamgateIntroProps {
   onComplete: () => void;
@@ -35,15 +34,6 @@ export function DreamgateIntro({ onComplete, onError }: DreamgateIntroProps) {
         className="dashboard-intro__art"
         onError={onError}
       />
-      <DreamgateLoadingKey />
-    </div>
-  );
-}
-
-export function DreamgateLoadingKey({ compact = false }: { compact?: boolean }) {
-  return (
-    <div className={`dashboard-intro__loader${compact ? " dashboard-intro__loader--compact" : ""}`} aria-label="Opening DreamGate">
-      <img src={loadingKey} alt="" aria-hidden="true" />
     </div>
   );
 }

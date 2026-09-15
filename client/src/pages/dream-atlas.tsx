@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ChevronDown, Compass, KeyRound, MapPin, Search } from "lucide-react";
+import { ChevronDown, Compass, MapPin, Search } from "lucide-react";
 import type { Dream } from "@shared/schema";
 import poolImage from "@assets/stock_images/ocean_waves_texture__8ce19598.jpg";
 import natureImage from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
@@ -9,7 +9,6 @@ import portalImage from "@assets/night-map-portal.webp";
 import parkImage from "@assets/dream-atlas-park.webp";
 import mallDetail from "@assets/atlas-detail-mall.webp";
 import waterDetail from "@assets/atlas-detail-water.webp";
-import keyDetail from "@assets/atlas-detail-key.webp";
 import villageDetail from "@assets/atlas-detail-village.webp";
 import atlasBackground from "@assets/dream-atlas-background.png";
 
@@ -88,7 +87,6 @@ export default function DreamAtlas() {
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
       <img className="atlas-background" src={atlasBackground} alt="" aria-hidden="true" />
-      <img className="atlas-detail atlas-detail--key" src={keyDetail} alt="" aria-hidden="true" />
       <img className="atlas-detail atlas-detail--village" src={villageDetail} alt="" aria-hidden="true" />
       <header className="atlas-header">
         <div>
@@ -139,7 +137,6 @@ export default function DreamAtlas() {
         </section>
       )}
 
-      <div className="atlas-footer-mark" aria-hidden="true"><KeyRound /><span>Certain places<br />always find you.</span></div>
     </main>
   );
 }

@@ -48,7 +48,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { DreamGateLogo } from "@/components/dreamgate-logo";
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import { DreamGateSymbolBackground } from "@/components/dreamgate-symbol-background";
-import { DreamgateIntro, DreamgateLoadingKey } from "@/components/dreamgate-intro";
+import { DreamgateIntro } from "@/components/dreamgate-intro";
 import { LunarNotificationSync } from "@/components/lunar-notification-settings";
 import {
   deactivateLunarNotificationUser,
@@ -1442,7 +1442,6 @@ function AccountControls({
 function RouteLoading() {
   return (
     <div className="route-loading flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center gap-3 bg-background px-6">
-      <DreamgateLoadingKey compact />
       <p className="text-sm text-muted-foreground">Opening your dream space…</p>
     </div>
   );
@@ -1715,7 +1714,6 @@ function AuthenticatedQueryProvider() {
         </>
       ) : (
         <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
-          <DreamgateLoadingKey compact />
           <p className="text-sm text-muted-foreground">Opening your private dream space…</p>
         </div>
       )}
@@ -1742,7 +1740,6 @@ function App() {
   if (!nativeTokenReady) {
     return (
       <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
-        <DreamgateLoadingKey compact />
         <p className="text-sm text-muted-foreground">
           Opening your private dream space…
         </p>
