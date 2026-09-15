@@ -7,7 +7,6 @@ import {
   Search, 
   BookOpen, 
   Moon, 
-  Wind, 
   ChevronRight,
   Heart,
   Star,
@@ -160,13 +159,6 @@ const learnContent = [
       />
     ),
     href: "/tarot",
-  },
-  {
-    id: "meditation-101",
-    title: "Meditation Techniques",
-    description: "Breathing exercises and mindfulness practices",
-    icon: <Wind className="h-5 w-5" />,
-    href: "/meditation",
   },
 ];
 
