@@ -352,7 +352,8 @@ function saveReading(reading: TarotReading) {
 }
 
 export default function Tarot() {
-  const { canAccess, openPaywall } = useSubscription();
+  const { canAccess, freeTarotPullsRemaining, openPaywall, recordTarotPull } =
+    useSubscription();
   const [selectedSpread, setSelectedSpread] = useState<string | null>(null);
   const [drawnCards, setDrawnCards] = useState<{ card: TarotCard; reversed: boolean; position: string }[]>([]);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -412,6 +413,7 @@ export default function Tarot() {
       }))
     };
     saveReading(reading);
+    recordTarotPull();
     trackEvent("tarot_card_drawn", {
       spread: spreadId,
       card_count: drawn.length,
@@ -519,7 +521,11 @@ export default function Tarot() {
                   <div>
                     <p className="font-medium">Tarot readings are part of Psyra+</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Choose a spread below to open the subscription options.
+                      {freeTarotPullsRemaining > 0
+                        ? `${freeTarotPullsRemaining} free ${
+                            freeTarotPullsRemaining === 1 ? "pull" : "pulls"
+                          } remain.`
+                        : "Your free pulls are complete. Unlock the full Tarot practice."}
                     </p>
                   </div>
                 </div>

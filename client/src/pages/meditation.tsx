@@ -89,7 +89,13 @@ function formatAudioTime(seconds: number) {
 
 export default function Meditation() {
   const { user } = useUser();
-  const { canAccess, openPaywall } = useSubscription();
+  const {
+    canAccessMeditationSession,
+    freeMeditationSessionsRemaining,
+    isPremium,
+    openPaywall,
+    recordMeditationSession,
+  } = useSubscription();
   const [journeyState, setJourneyState] = useState<JourneyState>(emptyJourneyState);
   const [activeAudioId, setActiveAudioId] = useState<JourneyStepId | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -155,7 +161,7 @@ export default function Meditation() {
 
   const toggleAudio = (step: JourneyStep) => {
     if (!step.audioFile) return;
-    if (!canAccess("fullMeditationLibrary")) {
+    if (!canAccessMeditationSession(step.id)) {
       openPaywall({
         feature: "fullMeditationLibrary",
         eyebrow: "Psyra+ Meditation",
@@ -176,6 +182,7 @@ export default function Meditation() {
     }
 
     stopAudio();
+    recordMeditationSession(step.id);
     const audio = new Audio(step.audioFile);
     setMeditationMediaSession(step.audioLabel ?? step.title);
     audio.preload = "metadata";
@@ -249,14 +256,20 @@ export default function Meditation() {
           />
         </header>
 
-        {!canAccess("fullMeditationLibrary") && (
+        {!isPremium && (
           <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
-                <p className="font-medium">The meditation audio library is part of Psyra+</p>
+                  <p className="font-medium">
+                    {freeMeditationSessionsRemaining > 0
+                      ? "Try one guided session free."
+                      : "Your free guided session is complete."}
+                  </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your journey notes remain here. Unlock Psyra+ to play the guided sessions.
+                    {freeMeditationSessionsRemaining > 0
+                      ? "Start with one session, then unlock the full library when you are ready to go deeper."
+                      : "Your journey notes remain here. Unlock Psyra+ to continue through the full library."}
                 </p>
               </div>
             </div>
@@ -274,7 +287,7 @@ export default function Meditation() {
               }
               data-testid="button-unlock-meditation"
             >
-              Unlock Meditation
+              Unlock Full Library
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </section>
@@ -284,6 +297,7 @@ export default function Meditation() {
           {journeySteps.map((step) => {
             const completed = journeyState.completed[step.id];
             const isActiveAudio = activeAudioId === step.id;
+            const isAudioLocked = !canAccessMeditationSession(step.id);
 
             return (
               <article
@@ -308,7 +322,10 @@ export default function Meditation() {
                 {step.audioFile && (
                   <div className="dream-journey-audio">
                     <div className="dream-journey-audio__header">
-                      <span>{step.audioLabel}</span>
+                      <span className="inline-flex items-center gap-1.5">
+                        {isAudioLocked && <LockKeyhole aria-hidden="true" className="h-3.5 w-3.5" />}
+                        {step.audioLabel}
+                      </span>
                       <span>{step.duration}</span>
                     </div>
                     <div className="dream-journey-audio__controls">

@@ -2,10 +2,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { useUser } from "@clerk/react";
 import {
   isPremiumEntitlement,
   SUBSCRIPTION_CONFIG,
@@ -17,7 +19,22 @@ import {
 export const isDevelopmentBuild = import.meta.env.DEV;
 
 const DEV_SUBSCRIPTION_STORAGE_KEY = "dreamgate-development-subscription";
-const ASK_PSYRA_USAGE_STORAGE_KEY = "dreamgate-ask-psyra-usage";
+const LEGACY_ASK_PSYRA_USAGE_STORAGE_KEY = "dreamgate-ask-psyra-usage";
+const FREE_USAGE_STORAGE_KEY = "dreamgate-free-usage";
+
+interface FreeUsageState {
+  askPsyraCount: number;
+  atlasLocations: string[];
+  tarotPullCount: number;
+  meditationSessions: string[];
+}
+
+const emptyFreeUsage: FreeUsageState = {
+  askPsyraCount: 0,
+  atlasLocations: [],
+  tarotPullCount: 0,
+  meditationSessions: [],
+};
 
 export interface PaywallRequest {
   feature?: SubscriptionFeature;
@@ -37,8 +54,16 @@ interface SubscriptionContextValue extends DevelopmentSubscriptionState {
   provider: "development-mock" | "storekit";
   isPremium: boolean;
   freeAskPsyraRemaining: number;
+  freeAtlasLocationsRemaining: number;
+  freeTarotPullsRemaining: number;
+  freeMeditationSessionsRemaining: number;
   canAccess: (feature: SubscriptionFeature) => boolean;
+  canAccessAtlasLocation: (locationName: string) => boolean;
+  canAccessMeditationSession: (sessionId: string) => boolean;
+  recordAtlasLocation: (locationName: string) => void;
+  recordMeditationSession: (sessionId: string) => void;
   recordAskPsyraInterpretation: () => void;
+  recordTarotPull: () => void;
   setSelectedPlan: (plan: SubscriptionPlanId) => void;
   setDevelopmentEntitlement: (entitlement: SubscriptionEntitlement) => void;
   setDevelopmentTrialEligibility: (eligible: boolean) => void;
@@ -50,11 +75,6 @@ interface SubscriptionContextValue extends DevelopmentSubscriptionState {
 }
 
 const SubscriptionContext = createContext<SubscriptionContextValue | null>(null);
-
-function currentMonthKey() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
 
 function loadDevelopmentState(): DevelopmentSubscriptionState {
   if (!isDevelopmentBuild) {
@@ -90,17 +110,52 @@ function loadDevelopmentState(): DevelopmentSubscriptionState {
   };
 }
 
-function loadAskPsyraUsage() {
+function usageStorageKey(userScope: string) {
+  return `${FREE_USAGE_STORAGE_KEY}:${userScope}`;
+}
+
+function loadFreeUsage(userScope: string): FreeUsageState {
   try {
-    const stored = localStorage.getItem(ASK_PSYRA_USAGE_STORAGE_KEY);
-    if (!stored) return 0;
-    const parsed = JSON.parse(stored) as { month?: string; count?: number };
-    return parsed.month === currentMonthKey() && typeof parsed.count === "number"
-      ? Math.max(0, parsed.count)
-      : 0;
+    const stored = localStorage.getItem(usageStorageKey(userScope));
+    if (stored) {
+      const parsed = JSON.parse(stored) as Partial<FreeUsageState>;
+      return {
+        askPsyraCount:
+          typeof parsed.askPsyraCount === "number"
+            ? Math.max(0, parsed.askPsyraCount)
+            : 0,
+        atlasLocations: Array.isArray(parsed.atlasLocations)
+          ? parsed.atlasLocations.filter(
+              (location): location is string => typeof location === "string",
+            )
+          : [],
+        tarotPullCount:
+          typeof parsed.tarotPullCount === "number"
+            ? Math.max(0, parsed.tarotPullCount)
+            : 0,
+        meditationSessions: Array.isArray(parsed.meditationSessions)
+          ? parsed.meditationSessions.filter(
+              (session): session is string => typeof session === "string",
+            )
+          : [],
+      };
+    }
+
+    // Preserve the earlier Ask Psyra counter when an existing browser first
+    // moves to the per-user usage record.
+    const legacy = localStorage.getItem(LEGACY_ASK_PSYRA_USAGE_STORAGE_KEY);
+    if (legacy) {
+      const parsed = JSON.parse(legacy) as { count?: number };
+      return {
+        ...emptyFreeUsage,
+        askPsyraCount:
+          typeof parsed.count === "number" ? Math.max(0, parsed.count) : 0,
+      };
+    }
   } catch {
-    return 0;
+    return emptyFreeUsage;
   }
+  return emptyFreeUsage;
 }
 
 function saveDevelopmentState(state: DevelopmentSubscriptionState) {
@@ -112,11 +167,11 @@ function saveDevelopmentState(state: DevelopmentSubscriptionState) {
   }
 }
 
-function saveAskPsyraUsage(count: number) {
+function saveFreeUsage(userScope: string, usage: FreeUsageState) {
   try {
     localStorage.setItem(
-      ASK_PSYRA_USAGE_STORAGE_KEY,
-      JSON.stringify({ month: currentMonthKey(), count }),
+      usageStorageKey(userScope),
+      JSON.stringify(usage),
     );
   } catch {
     // The in-memory state remains usable when browser storage is blocked.
@@ -124,10 +179,27 @@ function saveAskPsyraUsage(count: number) {
 }
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
+  const { user } = useUser();
+  const userScope = user?.id ?? "guest";
   const [developmentState, setDevelopmentState] = useState(loadDevelopmentState);
-  const [askPsyraUsage, setAskPsyraUsage] = useState(loadAskPsyraUsage);
+  const [freeUsage, setFreeUsage] = useState(() => loadFreeUsage(userScope));
   const [paywallRequest, setPaywallRequest] =
     useState<PaywallRequest | null>(null);
+
+  useEffect(() => {
+    setFreeUsage(loadFreeUsage(userScope));
+  }, [userScope]);
+
+  const updateFreeUsage = useCallback(
+    (update: (current: FreeUsageState) => FreeUsageState) => {
+      setFreeUsage((current) => {
+        const next = update(current);
+        saveFreeUsage(userScope, next);
+        return next;
+      });
+    },
+    [userScope],
+  );
 
   const updateDevelopmentState = useCallback(
     (update: Partial<DevelopmentSubscriptionState>) => {
@@ -145,22 +217,101 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     if (isPremiumEntitlement(developmentState.entitlement)) {
       return;
     }
-    setAskPsyraUsage((current) => {
-      const next = current + 1;
-      saveAskPsyraUsage(next);
-      return next;
-    });
-  }, [developmentState.entitlement]);
+    updateFreeUsage((current) => ({
+      ...current,
+      askPsyraCount: current.askPsyraCount + 1,
+    }));
+  }, [developmentState.entitlement, updateFreeUsage]);
+
+  const recordTarotPull = useCallback(() => {
+    if (isPremiumEntitlement(developmentState.entitlement)) {
+      return;
+    }
+    updateFreeUsage((current) => ({
+      ...current,
+      tarotPullCount: current.tarotPullCount + 1,
+    }));
+  }, [developmentState.entitlement, updateFreeUsage]);
+
+  const recordAtlasLocation = useCallback(
+    (locationName: string) => {
+      if (isPremiumEntitlement(developmentState.entitlement)) {
+        return;
+      }
+      updateFreeUsage((current) =>
+        current.atlasLocations.includes(locationName) ||
+        current.atlasLocations.length >= SUBSCRIPTION_CONFIG.freeAtlasLocationLimit
+          ? current
+          : {
+              ...current,
+              atlasLocations: [...current.atlasLocations, locationName],
+            },
+      );
+    },
+    [developmentState.entitlement, updateFreeUsage],
+  );
+
+  const recordMeditationSession = useCallback(
+    (sessionId: string) => {
+      if (isPremiumEntitlement(developmentState.entitlement)) {
+        return;
+      }
+      updateFreeUsage((current) =>
+        current.meditationSessions.includes(sessionId) ||
+        current.meditationSessions.length >=
+          SUBSCRIPTION_CONFIG.freeMeditationSessionLimit
+          ? current
+          : {
+              ...current,
+              meditationSessions: [...current.meditationSessions, sessionId],
+            },
+      );
+    },
+    [developmentState.entitlement, updateFreeUsage],
+  );
 
   const canAccess = useCallback(
     (feature: SubscriptionFeature) => {
       if (isPremiumEntitlement(developmentState.entitlement)) return true;
       if (feature === "askPsyraInterpretation") {
-        return askPsyraUsage < SUBSCRIPTION_CONFIG.freeAskPsyraLimit;
+        return freeUsage.askPsyraCount < SUBSCRIPTION_CONFIG.freeAskPsyraLimit;
+      }
+      if (feature === "premiumTarot") {
+        return freeUsage.tarotPullCount < SUBSCRIPTION_CONFIG.freeTarotPullLimit;
+      }
+      if (feature === "dreamAtlasLocations") {
+        return (
+          freeUsage.atlasLocations.length <
+          SUBSCRIPTION_CONFIG.freeAtlasLocationLimit
+        );
+      }
+      if (feature === "fullMeditationLibrary") {
+        return (
+          freeUsage.meditationSessions.length <
+          SUBSCRIPTION_CONFIG.freeMeditationSessionLimit
+        );
       }
       return false;
     },
-    [askPsyraUsage, developmentState.entitlement],
+    [developmentState.entitlement, freeUsage],
+  );
+
+  const canAccessAtlasLocation = useCallback(
+    (locationName: string) =>
+      isPremiumEntitlement(developmentState.entitlement) ||
+      freeUsage.atlasLocations.includes(locationName) ||
+      freeUsage.atlasLocations.length <
+        SUBSCRIPTION_CONFIG.freeAtlasLocationLimit,
+    [developmentState.entitlement, freeUsage],
+  );
+
+  const canAccessMeditationSession = useCallback(
+    (sessionId: string) =>
+      isPremiumEntitlement(developmentState.entitlement) ||
+      freeUsage.meditationSessions.includes(sessionId) ||
+      freeUsage.meditationSessions.length <
+        SUBSCRIPTION_CONFIG.freeMeditationSessionLimit,
+    [developmentState.entitlement, freeUsage],
   );
 
   const purchaseSelectedPlan = useCallback(async () => {
@@ -199,10 +350,29 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       isPremium: isPremiumEntitlement(developmentState.entitlement),
       freeAskPsyraRemaining: Math.max(
         0,
-        SUBSCRIPTION_CONFIG.freeAskPsyraLimit - askPsyraUsage,
+         SUBSCRIPTION_CONFIG.freeAskPsyraLimit - freeUsage.askPsyraCount,
+       ),
+       freeAtlasLocationsRemaining: Math.max(
+         0,
+         SUBSCRIPTION_CONFIG.freeAtlasLocationLimit -
+           freeUsage.atlasLocations.length,
+       ),
+       freeTarotPullsRemaining: Math.max(
+         0,
+         SUBSCRIPTION_CONFIG.freeTarotPullLimit - freeUsage.tarotPullCount,
+       ),
+       freeMeditationSessionsRemaining: Math.max(
+         0,
+         SUBSCRIPTION_CONFIG.freeMeditationSessionLimit -
+           freeUsage.meditationSessions.length,
       ),
       canAccess,
+       canAccessAtlasLocation,
+       canAccessMeditationSession,
+       recordAtlasLocation,
+       recordMeditationSession,
       recordAskPsyraInterpretation,
+       recordTarotPull,
       setSelectedPlan: (plan) => updateDevelopmentState({ selectedPlan: plan }),
       setDevelopmentEntitlement: (entitlement) =>
         updateDevelopmentState({ entitlement }),
@@ -215,12 +385,17 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       closePaywall: () => setPaywallRequest(null),
     }),
     [
-      askPsyraUsage,
       canAccess,
+       canAccessAtlasLocation,
+       canAccessMeditationSession,
       developmentState,
+       freeUsage,
       paywallRequest,
       purchaseSelectedPlan,
+       recordAtlasLocation,
+       recordMeditationSession,
       recordAskPsyraInterpretation,
+       recordTarotPull,
       restorePurchases,
       updateDevelopmentState,
     ],

@@ -14,7 +14,8 @@ export type SubscriptionFeature =
   | "archetypeHistory"
   | "monthlyPsycheInsights"
   | "fullMeditationLibrary"
-  | "premiumTarot";
+  | "premiumTarot"
+  | "dreamAtlasLocations";
 
 export const SUBSCRIPTION_CONFIG = {
   productIds: {
@@ -22,6 +23,9 @@ export const SUBSCRIPTION_CONFIG = {
     annual: "PSYRA_ANNUAL_PRODUCT_ID",
   },
   freeAskPsyraLimit: 3,
+  freeAtlasLocationLimit: 1,
+  freeTarotPullLimit: 3,
+  freeMeditationSessionLimit: 1,
   legalLinks: {
     termsOfUse: "",
     privacyPolicy: "",
@@ -58,6 +62,7 @@ export const PREMIUM_FEATURES: SubscriptionFeature[] = [
   "monthlyPsycheInsights",
   "fullMeditationLibrary",
   "premiumTarot",
+  "dreamAtlasLocations",
 ];
 
 export const isPremiumEntitlement = (

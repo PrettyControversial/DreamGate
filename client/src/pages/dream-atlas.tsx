@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ChevronDown, MapPin, Search } from "lucide-react";
+import { ArrowRight, ChevronDown, LockKeyhole, MapPin, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useSubscription } from "@/lib/subscription";
 import type { Dream } from "@shared/schema";
 import atlasBackground from "@assets/dream-atlas-background.png";
 import atlasPool from "@/assets/atlas-location-pool.svg";
@@ -118,6 +120,13 @@ const excerpt = (content: string) => {
 
 export default function DreamAtlas() {
   const { data: dreams = [], isLoading } = useQuery<Dream[]>({ queryKey: ["/api/dreams"] });
+  const {
+    canAccessAtlasLocation,
+    freeAtlasLocationsRemaining,
+    isPremium,
+    openPaywall,
+    recordAtlasLocation,
+  } = useSubscription();
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"visited" | "recent">("visited");
   const [openLocation, setOpenLocation] = useState<string | null>(null);
@@ -140,6 +149,24 @@ export default function DreamAtlas() {
 
   const filtered = records.filter((record) => record.name.toLowerCase().includes(query.toLowerCase()));
   const recurringCount = records.filter((record) => record.dreams.length > 1).length;
+  const openLocationRecord = (locationName: string) => {
+    if (openLocation === locationName) {
+      setOpenLocation(null);
+      return;
+    }
+    if (!canAccessAtlasLocation(locationName)) {
+      openPaywall({
+        feature: "dreamAtlasLocations",
+        eyebrow: "Dream Atlas",
+        title: "Unlock Your Full Dreamworld",
+        description:
+          "Follow every recurring place across your dream journal and watch your inner geography take shape with Psyra+.",
+      });
+      return;
+    }
+    recordAtlasLocation(locationName);
+    setOpenLocation(locationName);
+  };
 
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
@@ -152,6 +179,39 @@ export default function DreamAtlas() {
           <p className="atlas-count">{dreams.filter((dream) => !dream.isArchived).length} dreams <span>·</span> {recurringCount} recurring locations</p>
         </div>
       </header>
+
+      {!isPremium && (
+        <section className="mx-auto mb-7 flex max-w-4xl flex-col gap-4 rounded-2xl border border-[#85765f]/35 bg-[#f6f3ec]/75 p-5 text-[#2d2924] shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <p className="font-medium">One dream location is yours to explore free.</p>
+              <p className="mt-1 text-sm text-[#625d56]">
+                {freeAtlasLocationsRemaining > 0
+                  ? "Open the place that feels most familiar. Psyra+ reveals the full map."
+                  : "Your free location is open. Unlock the rest of your dreamworld."}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            className="shrink-0 border-[#2d2924] bg-transparent text-[#2d2924] hover:bg-[#2d2924] hover:text-[#f6f3ec]"
+            onClick={() =>
+              openPaywall({
+                feature: "dreamAtlasLocations",
+                eyebrow: "Dream Atlas",
+                title: "Unlock Your Full Dreamworld",
+                description:
+                  "Follow every recurring place across your dream journal and watch your inner geography take shape with Psyra+.",
+              })
+            }
+            data-testid="button-unlock-atlas"
+          >
+            Unlock Full Atlas
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </section>
+      )}
 
       {records.length > 0 && (
         <section className="atlas-world-path" aria-label="Recurring locations">
@@ -189,13 +249,19 @@ export default function DreamAtlas() {
         <section className="atlas-records" aria-label="Dream locations">
           {filtered.map((record) => {
             const isOpen = openLocation === record.name;
+            const isLocked = !canAccessAtlasLocation(record.name);
             const dates = record.dreams.slice(-3).map((dream) => formatDate(dream.date));
             const image = locationImageFor(record.name);
             return (
               <article className={`atlas-record${isOpen ? " is-open" : ""}`} id={locationId(record.name)} key={record.name}>
-                <button className="atlas-record__summary" onClick={() => setOpenLocation(isOpen ? null : record.name)} aria-expanded={isOpen}>
+                <button
+                  className="atlas-record__summary"
+                  onClick={() => openLocationRecord(record.name)}
+                  aria-expanded={isOpen}
+                  aria-label={`${isOpen ? "Close" : "Open"} ${record.name}${isLocked ? " (Psyra+)" : ""}`}
+                >
                   <img className="atlas-record__image" src={image.src} alt={image.alt} />
-                  <span className="atlas-record__summary-copy"><strong>{record.name}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
+                  <span className="atlas-record__summary-copy"><strong>{record.name} {isLocked && <LockKeyhole aria-hidden="true" className="inline-block h-3.5 w-3.5 align-[-0.1em]" />}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
                   <ChevronDown aria-hidden="true" />
                 </button>
                 <p className="atlas-record__story">An evolving storyline from the dreams that took place here, in the order they were remembered.</p>
