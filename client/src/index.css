@@ -9024,3 +9024,69 @@
   height: 0.95rem;
 }
 
+/* Final readability pass for The Descent. Secondary copy stays visible
+   against the dark surface instead of inheriting muted Day Mode values. */
+.night-map-page .night-map-arrival--compact .night-map-deck,
+.night-map-page .night-map-checklist-description,
+.night-map-page .night-map-checklist-card li,
+.night-map-page .night-map-meditation-track__guidance,
+.night-map-page .night-map-sound-note,
+.night-map-page .night-map-reflection__label,
+.night-map-page .night-map-moods button,
+.night-map-page .night-map-mark-complete,
+.night-map-page .night-map-previous,
+.night-map-page .night-map-kicker,
+.night-map-page .night-map-progress,
+.night-map-page .night-map-checklist-eyebrow,
+.night-map-page .night-map-checklist-number,
+.night-map-page .night-map-audio-player__times,
+.night-map-page .night-map-meditation-compact__heading > span,
+.night-map-page .night-map-saved,
+.night-map-page .night-map-text-button,
+.night-map-page .night-map-intention,
+.night-map-page .night-map-intention::placeholder {
+  color: #f8f3e9 !important;
+  opacity: 1 !important;
+}
+
+/* Save intention is a real pill control, not an underlined text link. */
+.night-map-page .night-map-text-button {
+  min-height: 2.8rem;
+  margin-top: 0.9rem !important;
+  padding: 0.7rem 1.05rem;
+  border: 1px solid rgba(248, 243, 233, 0.84) !important;
+  border-radius: 999px !important;
+  background: rgba(9, 10, 8, 0.84) !important;
+  color: #f8f3e9 !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  box-shadow: 0 0.65rem 1.4rem rgba(0, 0, 0, 0.22);
+}
+
+.night-map-page .night-map-text-button:hover,
+.night-map-page .night-map-text-button:focus-visible {
+  border-color: #ffffff !important;
+  background: rgba(36, 43, 31, 0.96) !important;
+  color: #ffffff !important;
+}
+
+.night-map-page .night-map-text-button:disabled {
+  border-color: rgba(248, 243, 233, 0.72) !important;
+  background: rgba(9, 10, 8, 0.72) !important;
+  color: #f8f3e9 !important;
+  cursor: not-allowed;
+  opacity: 1 !important;
+}
+
+.night-map-page .night-map-reflection__label svg,
+.night-map-page .night-map-practice-expand,
+.night-map-page .night-map-checklist-icon,
+.night-map-page .night-map-mark-complete span {
+  color: #f8f3e9 !important;
+}
+
