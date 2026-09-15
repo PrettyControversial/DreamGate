@@ -7,6 +7,8 @@ import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 import type { MoodEntry, SleepIntention } from "@shared/schema";
 import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.mp3";
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.mp3";
+import descentMoon from "@assets/descent-moon.jpg";
+import nightMapIvy from "@assets/night-map-ivy.webp";
 import nightMapPortal from "@assets/night-map-portal.webp";
 
 const moodOptions = [
@@ -201,6 +203,10 @@ export default function MoonTracker() {
       </header>
 
       <section className="descent-journey" aria-label="Lucid dream practices">
+        <div className="descent-atmosphere" aria-hidden="true">
+          <img className="descent-atmosphere__moon" src={descentMoon} alt="" />
+          <img className="descent-atmosphere__plant" src={nightMapIvy} alt="" />
+        </div>
         <div className="descent-progress">
           <span>{completedPractices.length} of {lucidPractices.length} complete</span>
           <div aria-hidden="true">{lucidPractices.map((practice) => <i key={practice.id} className={completedPractices.includes(practice.id) ? "is-complete" : ""} />)}</div>
