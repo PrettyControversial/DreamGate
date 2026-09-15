@@ -15,6 +15,7 @@ import {
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import tarotSymbol from "@assets/dreamgate_symbols/footer/54.webp";
 import psycheSymbol from "@assets/85_1788623536944.png";
+import atlasSymbol from "@assets/dream-atlas-discover-icon.png";
 import {
   markDiscoverToolSelected,
   markTarotEntrySource,
@@ -117,7 +118,14 @@ const allContent: ContentCard[] = [
     id: "atlas",
     title: "Dream Atlas",
     description: "Return to the places that recur across your dreams",
-    icon: <DreamGateFunctionSymbol kind="archive" className="h-6 w-6" />,
+    icon: (
+      <img
+        src={atlasSymbol}
+        alt=""
+        aria-hidden="true"
+        className="h-8 w-8 object-contain brightness-0 invert"
+      />
+    ),
     href: "/atlas",
     category: "Dreams",
   },
