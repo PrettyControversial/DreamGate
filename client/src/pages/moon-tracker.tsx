@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { BookOpen, Check, Eye, Feather, Headphones, Heart, Pause, Play, Sparkles } from "lucide-react";
+import { BookOpen, Check, ChevronDown, Eye, Feather, Headphones, Heart, Pause, Play, Sparkles } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { setMeditationMediaSession } from "@/lib/meditation-media-session";
@@ -48,32 +48,32 @@ const lucidPractices = [
   {
     id: "reality-check",
     icon: Eye,
-    eyebrow: "Guided practice · 9 min",
-    title: "Reality Check Meditation",
+    eyebrow: "Lucid dream training",
+    title: "Reality Check Meditation · 9 min",
     description: "Build a small habit of checking the moment. The aim is curiosity, so the same question can appear naturally inside a dream.",
     steps: ["Pause and notice three ordinary details around you.", "Ask, “Am I dreaming?” and give yourself time to answer.", "Read a line or study your hands, look away, then check again."],
   },
   {
     id: "mild",
     icon: Sparkles,
-    eyebrow: "Guided practice · 8 min",
-    title: "Theta Realm Rehearsal",
+    eyebrow: "Guided practice",
+    title: "Theta Realm Rehearsal · 8 min",
     description: "Practice recognizing a dream sign without adding pressure. You are teaching attention to stay steady when the scene changes.",
     steps: ["Recall a recent dream or choose one familiar dream sign.", "Picture yourself noticing it, breathing once, and becoming lucid.", "Repeat, “When I dream tonight, I will remember that I am dreaming.”"],
   },
   {
     id: "recall",
     icon: BookOpen,
-    eyebrow: "Morning practice · 3 min",
-    title: "Build recall",
+    eyebrow: "Morning practice",
+    title: "Build Recall · 3 min",
     description: "Lucid dreaming begins with remembering. Keep the first fragments close before the waking world takes over.",
     steps: ["Keep your eyes closed for a few breaths when you wake.", "Follow the last feeling, image, or person back through the dream.", "Write three words before you reach for your phone."],
   },
   {
     id: "intention",
     icon: Headphones,
-    eyebrow: "Bedtime practice · 2 min",
-    title: "Set a Dream Intention",
+    eyebrow: "Bedtime practice",
+    title: "Set a Dream Intention · 2 min",
     description: "Give the dreaming mind one clear instruction to carry across the threshold of sleep. Keep it kind and easy to remember.",
     steps: ["Choose one short intention you can remember easily.", "Write it below before getting into bed.", "Repeat it slowly three times with your eyes closed."],
   },
@@ -82,6 +82,7 @@ const lucidPractices = [
 export default function MoonTracker() {
   const [completedPractices, setCompletedPractices] = useState<string[]>([]);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [openPracticeId, setOpenPracticeId] = useState("reality-check");
   const [dailyIntention, setDailyIntention] = useState("");
   const [moodSaved, setMoodSaved] = useState(false);
   const [intentionSaved, setIntentionSaved] = useState(false);
@@ -191,6 +192,7 @@ export default function MoonTracker() {
         <div className="night-map-arrival__copy">
           <div className="night-map-arrival__card">
             <div className="night-map-arrival__card-copy">
+              <p className="night-map-brand">PSYRA</p>
               <h1>The Descent</h1>
               <p className="night-map-deck">
                 A nightly checklist for training awareness, preparing for lucid dreams, and crossing gently into sleep.
@@ -216,6 +218,9 @@ export default function MoonTracker() {
           <div className="night-map-compact-heading">
             <div><p className="night-map-kicker">01 / Lucid dream training</p><h2 id="night-map-practices-title">Lucid Dream Checklist</h2></div>
             <span className="night-map-progress">{completedPractices.length}/{lucidPractices.length} complete</span>
+          </div>
+          <div className="night-map-progress-track" aria-label={`${completedPractices.length} of ${lucidPractices.length} practices complete`}>
+            {lucidPractices.map((practice) => <span key={practice.id} className={completedPractices.includes(practice.id) ? "is-complete" : ""} />)}
           </div>
           <p className="night-map-checklist-intro">Reality checks, intention, meditation, and recall work together. Complete what supports you tonight.</p>
           <div className="night-map-lucid-checklist" role="list">
@@ -252,13 +257,24 @@ export default function MoonTracker() {
                   </button>
                   <p className="night-map-checklist-number">0{index + 1}</p>
                   <PracticeIcon className="night-map-checklist-icon" aria-hidden="true" />
+                   <button
+                     type="button"
+                     className="night-map-practice-expand"
+                     onClick={() => setOpenPracticeId((current) => current === practice.id ? "" : practice.id)}
+                     aria-expanded={openPracticeId === practice.id}
+                     aria-label={`${openPracticeId === practice.id ? "Collapse" : "Expand"} ${practice.title}`}
+                   >
+                     <ChevronDown aria-hidden="true" />
+                   </button>
                   <p className="night-map-checklist-eyebrow">{practice.eyebrow}</p>
                   <h3>{practice.title}</h3>
-                  <p className="night-map-checklist-description">{practice.description}</p>
-                  <ol>
-                    {practice.steps.map((step) => <li key={step}>{step}</li>)}
-                  </ol>
-                   {(() => {
+                   {openPracticeId === practice.id && (
+                     <div className="night-map-practice-body">
+                       <p className="night-map-checklist-description">{practice.description}</p>
+                       <ol>
+                         {practice.steps.map((step) => <li key={step}>{step}</li>)}
+                       </ol>
+                      {(() => {
                      const meditation = lucidMeditations.find((track) => track.practiceId === practice.id);
                      if (!meditation) return null;
                      const isActive = activeMeditationId === meditation.id;
@@ -281,14 +297,26 @@ export default function MoonTracker() {
                          <p className="night-map-meditation-track__guidance">{meditation.guidance}</p>
                        </div>
                      );
-                   })()}
-                  {practice.id === "intention" && (
-                    <a href="#night-reflection" className="night-map-checklist-link">Set intention <span aria-hidden="true">↓</span></a>
-                  )}
+                      })()}
+                     {practice.id === "intention" && (
+                       <a href="#night-reflection" className="night-map-checklist-link">Set intention <span aria-hidden="true">↓</span></a>
+                     )}
+                     <button
+                       type="button"
+                       className="night-map-mark-complete"
+                       onClick={() => togglePractice(practice.id)}
+                       aria-pressed={isComplete}
+                     >
+                       <span aria-hidden="true">{isComplete ? "✓" : "○"}</span>
+                       {isComplete ? "Completed" : "Mark as complete"}
+                     </button>
+                     </div>
+                   )}
                 </article>
               );
             })}
           </div>
+           <a className="night-map-continue" href="#night-meditation">Continue the Descent <span aria-hidden="true">→</span></a>
         </section>
 
         <section id="night-meditation" className="night-map-meditation-compact" data-testid="night-meditation" aria-labelledby="night-map-meditation-title">

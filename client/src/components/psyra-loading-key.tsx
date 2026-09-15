@@ -1,4 +1,4 @@
-import loadingKey from "@/assets/psyra-loading-key-transparent.png";
+import loadingKey from "@/assets/psyra-loading-key-reference.png";
 
 type PsyraLoadingKeyProps = {
   active?: boolean;

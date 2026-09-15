@@ -27,6 +27,12 @@ Night Map artwork must be assembled from a few visible foreground collage object
 
 **How to apply:** Keep each decorative asset pointer-events-none and responsive, but place it in its own foreground stage between sections or slightly overlapping a card edge. Use full visibility, varied alignment, and breathing room without reducing readability.
 
+The Descent is an intentional dark authenticated exception: use a near-black forest surface, cream typography, a single readable portal focal point, thin progress/path rules, and open practice rows instead of cream cards or dense borders.
+
+**Why:** The user supplied a mobile reference where the dark forest atmosphere is part of the page’s identity, but every practice label, instruction, and control still needs editorial contrast.
+
+**How to apply:** Keep the first practice open with its audio controls, collapse the remaining practices until selected, preserve the completion/reflection/sleep behavior below, and keep the bottom navigation dark and in normal page flow.
+
 The numbered dream glyph system is the approved decorative language: background glyphs use #62, #55, #59, #85, #96, #126, #141, and #150; footer glyphs map Home #16, Dream #38, Tarot #54, and Stats #139.
 
 **Why:** The user wants symbolic markings that feel embedded in DreamGate rather than generic iconography or rectangular image tiles.
