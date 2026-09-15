@@ -1,7 +1,18 @@
 import { Link } from "wouter";
-import { ArrowLeft, CircleHelp, Home } from "lucide-react";
+import { ArrowLeft, CircleHelp, Home, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const faqs = [
   {
@@ -26,7 +37,13 @@ const faqs = [
   },
 ];
 
-export default function HelpFaq() {
+export default function HelpFaq({
+  onDeleteAccount,
+  isDeletingAccount,
+}: {
+  onDeleteAccount: () => void;
+  isDeletingAccount: boolean;
+}) {
   return (
     <div className="min-h-screen bg-background px-4 py-8 md:px-8">
       <div className="mx-auto max-w-3xl space-y-8">
@@ -69,6 +86,62 @@ export default function HelpFaq() {
                 </details>
               ))}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-red-200/70 bg-card">
+          <CardContent className="flex flex-col gap-3 p-6 md:flex-row md:items-center md:justify-between md:p-8">
+            <div>
+              <h2 className="font-display text-xl text-foreground">Manage your account</h2>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                Permanently remove your account and all saved Psyra data.
+              </p>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex shrink-0 items-center gap-2 self-start text-sm font-semibold text-red-700 underline decoration-red-700/40 underline-offset-4 transition-colors hover:text-red-800 md:self-auto"
+                  data-testid="button-delete-account"
+                  disabled={isDeletingAccount}
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                  Delete account
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="border-[#171513]/20 bg-[#f6f3ec] text-[#171513]">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-display text-2xl font-normal">
+                    Delete your account?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-[#77716a]">
+                    This permanently deletes your Psyra account and all saved
+                    dreams, interpretations, and private journal data. This cannot
+                    be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    disabled={isDeletingAccount}
+                    className="border-[#171513]/20 bg-transparent text-[#171513] hover:bg-[#171513]/5"
+                  >
+                    Keep my account
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    type="button"
+                    disabled={isDeletingAccount}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      onDeleteAccount();
+                    }}
+                    className="bg-red-700 text-white hover:bg-red-800 focus:ring-red-700"
+                  >
+                    {isDeletingAccount && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isDeletingAccount ? "Deleting…" : "Delete permanently"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
 

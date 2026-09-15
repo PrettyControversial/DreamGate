@@ -67,7 +67,7 @@ const achievements = [
   { id: "streak_30", name: "30-Day Streak", symbol: achievementSymbols.leaf, requirement: { type: "streak", value: 30 } },
   { id: "dreams_10", name: "Dream Explorer", symbol: achievementSymbols.leafSprig, requirement: { type: "dreams", value: 10 } },
   { id: "dreams_50", name: "Dream Master", symbol: achievementSymbols.stone, requirement: { type: "dreams", value: 50 } },
-  { id: "tarot_10", name: "Card Reader", symbol: achievementSymbols.seatedStone, requirement: { type: "tarot", value: 10 } },
+  { id: "tarot_50", name: "Card Reader", symbol: achievementSymbols.seatedStone, requirement: { type: "tarot", value: 50 } },
   { id: "tarot_25", name: "Tarot Master", symbol: achievementSymbols.flower, requirement: { type: "tarot", value: 25 } },
 ];
 

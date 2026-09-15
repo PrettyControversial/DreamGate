@@ -345,20 +345,34 @@ function normalizeEnhancedInterpretation(
   parsed: Record<string, unknown>,
   dreamContent: string,
 ): EnhancedDreamInterpretation {
-  const answer = asText(parsed.answer) || asText(parsed.interpretation);
+  const nestedAnswer =
+    parsed.answer && typeof parsed.answer === "object" && !Array.isArray(parsed.answer)
+      ? (parsed.answer as Record<string, unknown>)
+      : undefined;
+  const nestedInterpretation =
+    parsed.interpretation &&
+    typeof parsed.interpretation === "object" &&
+    !Array.isArray(parsed.interpretation)
+      ? (parsed.interpretation as Record<string, unknown>)
+      : undefined;
+  const nestedPayload = nestedAnswer ?? nestedInterpretation;
+  const normalized = nestedPayload
+    ? { ...parsed, ...nestedPayload }
+    : parsed;
+  const answer = asText(normalized.answer) || asText(normalized.interpretation);
   const dreamOverview =
-    asText(parsed.dreamOverview) ||
-    asText(parsed.overview) ||
+    asText(normalized.dreamOverview) ||
+    asText(normalized.overview) ||
     answer;
 
   if (!dreamOverview) {
     throw new Error("AI response did not contain an interpretation");
   }
 
-  const rawSymbols = Array.isArray(parsed.keySymbols)
-    ? parsed.keySymbols
-    : Array.isArray(parsed.symbols)
-      ? parsed.symbols
+  const rawSymbols = Array.isArray(normalized.keySymbols)
+    ? normalized.keySymbols
+    : Array.isArray(normalized.symbols)
+      ? normalized.symbols
       : [];
   const keySymbols = rawSymbols
     .map((symbol) => {
@@ -381,20 +395,20 @@ function normalizeEnhancedInterpretation(
     })
     .filter(Boolean) as EnhancedDreamInterpretation["keySymbols"];
 
-  const parsedCoreThemes = asTextArray(parsed.coreThemes);
+  const parsedCoreThemes = asTextArray(normalized.coreThemes);
   const coreThemes = parsedCoreThemes.length
     ? parsedCoreThemes
-    : asTextArray(parsed.themes);
-  const parsedReflectionPrompts = asTextArray(parsed.reflectionPrompts);
+    : asTextArray(normalized.themes);
+  const parsedReflectionPrompts = asTextArray(normalized.reflectionPrompts);
   const reflectionPrompts = parsedReflectionPrompts.length
     ? parsedReflectionPrompts
-    : asTextArray(parsed.prompts);
+    : asTextArray(normalized.prompts);
 
   const archetypeInput =
-    parsed.archetypeAnalysis &&
-    typeof parsed.archetypeAnalysis === "object" &&
-    !Array.isArray(parsed.archetypeAnalysis)
-      ? (parsed.archetypeAnalysis as Record<string, unknown>)
+    normalized.archetypeAnalysis &&
+    typeof normalized.archetypeAnalysis === "object" &&
+    !Array.isArray(normalized.archetypeAnalysis)
+      ? (normalized.archetypeAnalysis as Record<string, unknown>)
       : undefined;
   const primaryArchetype = normalizeArchetypeId(archetypeInput?.primaryArchetype);
   if (!archetypeInput || !primaryArchetype) {
@@ -437,14 +451,14 @@ function normalizeEnhancedInterpretation(
     keySymbols: keySymbols.slice(0, 6),
     coreThemes: coreThemes.slice(0, 5),
     emotionalLandscape:
-      asText(parsed.emotionalLandscape) ||
+      asText(normalized.emotionalLandscape) ||
       "Notice the feeling that remained after waking; in Jungian work, the affect often reveals what the image is constellating in the psyche.",
     shadowElements:
-      asText(parsed.shadowElements) ||
+      asText(normalized.shadowElements) ||
       "Consider which quality, desire, fear, or vulnerability in the dream you may be keeping outside your conscious identity.",
     dreamsMessage:
-      asText(parsed.dreamsMessage) ||
-      asText(parsed.dreamMessage) ||
+      asText(normalized.dreamsMessage) ||
+      asText(normalized.dreamMessage) ||
       `The unconscious may be asking you to stay with the most emotionally charged image in this dream: ${dreamContent.slice(0, 120)}${dreamContent.length > 120 ? "…" : ""}`,
     reflectionPrompts: reflectionPrompts.length
       ? reflectionPrompts.slice(0, 5)
@@ -1085,6 +1099,7 @@ Use 0.0-1.0 scores to express how active each Jungian dimension appears in this 
       console.log("Starting Jungian dream decode");
       const response = await openai.chat.completions.create({
         model: useDirectOpenAI ? "gpt-4o" : "gpt-5-mini",
+        ...(!useDirectOpenAI ? { reasoning_effort: "low" as const } : {}),
         messages: [
           {
             role: "system",
@@ -1095,7 +1110,7 @@ Use 0.0-1.0 scores to express how active each Jungian dimension appears in this 
             content: `Please provide a thoughtful dream interpretation for this dream:\n\n"${content}"`
           }
         ],
-        ...(useDirectOpenAI ? { max_tokens: 1800 } : { max_completion_tokens: 3000 }),
+        ...(useDirectOpenAI ? { max_tokens: 1800 } : { max_completion_tokens: 6000 }),
       });
       console.log("AI response received successfully");
 

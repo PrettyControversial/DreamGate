@@ -35,7 +35,6 @@ import {
   Loader2,
   LogOut,
   Menu,
-  Trash2,
 } from "lucide-react";
 import {
   API_BASE_URL,
@@ -1252,12 +1251,8 @@ function AuthPageLayout({ children }: { children: React.ReactNode }) {
 
 function AccountControls({
   onSignOut,
-  onDeleteAccount,
-  isDeletingAccount,
 }: {
   onSignOut: () => void;
-  onDeleteAccount: () => void;
-  isDeletingAccount: boolean;
 }) {
   const { user } = useUser();
   const [location] = useLocation();
@@ -1383,51 +1378,6 @@ function AccountControls({
               <span>Sign out</span>
             </button>
           </SheetClose>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button
-                type="button"
-                className="dreamgate-drawer-link dreamgate-drawer-link--danger w-full"
-                data-testid="button-delete-account"
-                disabled={isDeletingAccount}
-              >
-                <Trash2 className="h-7 w-7 stroke-[1.3]" />
-                <span>Delete account</span>
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="border-[#171513]/20 bg-[#f6f3ec] text-[#171513]">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="font-display text-2xl font-normal">
-                  Delete your account?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-[#77716a]">
-                  This permanently deletes your Psyra account and all saved
-                  dreams, interpretations, and private journal data. This cannot
-                  be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                  disabled={isDeletingAccount}
-                  className="border-[#171513]/20 bg-transparent text-[#171513] hover:bg-[#171513]/5"
-                >
-                  Keep my account
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  type="button"
-                  disabled={isDeletingAccount}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    onDeleteAccount();
-                  }}
-                  className="bg-red-700 text-white hover:bg-red-800 focus:ring-red-700"
-                >
-                  {isDeletingAccount && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isDeletingAccount ? "Deleting…" : "Delete permanently"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </nav>
 
         <div className="relative z-10 mx-7 mb-[max(1.75rem,env(safe-area-inset-bottom))] mt-4 border-t border-[#171513]/15 pt-5">
@@ -1455,7 +1405,85 @@ function RouteLoading() {
   );
 }
 
-function AppRoutes() {
+const APP_REVIEW_PROMPTED_KEY = "psyra-app-review-prompted";
+
+function AppReviewPrompt({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [rating, setRating] = useState(0);
+
+  useEffect(() => {
+    if (!open) setRating(0);
+  }, [open]);
+
+  const finishReview = (choice: "review" | "later") => {
+    trackEvent("app_review_prompt_responded", {
+      choice,
+      rating: rating || undefined,
+    });
+    onOpenChange(false);
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="border-[#171513]/20 bg-[#f6f3ec] text-[#171513]">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-display text-2xl font-normal">
+            How is Psyra feeling?
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-[#77716a]">
+            You&apos;ve spent some time with your dream practice. If Psyra has been
+            useful, a quick review helps others find this space too.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="flex justify-center gap-2 py-3" aria-label="Rate Psyra">
+          {[1, 2, 3, 4, 5].map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setRating(value)}
+              className={`text-3xl leading-none transition-colors ${
+                value <= rating ? "text-amber-600" : "text-[#b9b1a7]"
+              }`}
+              aria-label={`${value} ${value === 1 ? "star" : "stars"}`}
+              aria-pressed={rating === value}
+              data-testid={`button-review-rating-${value}`}
+            >
+              ★
+            </button>
+          ))}
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel
+            onClick={() => finishReview("later")}
+            className="border-[#171513]/20 bg-transparent text-[#171513] hover:bg-[#171513]/5"
+          >
+            Maybe later
+          </AlertDialogCancel>
+          <AlertDialogAction
+            disabled={rating === 0}
+            onClick={() => finishReview("review")}
+            className="bg-[#171513] text-[#f6f3ec] hover:bg-[#302b25]"
+          >
+            Leave a review
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+function AppRoutes({
+  onDeleteAccount,
+  isDeletingAccount,
+}: {
+  onDeleteAccount: () => void;
+  isDeletingAccount: boolean;
+}) {
   return (
     <Suspense fallback={<RouteLoading />}>
       <Switch>
@@ -1490,7 +1518,14 @@ function AppRoutes() {
         <Route path="/stats" component={Stats} />
         <Route path="/discover" component={Discover} />
         <Route path="/psyche" component={Psyche} />
-        <Route path="/help" component={HelpFaq} />
+        <Route path="/help">
+          {() => (
+            <HelpFaq
+              onDeleteAccount={onDeleteAccount}
+              isDeletingAccount={isDeletingAccount}
+            />
+          )}
+        </Route>
         <Route component={NotFound} />
       </Switch>
     </Suspense>
@@ -1505,6 +1540,7 @@ function AuthenticatedApp() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [isOpening, setIsOpening] = useState(true);
+  const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
   const { paywallRequest, closePaywall } = useSubscription();
   const isDiscover = location === "/discover";
   const isAtlas = location === "/atlas";
@@ -1514,6 +1550,33 @@ function AuthenticatedApp() {
     location.startsWith("/dream/") ||
     location.startsWith("/decoder");
   const isHome = location === "/user-portal";
+
+  useEffect(() => {
+    let prompted = false;
+    try {
+      prompted = sessionStorage.getItem(APP_REVIEW_PROMPTED_KEY) === "true";
+    } catch {
+      // The prompt can still be shown if session storage is unavailable.
+    }
+    if (prompted) return;
+
+    let visibleSeconds = 0;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      visibleSeconds += 1;
+      if (visibleSeconds < 30 * 60) return;
+
+      try {
+        sessionStorage.setItem(APP_REVIEW_PROMPTED_KEY, "true");
+      } catch {
+        // Do not block the review prompt when browser storage is unavailable.
+      }
+      setIsReviewPromptOpen(true);
+      window.clearInterval(timer);
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
   const completeOpening = () => {
     try {
       sessionStorage.setItem("dreamgate-intro-seen-v3", "true");
@@ -1587,14 +1650,15 @@ function AuthenticatedApp() {
               </Link>
             <AccountControls
               onSignOut={handleSignOut}
-              onDeleteAccount={handleDeleteAccount}
-              isDeletingAccount={isDeletingAccount}
             />
           </header>
           <LunarNotificationSync />
           {!isAtlas && <DreamGateSymbolBackground />}
           <main className="relative z-10 min-h-0 flex-1">
-            <AppRoutes />
+            <AppRoutes
+              onDeleteAccount={handleDeleteAccount}
+              isDeletingAccount={isDeletingAccount}
+            />
           </main>
           <div className="dreamgate-bottom-nav-spacer shrink-0" aria-hidden="true" />
           <BottomNav />
@@ -1602,6 +1666,10 @@ function AuthenticatedApp() {
             open={paywallRequest !== null}
             request={paywallRequest}
             onClose={closePaywall}
+          />
+          <AppReviewPrompt
+            open={isReviewPromptOpen}
+            onOpenChange={setIsReviewPromptOpen}
           />
           {isOpening && (
             <DreamgateIntro

@@ -99,6 +99,14 @@ const allContent: ContentCard[] = [
     category: "Wellness",
   },
   {
+    id: "night-map",
+    title: "The Descent",
+    description: "A nightly lucid-dream checklist",
+    icon: <DreamGateFunctionSymbol kind="night-map" className="h-8 w-8 brightness-0 invert" />,
+    href: "/night-map",
+    category: "Wellness",
+  },
+  {
     id: "calendar",
     title: "Moon Calendar",
     description: "Lunar phase tracking",
@@ -128,14 +136,6 @@ const allContent: ContentCard[] = [
     ),
     href: "/atlas",
     category: "Dreams",
-  },
-  {
-    id: "night-map",
-    title: "The Descent",
-    description: "A nightly lucid-dream checklist",
-    icon: <DreamGateFunctionSymbol kind="night-map" className="h-8 w-8 brightness-0 invert" />,
-    href: "/night-map",
-    category: "Wellness",
   },
 ];
 
