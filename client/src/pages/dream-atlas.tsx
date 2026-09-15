@@ -3,52 +3,59 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { ChevronDown, Compass, MapPin, Search } from "lucide-react";
 import type { Dream } from "@shared/schema";
-import poolImage from "@assets/stock_images/ocean_waves_texture__8ce19598.jpg";
-import natureImage from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
-import portalImage from "@assets/night-map-portal.webp";
-import parkImage from "@assets/dream-atlas-park.webp";
-import mallDetail from "@assets/atlas-detail-mall.webp";
-import waterDetail from "@assets/atlas-detail-water.webp";
-import villageDetail from "@assets/atlas-detail-village.webp";
 import atlasBackground from "@assets/dream-atlas-background.png";
 
 type AtlasRecord = {
   name: string;
   dreams: Dream[];
-  image: string;
 };
 
+type LocationFamily = {
+  name: string;
+  terms: string[];
+  exclude?: string[];
+};
+
+// These are physical places only. Do not add objects, characters, emotions,
+// symbols, or activities here: a dream belongs to a location because the
+// writing names the place where it happens, not because it contains an object
+// associated with that place.
 const locationFamilies = [
-  { name: "The Pool", terms: ["pool", "swimming pool"] },
+  { name: "The Pool", terms: ["pool", "swimming pool", "natatorium"] },
   { name: "The Fair", terms: ["fairground", "state fair", "county fair", "carnival", "amusement park"] },
-  { name: "The Mall", terms: ["shopping mall", "mall"] },
+  { name: "The Mall", terms: ["shopping mall", "mall", "food court"] },
   { name: "Childhood Home", terms: ["childhood home", "childhood house", "old house"] },
-  { name: "Home", terms: ["my home", "my house", "at home", "house", "apartment"] },
+  { name: "Home", terms: ["my home", "my house", "at home", "apartment", "bedroom", "living room", "kitchen", "hallway"] },
   { name: "School", terms: ["school", "classroom", "college", "university", "campus"] },
-  { name: "The Hospital", terms: ["hospital", "clinic", "doctor's office", "nurse's station"] },
-  { name: "The Ocean", terms: ["ocean", "sea", "beach", "shore"] },
-  { name: "The Park", terms: ["park", "playground", "public garden", "city park"], exclude: ["amusement park"] },
+  { name: "The Hospital", terms: ["hospital", "clinic", "doctor's office", "doctor’s office", "nurse's station", "nurse’s station"] },
+  { name: "The Ocean", terms: ["ocean", "at sea", "beach", "shore", "seashore", "coast", "coastline"] },
+  { name: "The Park", terms: ["park", "playground", "public garden", "city park", "garden"], exclude: ["amusement park"] },
   { name: "The Forest", terms: ["forest", "woods", "woodland"] },
-  { name: "The City", terms: ["city", "downtown", "street", "sidewalk"] },
+  { name: "The City", terms: ["city", "downtown", "street", "sidewalk", "neighborhood", "town"] },
   { name: "The Hotel", terms: ["hotel", "motel", "resort"] },
-  { name: "The Airport", terms: ["airport", "airplane", "terminal"] },
-  { name: "The Store", terms: ["store", "walmart", "shop", "grocery"] },
-  { name: "The Restaurant", terms: ["restaurant", "cafe", "diner"] },
-  { name: "The Road", terms: ["road", "highway", "driving", "parking lot"] },
-];
+  { name: "The Airport", terms: ["airport", "terminal", "arrivals hall", "departure lounge"] },
+  { name: "The Store", terms: ["store", "walmart", "shop", "grocery store", "supermarket", "bookstore", "market"] },
+  { name: "The Restaurant", terms: ["restaurant", "cafe", "café", "diner", "bar"] },
+  { name: "The Road", terms: ["road", "highway", "motorway", "parking lot", "parking garage", "driveway"] },
+  { name: "The Train Station", terms: ["train station", "railway station", "subway station", "platform"] },
+  { name: "The Library", terms: ["library"] },
+  { name: "The Church", terms: ["church", "chapel", "cathedral", "mosque", "temple"] },
+  { name: "The Theater", terms: ["theater", "theatre", "cinema", "movie theater"] },
+  { name: "The Office", terms: ["office", "workplace"] },
+  { name: "The Rooftop", terms: ["rooftop", "roof terrace"] },
+  { name: "The Bridge", terms: ["bridge", "overpass"] },
+  { name: "The Lake", terms: ["lake", "pond", "reservoir"] },
+  { name: "The Cave", terms: ["cave", "cavern"] },
+  { name: "The Desert", terms: ["desert", "dunes"] },
+  { name: "The Mountain", terms: ["mountain", "mountainside", "summit"] },
+  { name: "The Threshold", terms: ["doorway", "threshold", "entrance", "stairwell", "elevator"] },
+] satisfies LocationFamily[];
 
 const containsPhrase = (text: string, phrase: string) => {
   const escaped = phrase
     .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     .replace(/\s+/g, "\\s+");
   return new RegExp(`(^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`, "i").test(text);
-};
-
-const locationImage = (name: string) => {
-  if (/pool|ocean/i.test(name)) return poolImage;
-  if (/park/i.test(name)) return parkImage;
-  if (/forest|home/i.test(name)) return natureImage;
-  return portalImage;
 };
 
 const formatDate = (date: Date | string) =>
@@ -73,7 +80,7 @@ export default function DreamAtlas() {
         const isExcluded = family.exclude?.some((term) => containsPhrase(text, term)) ?? false;
         return !isExcluded && family.terms.some((term) => containsPhrase(text, term));
       });
-      return { name: family.name, dreams: matches.sort((a, b) => +new Date(a.date) - +new Date(b.date)), image: locationImage(family.name) };
+      return { name: family.name, dreams: matches.sort((a, b) => +new Date(a.date) - +new Date(b.date)) };
     }).filter((record) => record.dreams.length > 0);
 
     return grouped.sort((a, b) => sort === "visited"
@@ -87,7 +94,6 @@ export default function DreamAtlas() {
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
       <img className="atlas-background" src={atlasBackground} alt="" aria-hidden="true" />
-      <img className="atlas-detail atlas-detail--village" src={villageDetail} alt="" aria-hidden="true" />
       <header className="atlas-header">
         <div>
           <p className="atlas-kicker">Your dreamworld</p>
@@ -100,8 +106,10 @@ export default function DreamAtlas() {
 
       <section className="atlas-tools" aria-label="Atlas controls">
         <label><Search aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search your dreamworld" /></label>
-        <div><button className={sort === "visited" ? "is-active" : ""} onClick={() => setSort("visited")}>Most visited</button><button className={sort === "recent" ? "is-active" : ""} onClick={() => setSort("recent")}>Recently visited</button></div>
-        <img className="atlas-detail atlas-detail--mall" src={mallDetail} alt="" aria-hidden="true" />
+        <div>
+          <button className={sort === "visited" ? "is-active" : ""} onClick={() => setSort("visited")}>Most visited</button>
+          <button className={sort === "recent" ? "is-active" : ""} onClick={() => setSort("recent")}>Recently visited</button>
+        </div>
       </section>
 
       {isLoading ? <p className="atlas-empty">Opening your dreamworld…</p> : filtered.length === 0 ? (
@@ -114,12 +122,10 @@ export default function DreamAtlas() {
             return (
               <article className={`atlas-record${isOpen ? " is-open" : ""}`} key={record.name}>
                 <button className="atlas-record__summary" onClick={() => setOpenLocation(isOpen ? null : record.name)} aria-expanded={isOpen}>
-                  <img className={record.name === "The Park" ? "atlas-record__park-image" : ""} src={record.image} alt="" />
-                  <span><strong>{record.name}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
+                   <span><strong>{record.name}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
                   <ChevronDown aria-hidden="true" />
                 </button>
-                <p className="atlas-record__story">Across {record.dreams.length} {record.dreams.length === 1 ? "visit" : "visits"}, this place has gathered a story of return, change, and unfinished moments.</p>
-                {record.name === "The Pool" && isOpen && <img className="atlas-detail atlas-detail--water" src={waterDetail} alt="" aria-hidden="true" />}
+                <p className="atlas-record__story">An evolving storyline from the dreams that took place here, in the order they were remembered.</p>
                 {isOpen && (
                   <div className="atlas-timeline">
                     {record.dreams.map((dream) => (
