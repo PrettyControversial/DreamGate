@@ -31,7 +31,7 @@ The Descent is an intentional dark authenticated exception: use a near-black for
 
 **Why:** The user supplied a mobile reference where the dark forest atmosphere is part of the page’s identity, but every practice label, instruction, and control still needs editorial contrast.
 
-**How to apply:** Keep the first practice open with its audio controls, collapse the remaining practices until selected, preserve the completion/reflection/sleep behavior below, and keep the bottom navigation dark and in normal page flow.
+**How to apply:** Keep the first practice open with its audio controls, collapse the remaining practices until selected, preserve the completion/reflection/sleep behavior below, and keep the bottom navigation dark and in normal page flow. Fog belongs behind the content and must not be used as a text color.
 
 The numbered dream glyph system is the approved decorative language: background glyphs use #62, #55, #59, #85, #96, #126, #141, and #150; footer glyphs map Home #16, Dream #38, Tarot #54, and Stats #139.
 
