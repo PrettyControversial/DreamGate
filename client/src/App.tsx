@@ -48,7 +48,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { DreamGateLogo } from "@/components/dreamgate-logo";
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import { DreamGateSymbolBackground } from "@/components/dreamgate-symbol-background";
-import { DreamgateIntro } from "@/components/dreamgate-intro";
+import { DreamgateIntro, DreamgateLoadingKey } from "@/components/dreamgate-intro";
 import { LunarNotificationSync } from "@/components/lunar-notification-settings";
 import {
   deactivateLunarNotificationUser,
@@ -1441,7 +1441,8 @@ function AccountControls({
 
 function RouteLoading() {
   return (
-    <div className="flex min-h-[calc(100dvh-8rem)] items-center justify-center bg-background px-6">
+    <div className="route-loading flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center gap-3 bg-background px-6">
+      <DreamgateLoadingKey compact />
       <p className="text-sm text-muted-foreground">Opening your dream space…</p>
     </div>
   );
@@ -1496,13 +1497,7 @@ function AuthenticatedApp() {
   const { toast } = useToast();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const [isOpening, setIsOpening] = useState(() => {
-    try {
-      return sessionStorage.getItem("dreamgate-intro-seen-v3") !== "true";
-    } catch {
-      return true;
-    }
-  });
+  const [isOpening, setIsOpening] = useState(true);
   const { paywallRequest, closePaywall } = useSubscription();
   const isDiscover = location === "/discover";
 
@@ -1718,7 +1713,8 @@ function AuthenticatedQueryProvider() {
           </ThemeProvider>
         </>
       ) : (
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
+          <DreamgateLoadingKey compact />
           <p className="text-sm text-muted-foreground">Opening your private dream space…</p>
         </div>
       )}
@@ -1744,7 +1740,8 @@ function App() {
 
   if (!nativeTokenReady) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
+        <DreamgateLoadingKey compact />
         <p className="text-sm text-muted-foreground">
           Opening your private dream space…
         </p>

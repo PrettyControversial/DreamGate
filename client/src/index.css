@@ -3305,7 +3305,7 @@
   pointer-events: none;
 }
 
-.dashboard-intro img {
+.dashboard-intro__art {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -3317,18 +3317,30 @@
   right: 50%;
   bottom: max(2rem, env(safe-area-inset-bottom));
   display: grid;
-  width: 3rem;
-  height: 3rem;
+  width: 7rem;
+  height: 7rem;
   place-items: center;
   color: rgba(246, 243, 236, 0.92);
   transform: translateX(50%);
 }
 
-.dashboard-intro__loader svg {
-  width: 2rem;
-  height: 2rem;
+.dashboard-intro__loader img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
   animation: dreamgate-key-turn 1.15s cubic-bezier(.65, 0, .35, 1) infinite;
-  filter: drop-shadow(0 0 .65rem rgba(246, 243, 236, .22));
+  box-shadow: 0 0 1.25rem rgba(246, 243, 236, .18);
+}
+
+.dashboard-intro__loader--compact {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: 5.25rem;
+  height: 5.25rem;
+  transform: none;
 }
 
 @keyframes dreamgate-key-turn {
@@ -3337,7 +3349,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-intro__loader svg { animation: none; }
+  .dashboard-intro__loader img { animation: none; }
 }
 
 .home-dashboard {
@@ -7193,6 +7205,7 @@
 
 /* Dream Atlas — a living index of recurring dream locations. */
 .atlas-page {
+  position: relative;
   min-height: 100dvh;
   padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 6vw, 4rem) calc(7rem + env(safe-area-inset-bottom));
   overflow: hidden;
@@ -7200,6 +7213,8 @@
   color: #0e0c06;
   font-family: var(--font-sans);
 }
+.atlas-background-art { position: absolute; z-index: 0; top: 0; left: 50%; width: min(100%, 64rem); height: auto; opacity: .19; pointer-events: none; transform: translateX(-50%); }
+.atlas-page > :not(.atlas-background-art) { position: relative; z-index: 1; }
 .atlas-header { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 15rem; gap: 2rem; width: min(100%, 64rem); margin: 0 auto 2rem; }
 .atlas-kicker { margin: 0 0 .55rem; font-size: .72rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; }
 .atlas-header h1 { margin: 0; font-family: var(--font-display); font-size: clamp(3.5rem, 9vw, 6.75rem); font-weight: 400; line-height: .88; letter-spacing: -.05em; }
@@ -7222,6 +7237,7 @@
 .atlas-record { padding: 1.7rem 0; border-bottom: 1px solid rgba(14,12,6,.32); }
 .atlas-record__summary { display: grid; grid-template-columns: 9rem minmax(0,1fr) 2rem; gap: 1.6rem; width: 100%; align-items: center; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; }
 .atlas-record__summary > img { width: 9rem; height: 9rem; border-radius: 50%; object-fit: cover; filter: saturate(.55) contrast(.9); }
+.atlas-record__summary > img.atlas-record__park-image { object-position: 50% 88%; }
 .atlas-record__summary > span { min-width: 0; }
 .atlas-record__summary strong { display: block; font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.15rem); font-weight: 400; line-height: 1; text-transform: uppercase; }
 .atlas-record__summary b { display: block; margin-top: .45rem; font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; }
@@ -7251,6 +7267,7 @@
 
 @media (max-width: 640px) {
   .atlas-page { padding-top: 1.6rem; }
+  .atlas-background-art { width: 100%; opacity: .16; }
   .atlas-header { display: block; }
   .atlas-header h1 { font-size: 3.25rem; }
   .atlas-deck { font-size: 1.15rem; }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { KeyRound } from "lucide-react";
 import introImage from "@assets/Copy_of_Holistic_Coach_Instagram_Kit_(Square_Posts)_1788595169788.png";
+import loadingKey from "@assets/dreamgate-loading-key.webp";
 
 interface DreamgateIntroProps {
   onComplete: () => void;
@@ -19,7 +19,7 @@ export function DreamgateIntro({ onComplete, onError }: DreamgateIntroProps) {
   };
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(finish, 1200);
+    const timeoutId = window.setTimeout(finish, 2400);
     return () => window.clearTimeout(timeoutId);
   }, []);
 
@@ -32,11 +32,18 @@ export function DreamgateIntro({ onComplete, onError }: DreamgateIntroProps) {
       <img
         src={introImage}
         alt="Who looks outside, dreams; who looks inside, awakes. — Carl Jung"
+        className="dashboard-intro__art"
         onError={onError}
       />
-      <div className="dashboard-intro__loader" aria-label="Opening DreamGate">
-        <KeyRound aria-hidden="true" />
-      </div>
+      <DreamgateLoadingKey />
+    </div>
+  );
+}
+
+export function DreamgateLoadingKey({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`dashboard-intro__loader${compact ? " dashboard-intro__loader--compact" : ""}`} aria-label="Opening DreamGate">
+      <img src={loadingKey} alt="" aria-hidden="true" />
     </div>
   );
 }

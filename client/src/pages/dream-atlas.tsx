@@ -6,6 +6,7 @@ import type { Dream } from "@shared/schema";
 import poolImage from "@assets/stock_images/ocean_waves_texture__8ce19598.jpg";
 import natureImage from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
 import portalImage from "@assets/night-map-portal.webp";
+import atlasCollage from "@assets/dream-atlas-collage.webp";
 
 type AtlasRecord = {
   name: string;
@@ -41,6 +42,7 @@ const containsPhrase = (text: string, phrase: string) => {
 
 const locationImage = (name: string) => {
   if (/pool|ocean/i.test(name)) return poolImage;
+  if (/park/i.test(name)) return atlasCollage;
   if (/forest|home/i.test(name)) return natureImage;
   return portalImage;
 };
@@ -80,6 +82,7 @@ export default function DreamAtlas() {
 
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
+      <img className="atlas-background-art" src={atlasCollage} alt="" aria-hidden="true" />
       <header className="atlas-header">
         <div>
           <p className="atlas-kicker">Your dreamworld</p>
@@ -105,7 +108,7 @@ export default function DreamAtlas() {
             return (
               <article className={`atlas-record${isOpen ? " is-open" : ""}`} key={record.name}>
                 <button className="atlas-record__summary" onClick={() => setOpenLocation(isOpen ? null : record.name)} aria-expanded={isOpen}>
-                  <img src={record.image} alt="" />
+                  <img className={record.name === "The Park" ? "atlas-record__park-image" : ""} src={record.image} alt="" />
                   <span><strong>{record.name}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
                   <ChevronDown aria-hidden="true" />
                 </button>
