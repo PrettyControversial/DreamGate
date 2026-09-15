@@ -7044,6 +7044,198 @@
   margin-top: 1.4rem;
 }
 
+/* The Descent — continuous, borderless night journey. */
+.descent-page {
+  --descent-ivory: #f6f3ec;
+  --descent-ink: #0e0c06;
+  --descent-muted: rgba(246, 243, 236, 0.66);
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--descent-ink);
+  color: var(--descent-ivory);
+  font-family: var(--font-sans);
+}
+
+.descent-hero {
+  position: relative;
+  min-height: clamp(32rem, 72vh, 48rem);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.descent-hero__image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 66% center;
+  filter: saturate(0.72) contrast(1.08) brightness(0.72);
+}
+
+.descent-hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(14,12,6,.94) 0%, rgba(14,12,6,.66) 48%, rgba(14,12,6,.18) 78%), linear-gradient(0deg, #0e0c06 0%, transparent 42%);
+}
+
+.descent-hero__copy {
+  width: min(100%, 76rem);
+  margin: 0 auto;
+  padding: clamp(7rem, 16vw, 12rem) clamp(1.4rem, 7vw, 5.5rem) 4.5rem;
+}
+
+.descent-brand {
+  margin: 0 0 1.25rem;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .38em;
+  text-transform: uppercase;
+}
+
+.descent-hero h1 {
+  max-width: 42rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 11vw, 8rem);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: -.045em;
+}
+
+.descent-hero__copy > p:last-child {
+  max-width: 31rem;
+  margin: 1.75rem 0 0;
+  color: var(--descent-muted);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  line-height: 1.65;
+}
+
+.descent-journey {
+  width: min(100%, 56rem);
+  margin: 0 auto;
+  padding: 1rem clamp(1.25rem, 5vw, 3rem) calc(8rem + env(safe-area-inset-bottom));
+}
+
+.descent-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0 2rem;
+  color: var(--descent-muted);
+  font-size: .68rem;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+
+.descent-progress > div { display: flex; align-items: center; }
+.descent-progress i { display: block; width: 2.4rem; height: 1px; background: rgba(246,243,236,.24); }
+.descent-progress i::before { content: ""; display: block; width: .45rem; height: .45rem; margin-top: -.2rem; border: 1px solid rgba(246,243,236,.45); border-radius: 50%; background: #0e0c06; }
+.descent-progress i.is-complete::before { border-color: #f6f3ec; background: #f6f3ec; box-shadow: 0 0 16px rgba(246,243,236,.45); }
+
+.descent-practices { position: relative; }
+.descent-practices::before { content: ""; position: absolute; top: 2.7rem; bottom: 2.7rem; left: .6rem; width: 1px; background: rgba(246,243,236,.25); }
+
+.descent-practice {
+  position: relative;
+  margin-left: 2.5rem;
+  border-bottom: 1px solid rgba(246,243,236,.22);
+}
+
+.descent-practice__node {
+  position: absolute;
+  top: 2.05rem;
+  left: -2.5rem;
+  z-index: 2;
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border: 1px solid rgba(246,243,236,.58);
+  border-radius: 50%;
+  background: #0e0c06;
+}
+
+.descent-practice.is-open .descent-practice__node { box-shadow: 0 0 18px rgba(246,243,236,.35); }
+.descent-practice.is-complete .descent-practice__node { background: #f6f3ec; color: #0e0c06; }
+.descent-practice__node svg { width: .75rem; height: .75rem; }
+
+.descent-practice__summary {
+  display: grid;
+  grid-template-columns: 2rem 2rem minmax(0,1fr) 2rem;
+  gap: .75rem;
+  width: 100%;
+  min-height: 7.25rem;
+  align-items: center;
+  padding: 1rem 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.descent-practice__summary > svg:not(.descent-practice__chevron) { width: 1.45rem; height: 1.45rem; stroke-width: 1.35; }
+.descent-practice__number { align-self: start; padding-top: .65rem; color: var(--descent-muted); font-size: .7rem; letter-spacing: .12em; }
+.descent-practice__title small { display: block; margin-bottom: .42rem; color: var(--descent-muted); font-size: .62rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.descent-practice__title strong { display: block; font-family: var(--font-display); font-size: clamp(1.45rem, 4vw, 2.1rem); font-weight: 400; line-height: 1.05; }
+.descent-practice__chevron { width: 1.2rem; height: 1.2rem; transition: transform .25s ease; }
+.descent-practice.is-open .descent-practice__chevron { transform: rotate(180deg); }
+
+.descent-practice__body { padding: 0 0 2.25rem 4.75rem; animation: descent-reveal .28s ease both; }
+@keyframes descent-reveal { from { opacity: 0; transform: translateY(-.5rem); } }
+.descent-practice__body > p { max-width: 37rem; margin: 0 0 1.5rem; color: var(--descent-muted); line-height: 1.65; }
+.descent-practice__body ol { margin: 1.5rem 0; padding-left: 1.25rem; color: var(--descent-muted); }
+.descent-practice__body li { padding-left: .35rem; line-height: 1.6; }
+.descent-practice__body li + li { margin-top: .55rem; }
+
+.descent-audio { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+.descent-audio__play { display: grid; flex: 0 0 auto; width: 4.75rem; height: 4.75rem; place-items: center; border: 1px solid #f6f3ec; border-radius: 50%; background: transparent; color: #f6f3ec; box-shadow: 0 0 22px rgba(246,243,236,.08); }
+.descent-audio__play svg { width: 1.35rem; height: 1.35rem; }
+.descent-audio__track { flex: 1; }
+.descent-audio__track input { width: 100%; accent-color: #f6f3ec; }
+.descent-audio__track span { display: flex; justify-content: space-between; margin-top: .35rem; color: var(--descent-muted); font-size: .72rem; }
+.descent-audio__track b { font-weight: 400; }
+
+.descent-reflection { margin: 1.75rem 0; }
+.descent-reflection > span { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.descent-reflection > span svg { width: 1rem; height: 1rem; }
+.descent-moods { display: flex; flex-wrap: wrap; gap: .55rem; }
+.descent-moods button { min-height: 2.75rem; padding: .6rem 1rem; border: 1px solid rgba(246,243,236,.28); border-radius: 99rem; background: transparent; color: var(--descent-muted); }
+.descent-moods button.is-selected { border-color: #f6f3ec; background: #f6f3ec; color: #0e0c06; }
+.descent-reflection em { display: flex; align-items: center; gap: .4rem; margin-top: .75rem; color: var(--descent-muted); font-size: .72rem; font-style: normal; }
+.descent-reflection em svg { width: .9rem; }
+.descent-intention { min-height: 7rem !important; border: 1px solid rgba(246,243,236,.3) !important; background: rgba(246,243,236,.04) !important; color: #f6f3ec !important; }
+.descent-save { min-height: 2.75rem; margin-top: .75rem; padding: .65rem 1.1rem; border: 0; border-radius: 99rem; background: #f6f3ec; color: #0e0c06; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+
+.descent-complete { display: flex; align-items: center; gap: .7rem; min-height: 2.75rem; border: 0; background: transparent; color: var(--descent-muted); font-family: var(--font-display); font-size: 1.05rem; }
+.descent-complete > span { display: grid; width: 2rem; height: 2rem; place-items: center; border: 1px solid rgba(246,243,236,.4); border-radius: 50%; }
+.descent-complete svg { width: 1rem; }
+
+.descent-continue { display: flex; width: min(100%, 34rem); min-height: 4.75rem; align-items: center; justify-content: center; gap: 1rem; margin: 3rem auto 0; padding: 1rem 1.5rem; border: 0; border-radius: 99rem; background: #f6f3ec; color: #0e0c06; font-family: var(--font-display); font-size: clamp(1.25rem, 4vw, 1.65rem); }
+
+@media (max-width: 640px) {
+  .descent-hero { min-height: 34rem; }
+  .descent-hero__image { object-position: 67% center; }
+  .descent-hero__copy { padding: 7rem 1.25rem 3rem; }
+  .descent-hero h1 { font-size: clamp(3.8rem, 19vw, 5.8rem); }
+  .descent-progress { align-items: flex-start; flex-direction: column; }
+  .descent-progress i { width: 3rem; }
+  .descent-journey { padding-inline: 1.1rem; }
+  .descent-practice { margin-left: 1.9rem; }
+  .descent-practice__node { left: -1.9rem; }
+  .descent-practices::before { left: .6rem; }
+  .descent-practice__summary { grid-template-columns: 1.45rem 1.6rem minmax(0,1fr) 1.25rem; gap: .55rem; min-height: 6.6rem; }
+  .descent-practice__number { font-size: .6rem; }
+  .descent-practice__title strong { font-size: 1.45rem; }
+  .descent-practice__body { padding-left: 3.6rem; }
+  .descent-audio__play { width: 4rem; height: 4rem; }
+}
+
 .night-map-meditation-track {
   min-width: 0;
   border: 1px solid var(--night-map-line);
