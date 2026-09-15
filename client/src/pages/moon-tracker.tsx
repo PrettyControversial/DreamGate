@@ -88,6 +88,14 @@ const lucidPractices = [
     description: "Give the dreaming mind one clear instruction to carry across the threshold of sleep. Keep it kind and easy to remember.",
     steps: ["Choose one short intention you can remember easily.", "Write it below before getting into bed.", "Repeat it slowly three times with your eyes closed."],
   },
+  {
+    id: "box-breathing",
+    icon: Headphones,
+    eyebrow: "Final sleep preparation",
+    title: "Box Breathing for Sleep · 6 min",
+    description: "Settle your body before lucid dreaming. A steady four-count rhythm gives your attention one gentle place to rest as sleep begins.",
+    steps: ["Get comfortable and let your jaw, shoulders, and hands soften.", "Follow the four-count rhythm without trying to force sleep.", "Let the final breath carry you toward the dream state."],
+  },
 ];
 
 export default function MoonTracker() {
@@ -213,41 +221,6 @@ export default function MoonTracker() {
               <div className="night-map-headphones-note">
                 <Headphones aria-hidden="true" />
                 <span>Headphones are recommended</span>
-              </div>
-              <div className="night-map-box-breathing">
-                <div className="night-map-box-breathing__copy">
-                  <p>Sleep meditation</p>
-                  <h2>Box Breathing for Sleep</h2>
-                </div>
-                <button
-                  type="button"
-                  className="night-map-box-breathing__play"
-                  onClick={() => toggleNightMeditation(lucidMeditations[2])}
-                  aria-label={activeMeditationId === "box-breathing" && nightMeditationPlaying ? "Pause Box Breathing for Sleep" : "Play Box Breathing for Sleep"}
-                  data-testid="button-box-breathing"
-                >
-                  {activeMeditationId === "box-breathing" && nightMeditationPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
-                </button>
-                <div className="night-map-box-breathing__track">
-                  <div className="night-map-box-breathing__times">
-                    <span>{activeMeditationId === "box-breathing" ? formatAudioTime(nightMeditationCurrentTime) : "0:00"}</span>
-                    <span>6:40</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max={activeMeditationId === "box-breathing" ? nightMeditationDuration || 400 : 400}
-                    step="0.1"
-                    value={activeMeditationId === "box-breathing" ? Math.min(nightMeditationCurrentTime, nightMeditationDuration || 400) : 0}
-                    onChange={(event) => {
-                      if (activeMeditationId !== "box-breathing") return;
-                      const nextTime = Number(event.target.value);
-                      setNightMeditationCurrentTime(nextTime);
-                      if (nightMeditationRef.current) nightMeditationRef.current.currentTime = nextTime;
-                    }}
-                    aria-label="Box Breathing for Sleep progress"
-                  />
-                </div>
               </div>
               <a href="#night-practices" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
             </div>
