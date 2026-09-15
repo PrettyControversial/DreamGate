@@ -7,6 +7,8 @@ import poolImage from "@assets/stock_images/ocean_waves_texture__8ce19598.jpg";
 import natureImage from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
 import portalImage from "@assets/night-map-portal.webp";
 import atlasCollage from "@assets/dream-atlas-collage.webp";
+import parkImage from "@assets/dream-atlas-park.webp";
+import cornerKey from "@assets/dreamgate-loading-key.webp";
 
 type AtlasRecord = {
   name: string;
@@ -42,7 +44,7 @@ const containsPhrase = (text: string, phrase: string) => {
 
 const locationImage = (name: string) => {
   if (/pool|ocean/i.test(name)) return poolImage;
-  if (/park/i.test(name)) return atlasCollage;
+  if (/park/i.test(name)) return parkImage;
   if (/forest|home/i.test(name)) return natureImage;
   return portalImage;
 };
@@ -83,6 +85,7 @@ export default function DreamAtlas() {
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
       <img className="atlas-background-art" src={atlasCollage} alt="" aria-hidden="true" />
+      <img className="atlas-corner-key" src={cornerKey} alt="" aria-hidden="true" />
       <header className="atlas-header">
         <div>
           <p className="atlas-kicker">Your dreamworld</p>
