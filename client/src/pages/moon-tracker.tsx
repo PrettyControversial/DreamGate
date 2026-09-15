@@ -379,7 +379,7 @@ export default function MoonTracker() {
               {recentMoods?.length ? <p className="night-map-previous">Last check-in: {moodOptions.find((option) => option.value === recentMoods[0].mood)?.label ?? "Noted"}.</p> : null}
             </div>
             <div>
-              <div className="night-map-reflection__label"><Feather aria-hidden="true" /><span>Tonight&apos;s intention</span></div>
+              <div className="night-map-reflection__label"><Feather aria-hidden="true" /><span className="night-map-reflection__label-text night-map-reflection__label-text--squiggle">Tonight&apos;s intention</span></div>
               <Textarea value={dailyIntention} onChange={(event) => setDailyIntention(event.target.value)} placeholder="I want to remember..." className="night-map-intention" data-testid="textarea-daily-intention" />
               <div className="night-map-intention__actions"><button type="button" onClick={() => dailyIntention.trim() && intentionMutation.mutate(dailyIntention.trim())} disabled={!dailyIntention.trim() || intentionMutation.isPending} className="night-map-text-button" data-testid="button-save-intention">Save intention</button>{intentionSaved && <span className="night-map-saved"><Check aria-hidden="true" /> Saved</span>}</div>
               {recentIntentions?.length ? <p className="night-map-previous">Last intention: “{recentIntentions[0].intention}”</p> : null}
