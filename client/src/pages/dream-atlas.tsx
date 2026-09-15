@@ -11,6 +11,7 @@ import mallDetail from "@assets/atlas-detail-mall.webp";
 import waterDetail from "@assets/atlas-detail-water.webp";
 import keyDetail from "@assets/atlas-detail-key.webp";
 import villageDetail from "@assets/atlas-detail-village.webp";
+import atlasBackground from "@assets/dream-atlas-background.png";
 
 type AtlasRecord = {
   name: string;
@@ -86,6 +87,7 @@ export default function DreamAtlas() {
 
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
+      <img className="atlas-background" src={atlasBackground} alt="" aria-hidden="true" />
       <img className="atlas-detail atlas-detail--key" src={keyDetail} alt="" aria-hidden="true" />
       <img className="atlas-detail atlas-detail--village" src={villageDetail} alt="" aria-hidden="true" />
       <header className="atlas-header">
