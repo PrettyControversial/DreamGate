@@ -15,7 +15,7 @@ import {
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import tarotSymbol from "@assets/dreamgate_symbols/footer/54.webp";
 import psycheSymbol from "@assets/85_1788623536944.png";
-import atlasSymbol from "@assets/dream-atlas-discover-icon.png";
+import atlasSymbol from "@assets/dream-atlas-discover-icon.webp";
 import {
   markDiscoverToolSelected,
   markTarotEntrySource,

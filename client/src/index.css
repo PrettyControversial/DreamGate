@@ -8959,7 +8959,44 @@
 .night-map-page .night-map-continue span,
 .night-map-page .night-map-complete__button,
 .night-map-page .night-map-complete__button span {
-  color: #090a08 !important;
+  color: #f8f3e9 !important;
+}
+
+/* Match the compact, bold sans-serif button lettering from the supplied
+   reference while keeping the control legible on The Descent's dark surface. */
+.night-map-page .night-map-complete__button {
+  min-height: 3.5rem;
+  width: min(100%, 22rem);
+  border: 1px solid rgba(248, 243, 233, 0.84) !important;
+  background: rgba(9, 10, 8, 0.84) !important;
+  color: #f8f3e9 !important;
+  font-family: var(--font-accent) !important;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-complete__button span {
+  color: #f8f3e9 !important;
+}
+
+.night-map-page .night-map-complete__button:hover {
+  background: rgba(36, 43, 31, 0.96) !important;
+  color: #ffffff !important;
+}
+
+.night-map-page .night-map-complete__button:hover span {
+  color: #ffffff !important;
+}
+
+.night-map-page .night-map-reflection__label-text--squiggle {
+  text-decoration-color: #f8f3e9;
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.28em;
 }
 
 .dreamgate-app-shell:has(.night-map-page) .dreamgate-night-footer,

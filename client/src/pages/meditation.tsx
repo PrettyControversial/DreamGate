@@ -6,10 +6,10 @@ import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 import { useSubscription } from "@/lib/subscription";
 import { Button } from "@/components/ui/button";
 
-import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.mp3";
-import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.mp3";
-import guideAudio from "@assets/dreamgate_meditations/meeting-your-guide.mp3";
-import groundingBoxAudio from "@assets/dreamgate_meditations/the-grounding-box.mp3";
+import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.m4a";
+import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.m4a";
+import guideAudio from "@assets/dreamgate_meditations/meeting-your-guide.m4a";
+import groundingBoxAudio from "@assets/dreamgate_meditations/the-grounding-box.m4a";
 import meditationSymbolRelief from "@assets/meditation-symbol-relief.webp";
 
 type JourneyStepId = "guide" | "shadow" | "symbol" | "breath";

@@ -19,7 +19,7 @@ export default function Landing() {
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         aria-hidden="true"
       >
         <source src={authBackgroundVideo} type="video/mp4" />

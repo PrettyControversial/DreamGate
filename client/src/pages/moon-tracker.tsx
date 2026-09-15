@@ -5,9 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 import type { MoodEntry, SleepIntention } from "@shared/schema";
-import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.mp3";
-import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.mp3";
-import boxBreathingAudio from "@/assets/box-breathing-for-sleep.mp3";
+import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.m4a";
+import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.m4a";
+import boxBreathingAudio from "@/assets/box-breathing-for-sleep.m4a";
 import nightMapPaperTexture from "@assets/night-map-paper-texture.webp";
 import nightMapHeaderRelief from "@assets/night-map-stone-cutout.png";
 import nightMapPortal from "@assets/night-map-portal.webp";
@@ -373,7 +373,7 @@ export default function MoonTracker() {
           <div className="night-map-compact-heading"><div><p className="night-map-kicker">03 / Reflection</p><h2 id="night-map-reflection-title">Arrive as you are.</h2></div></div>
           <div className="night-map-reflection__grid">
             <div>
-              <div className="night-map-reflection__label"><Heart aria-hidden="true" /><span>How does the body feel?</span></div>
+              <div className="night-map-reflection__label"><Heart aria-hidden="true" /><span className="night-map-reflection__label-text night-map-reflection__label-text--squiggle">How are you feeling?</span></div>
               <div className="night-map-moods">{moodOptions.map((option) => <button key={option.value} type="button" onClick={() => { setSelectedMood(option.value); moodMutation.mutate(option.value); }} className={selectedMood === option.value ? "is-selected" : ""} aria-pressed={selectedMood === option.value} data-testid={`button-mood-${option.value}`}>{option.label}</button>)}</div>
               {moodSaved && <p className="night-map-saved"><Check aria-hidden="true" /> Saved for tonight.</p>}
               {recentMoods?.length ? <p className="night-map-previous">Last check-in: {moodOptions.find((option) => option.value === recentMoods[0].mood)?.label ?? "Noted"}.</p> : null}
