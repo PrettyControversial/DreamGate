@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ChevronDown, Compass, MapPin, Search } from "lucide-react";
+import { ChevronDown, MapPin, Search } from "lucide-react";
 import type { Dream } from "@shared/schema";
 import atlasBackground from "@assets/dream-atlas-background.png";
 
@@ -101,7 +101,6 @@ export default function DreamAtlas() {
           <p className="atlas-deck">The places you return to are becoming a world of their own.</p>
           <p className="atlas-count">{dreams.filter((dream) => !dream.isArchived).length} dreams <span>·</span> {recurringCount} recurring locations</p>
         </div>
-        <div className="atlas-sketch" aria-hidden="true"><Compass /><span>Same places.<br />Deeper meanings.</span></div>
       </header>
 
       <section className="atlas-tools" aria-label="Atlas controls">

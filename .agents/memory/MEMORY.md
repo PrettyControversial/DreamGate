@@ -1,5 +1,6 @@
 - [Managed AI completion shape](managed-ai-completion-shape.md) — reserve reasoning budget and normalize alternate JSON shapes; never replace decode failures with generic success content.
 - [DreamGate visual source of truth](dreamgate-visual-system.md) — Discover defines authenticated-app styling; keep Welcome and the post-login intro visually isolated.
+- [Dream Atlas parchment](dreamgate-visual-system.md) — the Atlas uses the supplied parchment artwork as its only decorative image; keep location content layered in the open area.
 - [DreamGate intro playback](dreamgate-intro-playback.md) — play the pre-home animation once per auth session and again during logout, not on every Home mount.
 - [Psyra interpretation metadata](psyra-interpretation-metadata.md) — keep archetype analysis inside the saved interpretation envelope so old dreams remain readable and profiles aggregate without rereading dream text.
 - [Psyra+ access boundaries](psyra-plus-access-boundaries.md) — keep paywall UI, entitlements, and purchase providers separate; development premium state must never unlock production.
