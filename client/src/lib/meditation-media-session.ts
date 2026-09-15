@@ -11,8 +11,8 @@ export function setMeditationMediaSession(title: string) {
 
   navigator.mediaSession.metadata = new MediaMetadata({
     title,
-    artist: "DreamGate",
-    album: "DreamGate Meditations",
+    artist: "Psyra",
+    album: "Psyra Meditations",
     artwork: [
       {
         src: dreamGateEye,

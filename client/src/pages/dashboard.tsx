@@ -663,7 +663,7 @@ export default function Dashboard() {
 
         <section className="space-y-4">
           <h2 className="font-display text-xl text-foreground" data-testid="text-popular">
-            Popular on DreamGate
+            Popular on Psyra
           </h2>
           <CategoryTabs activeTab={activeCategory} onTabChange={setActiveCategory} />
           <div className="carousel-scroll -mx-4 px-4">

@@ -227,6 +227,18 @@ export default function MoonTracker() {
                   key={practice.id}
                   className={`night-map-checklist-card${isComplete ? " is-complete" : ""}`}
                   role="listitem"
+                  tabIndex={0}
+                  onClick={(event) => {
+                    if ((event.target as HTMLElement).closest("button, input, textarea, a")) return;
+                    togglePractice(practice.id);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    if ((event.target as HTMLElement).closest("button, input, textarea, a")) return;
+                    event.preventDefault();
+                    togglePractice(practice.id);
+                  }}
+                  aria-label={`${isComplete ? "Completed" : "Complete"} ${practice.title}`}
                 >
                   <button
                     type="button"

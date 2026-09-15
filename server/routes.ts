@@ -7,6 +7,7 @@ import {
   updateDreamSchema, 
   insertWritingPromptSchema,
   insertSavedWritingPromptSchema,
+  insertWritingResponseSchema,
   insertNumerologySchema,
   insertIntentionSchema,
   updateIntentionSchema,
@@ -197,6 +198,50 @@ export async function registerRoutes(
       res.status(204).send();
     } catch {
       res.status(500).json({ error: "Failed to remove saved prompt" });
+    }
+  });
+
+  app.get("/api/writing-responses", async (_req, res) => {
+    try {
+      res.json(await storage.getWritingResponses(currentUserId(res)));
+    } catch {
+      res.status(500).json({ error: "Failed to fetch writing responses" });
+    }
+  });
+
+  app.post("/api/writing-responses", async (req, res) => {
+    const parsed = insertWritingResponseSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.message });
+    }
+    try {
+      const response = await storage.createWritingResponse(
+        currentUserId(res),
+        parsed.data,
+      );
+      res.status(201).json(response);
+    } catch {
+      res.status(500).json({ error: "Failed to save writing response" });
+    }
+  });
+
+  app.patch("/api/writing-responses/:id", async (req, res) => {
+    const responseText = z.string().trim().min(1).max(20000).safeParse(req.body?.response);
+    if (!responseText.success) {
+      return res.status(400).json({ error: "Writing response is required" });
+    }
+    try {
+      const response = await storage.updateWritingResponse(
+        currentUserId(res),
+        req.params.id,
+        responseText.data,
+      );
+      if (!response) {
+        return res.status(404).json({ error: "Writing response not found" });
+      }
+      res.json(response);
+    } catch {
+      res.status(500).json({ error: "Failed to update writing response" });
     }
   });
 

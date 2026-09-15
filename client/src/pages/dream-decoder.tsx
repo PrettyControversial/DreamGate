@@ -263,7 +263,7 @@ export default function DreamDecoder() {
         typeof newDream !== "object" ||
         typeof (newDream as { id?: unknown }).id !== "string"
       ) {
-        throw new Error("DreamGate returned an unreadable saved dream.");
+        throw new Error("Psyra returned an unreadable saved dream.");
       }
       const savedDream = newDream as {
         id: string;

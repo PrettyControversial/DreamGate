@@ -208,7 +208,7 @@ export default function Stats() {
   }, [currentMonth, stats.activeDates]);
 
   const handleShare = async () => {
-      const text = `My DreamGate Stats:\n- Current Streak: ${stats.currentStreak} days\n- Longest Streak: ${stats.longestStreak} days\n- Dreams Interpreted: ${stats.dreamsDecoded}\n- Tarot Readings: ${stats.tarotReadings}`;
+      const text = `My Psyra Stats:\n- Current Streak: ${stats.currentStreak} days\n- Longest Streak: ${stats.longestStreak} days\n- Dreams Interpreted: ${stats.dreamsDecoded}\n- Tarot Readings: ${stats.tarotReadings}`;
     
     if (navigator.share) {
       await navigator.share({ text });

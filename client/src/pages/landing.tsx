@@ -37,7 +37,7 @@ export default function Landing() {
             Welcome to
           </p>
           <h1 className="glam-welcome-title mt-2 font-display text-5xl leading-none sm:text-6xl">
-            DreamGate
+            Psyra
           </h1>
           <p className="glam-welcome-description mt-6 max-w-sm text-base leading-relaxed sm:text-lg">
             A doorway into the world beneath your waking mind.

@@ -125,7 +125,7 @@ export function AppSidebar() {
             <DreamGateLogo className="h-10 w-10 rounded-lg" />
             <div className="flex flex-col">
               <span className="dreamgate-wordmark text-lg">
-                DreamGate
+                Psyra
               </span>
               <span className="text-xs text-muted-foreground">
                 Your dream journal

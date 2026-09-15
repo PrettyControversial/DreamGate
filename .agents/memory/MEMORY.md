@@ -14,3 +14,4 @@
 - [Moon calendar module boundary](moon-calendar-source-boundary.md) — keep one complete page module; duplicated imports appended after JSX prevent Vite from starting.
 - [DreamGate response budget](dreamgate-response-budget.md) — keep the first usable screen under two seconds; decorative media must never block interaction.
 - [Autoscale startup readiness](autoscale-startup-readiness.md) — bind the HTTP port before async app setup so root health probes do not fail during cold starts.
+- [Development schema sync](db-schema-sync.md) — inspect additive Drizzle changes before approving a non-TTY push that reports a named-schema conflict.

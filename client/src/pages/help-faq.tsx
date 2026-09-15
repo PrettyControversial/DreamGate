@@ -20,9 +20,9 @@ const faqs = [
       "Psyra offers reflective, Jung-inspired prompts about images, emotions, and themes. It is a tool for self-reflection, not a diagnosis or a prediction.",
   },
   {
-    question: "Can I use DreamGate on my phone?",
+    question: "Can I use Psyra on my phone?",
     answer:
-      "Yes. DreamGate is designed for mobile screens, and voice input works when your browser or installed app provides microphone access.",
+      "Yes. Psyra is designed for mobile screens, and voice input works when your browser or installed app provides microphone access.",
   },
 ];
 
@@ -37,7 +37,7 @@ export default function HelpFaq() {
             </Button>
           </Link>
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">DreamGate support</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Psyra support</p>
             <h1 className="font-display text-3xl text-foreground">Help & FAQ</h1>
           </div>
         </div>
@@ -51,7 +51,7 @@ export default function HelpFaq() {
               <div>
                 <h2 className="font-display text-xl text-foreground">A little guidance for your practice</h2>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  DreamGate is a quiet space to remember, reflect, and explore.
+                  Psyra is a quiet space to remember, reflect, and explore.
                 </p>
               </div>
             </div>

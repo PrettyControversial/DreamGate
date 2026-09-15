@@ -93,6 +93,27 @@ export const insertSavedWritingPromptSchema = createInsertSchema(savedWritingPro
 export type InsertSavedWritingPrompt = z.infer<typeof insertSavedWritingPromptSchema>;
 export type SavedWritingPrompt = typeof savedWritingPrompts.$inferSelect;
 
+export const writingResponses = pgTable("writing_responses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  promptId: varchar("prompt_id").notNull(),
+  prompt: text("prompt").notNull(),
+  response: text("response").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertWritingResponseSchema = createInsertSchema(writingResponses).pick({
+  promptId: true,
+  prompt: true,
+  response: true,
+}).extend({
+  response: z.string().trim().min(1).max(20000),
+});
+
+export type InsertWritingResponse = z.infer<typeof insertWritingResponseSchema>;
+export type WritingResponse = typeof writingResponses.$inferSelect;
+
 // Moon phase types
 export const moonPhases = [
   "new_moon",

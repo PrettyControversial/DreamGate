@@ -40,7 +40,7 @@ export function getApiUrl(url: string): string {
   }
   if ((isNativePlatform && apiBaseConfigurationError) || !API_BASE_URL) {
     throw new Error(
-      "DreamGate could not connect securely. Please close and reopen the app, then try again.",
+      "Psyra could not connect securely. Please close and reopen the app, then try again.",
     );
   }
   const path = url.startsWith("/") ? url : `/${url}`;
@@ -89,9 +89,9 @@ export async function apiRequest(
       credentials: "include",
     });
   } catch (error) {
-    console.error("DreamGate API request failed before receiving a response:", error);
+    console.error("Psyra API request failed before receiving a response:", error);
     throw new Error(
-      "DreamGate could not connect securely. Please try again in a moment.",
+      "Psyra could not connect securely. Please try again in a moment.",
     );
   }
   await throwIfResNotOk(res);

@@ -323,7 +323,7 @@ export default function Meditation() {
                       <button
                         type="button"
                         className="dream-journey-note-save home-capsule-button home-capsule-button--outline no-default-hover-elevate no-default-active-elevate"
-                        onClick={() => saveJourneyNote(step.id)}
+                        onClick={() => saveJourneyNote(step.id as ReflectionStepId)}
                         disabled={
                           !reflectionDrafts[step.id].trim() ||
                           reflectionDrafts[step.id].trim() === journeyState.reflections[step.id]

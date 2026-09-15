@@ -52,7 +52,7 @@ app.get("/health", (_req, res) => {
 
 app.use((req, res, next) => {
   if (!appReady && req.path === "/") {
-    res.status(200).type("text/plain").send("DreamGate is starting");
+    res.status(200).type("text/plain").send("Psyra is starting");
     return;
   }
   next();

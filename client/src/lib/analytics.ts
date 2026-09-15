@@ -18,7 +18,7 @@ export function trackEvent(name: string, data?: AnalyticsData): void {
   try {
     window.umami?.track(name, data);
   } catch {
-    // Analytics must never interrupt a user's DreamGate experience.
+    // Analytics must never interrupt a user's Psyra experience.
   }
 }
 

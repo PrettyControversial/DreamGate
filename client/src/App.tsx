@@ -20,7 +20,12 @@ import {
   useLocation,
 } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
-import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import {
+  QueryClientProvider,
+  useIsFetching,
+  useIsMutating,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   AlertCircle,
   CheckCircle2,
@@ -34,6 +39,7 @@ import {
 } from "lucide-react";
 import {
   API_BASE_URL,
+  apiRequest,
   queryClient,
   setAuthTokenProvider,
 } from "./lib/queryClient";
@@ -49,6 +55,7 @@ import { DreamGateLogo } from "@/components/dreamgate-logo";
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import { DreamGateSymbolBackground } from "@/components/dreamgate-symbol-background";
 import { DreamgateIntro } from "@/components/dreamgate-intro";
+import { PsyraLoadingKey } from "@/components/psyra-loading-key";
 import { LunarNotificationSync } from "@/components/lunar-notification-settings";
 import {
   deactivateLunarNotificationUser,
@@ -612,11 +619,11 @@ function SignInPage() {
   return (
     <AuthPageLayout>
       <div className="auth-video-card mx-auto w-[440px] max-w-full overflow-hidden p-8 text-[#f8f4fa]">
-        <img src={dreamgateLogo} alt="DreamGate" className="mx-auto h-14 w-auto" />
+        <img src={dreamgateLogo} alt="Psyra" className="mx-auto h-14 w-auto" />
         <div className="mt-6 text-center">
           <h1 className="font-display text-2xl">
             {step === "credentials"
-              ? "Welcome back to DreamGate"
+              ? "Welcome back to Psyra"
               : verificationPurpose === "device"
                 ? "Verify this device"
                 : "Verify your account"}
@@ -863,7 +870,7 @@ function ForgotPasswordPage() {
   return (
     <AuthPageLayout>
       <div className="auth-video-card mx-auto w-[440px] max-w-full overflow-hidden p-8 text-[#f8f4fa]">
-        <img src={dreamgateLogo} alt="DreamGate" className="mx-auto h-14 w-auto" />
+        <img src={dreamgateLogo} alt="Psyra" className="mx-auto h-14 w-auto" />
         <div className="mt-6 text-center">
           <h1 className="font-display text-2xl">
             {step === "complete" ? "Password updated" : "Reset your password"}
@@ -871,7 +878,7 @@ function ForgotPasswordPage() {
           <p className="mt-1 text-sm text-[#aca8b4]">
             {step === "email" && "We'll send a reset code to your email."}
             {step === "code" && "Enter the code from your email."}
-            {step === "password" && "Choose a new password for DreamGate."}
+            {step === "password" && "Choose a new password for Psyra."}
             {step === "complete" && "Your private dream space is ready for you."}
           </p>
         </div>
@@ -1125,9 +1132,9 @@ function SignUpPage() {
   return (
     <AuthPageLayout>
       <div className="auth-video-card mx-auto w-[440px] max-w-full overflow-hidden p-8 text-[#f8f4fa]">
-        <img src={dreamgateLogo} alt="DreamGate" className="mx-auto h-14 w-auto" />
+        <img src={dreamgateLogo} alt="Psyra" className="mx-auto h-14 w-auto" />
         <div className="mt-6 text-center">
-          <h1 className="font-display text-2xl">Begin your DreamGate journey</h1>
+          <h1 className="font-display text-2xl">Begin your Psyra journey</h1>
           <p className="mt-1 text-sm text-[#aca8b4]">
             {step === "details"
               ? "Create an account to keep your reflections private"
@@ -1297,7 +1304,7 @@ function AccountControls({
             {label}&apos;s space
           </p>
           <SheetTitle className="font-display text-3xl font-normal text-[#171513]">
-            Move through DreamGate
+            Move through Psyra
           </SheetTitle>
           <SheetDescription className="max-w-[17rem] font-accent text-xs leading-relaxed text-[#77716a]">
             Return to the places that support your dream practice.
@@ -1306,7 +1313,7 @@ function AccountControls({
 
         <nav
           className="relative z-10 flex-1 overflow-y-auto px-4 py-2"
-          aria-label="DreamGate menu"
+          aria-label="Psyra menu"
         >
           <SheetClose asChild>
             <Link href="/user-portal" className={drawerLinkClass("/user-portal")}>
@@ -1394,7 +1401,7 @@ function AccountControls({
                   Delete your account?
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-[#77716a]">
-                  This permanently deletes your DreamGate account and all saved
+                  This permanently deletes your Psyra account and all saved
                   dreams, interpretations, and private journal data. This cannot
                   be undone.
                 </AlertDialogDescription>
@@ -1427,7 +1434,7 @@ function AccountControls({
           <div className="flex items-center gap-3">
             <DreamGateLogo />
             <div>
-              <p className="dreamgate-wordmark text-base text-[#171513]">DreamGate</p>
+              <p className="dreamgate-wordmark text-base text-[#171513]">Psyra</p>
               <p className="text-[0.6rem] uppercase tracking-[0.22em] text-[#77716a]">
                 The world beneath your waking mind
               </p>
@@ -1442,7 +1449,8 @@ function AccountControls({
 function RouteLoading() {
   return (
     <div className="route-loading flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center gap-3 bg-background px-6">
-      <p className="text-sm text-muted-foreground">Opening your dream space…</p>
+      <PsyraLoadingKey label="Opening Psyra" />
+      <p className="text-sm text-muted-foreground">Opening your private Psyra space…</p>
     </div>
   );
 }
@@ -1574,7 +1582,7 @@ function AuthenticatedApp() {
             <Link href="/user-portal" className="flex items-center gap-2.5">
                 <DreamGateLogo />
                 <h1 className="dreamgate-wordmark text-base text-foreground">
-                  DreamGate
+                  Psyra
                 </h1>
               </Link>
             <AccountControls
@@ -1660,13 +1668,13 @@ function ClerkProviderWithRoutes() {
         formButtonPrimary: "Sign in",
         signIn: {
           start: {
-            title: "Welcome back to DreamGate",
+            title: "Welcome back to Psyra",
             subtitle: "Sign in to continue your dream practice",
           },
         },
         signUp: {
           start: {
-            title: "Begin your DreamGate journey",
+            title: "Begin your Psyra journey",
             subtitle: "Create an account to keep your reflections private",
           },
         },
@@ -1698,6 +1706,26 @@ function AuthenticatedQueryProvider() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthenticatedQueryContent
+        authTransportReady={authTransportReady}
+        isLoaded={isLoaded}
+      />
+    </QueryClientProvider>
+  );
+}
+
+function AuthenticatedQueryContent({
+  authTransportReady,
+  isLoaded,
+}: {
+  authTransportReady: boolean;
+  isLoaded: boolean;
+}) {
+  const isFetching = useIsFetching();
+  const isMutating = useIsMutating();
+
+  return (
+    <>
       {authTransportReady && isLoaded ? (
         <>
           <ClerkQueryClientCacheInvalidator />
@@ -1714,10 +1742,15 @@ function AuthenticatedQueryProvider() {
         </>
       ) : (
         <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
-          <p className="text-sm text-muted-foreground">Opening your private dream space…</p>
+          <PsyraLoadingKey label="Opening Psyra" />
+          <p className="text-sm text-muted-foreground">Opening your private Psyra space…</p>
         </div>
       )}
-    </QueryClientProvider>
+      <PsyraLoadingKey
+        active={isLoaded && authTransportReady && (isFetching > 0 || isMutating > 0)}
+        label="Psyra is loading"
+      />
+    </>
   );
 }
 
@@ -1740,9 +1773,8 @@ function App() {
   if (!nativeTokenReady) {
     return (
       <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          Opening your private dream space…
-        </p>
+        <PsyraLoadingKey label="Opening Psyra" />
+        <p className="text-sm text-muted-foreground">Opening your private Psyra space…</p>
       </div>
     );
   }

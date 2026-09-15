@@ -7897,3 +7897,322 @@
     animation: none;
   }
 }
+
+/* Psyra's global loading state stays visible only while a request is active. */
+.psyra-loading-key {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--background) 74%, transparent);
+}
+
+.psyra-loading-key img {
+  width: clamp(4.5rem, 12vw, 6.5rem);
+  height: auto;
+  opacity: 0.96;
+  animation: psyra-key-rotate 2.8s linear infinite;
+  filter: drop-shadow(0 0.5rem 1.25rem rgba(0, 0, 0, 0.22));
+}
+
+@keyframes psyra-key-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* The Descent is the dark, inverted editorial path through the night ritual. */
+.night-map-page {
+  --descent-paper: #0d0d0c;
+  --descent-paper-deep: #151514;
+  --descent-ink: #f2ede2;
+  --descent-muted: rgba(242, 237, 226, 0.68);
+  --descent-faint: rgba(242, 237, 226, 0.42);
+  --descent-line: rgba(242, 237, 226, 0.2);
+  background:
+    radial-gradient(circle at 76% 8%, rgba(101, 93, 76, 0.28), transparent 28%),
+    linear-gradient(180deg, #0b0b0a 0%, #141412 56%, #0b0b0a 100%) !important;
+  color-scheme: dark;
+}
+
+.night-map-page::before {
+  background:
+    radial-gradient(ellipse at 17% 38%, rgba(255, 255, 255, 0.06), transparent 25%),
+    linear-gradient(105deg, transparent 0 55%, rgba(206, 191, 158, 0.08) 76%, transparent 100%);
+}
+
+.night-map-page .night-map-arrival--compact {
+  width: min(100% - 2rem, 76rem);
+  min-height: min(42rem, calc(100dvh - 4rem));
+}
+
+.night-map-page .night-map-arrival--compact h1,
+.night-map-page .night-map-checklist-card h3,
+.night-map-page .night-map-meditation-track__heading h4,
+.night-map-page .night-map-complete h2 {
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-arrival__mirror {
+  opacity: 0.84;
+  mix-blend-mode: screen;
+}
+
+.night-map-page .night-map-arrival__mirror::after {
+  background: rgba(180, 153, 103, 0.2);
+}
+
+.night-map-page .night-map-arrival__mirror img {
+  filter: saturate(0.45) contrast(1.08) brightness(0.72);
+}
+
+.night-map-page .night-map-section-nav {
+  border-color: var(--descent-line) !important;
+  background: rgba(13, 13, 12, 0.9) !important;
+  backdrop-filter: blur(16px);
+}
+
+.night-map-page .night-map-section-nav a,
+.night-map-page .night-map-text-link,
+.night-map-page .night-map-checklist-link,
+.night-map-page .night-map-text-button {
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-lucid-checklist {
+  border-left-color: var(--descent-line) !important;
+}
+
+.night-map-page .night-map-checklist-toggle {
+  border-color: var(--descent-ink) !important;
+  background: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-checklist-toggle:hover,
+.night-map-page .night-map-checklist-toggle:focus-visible,
+.night-map-page .night-map-checklist-card.is-complete .night-map-checklist-toggle {
+  background: var(--descent-ink) !important;
+  color: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-meditation-compact,
+.night-map-page .night-map-reflection,
+.night-map-page .night-map-complete {
+  border-top-color: var(--descent-line) !important;
+  background: transparent !important;
+}
+
+.night-map-page .night-map-object-stage {
+  opacity: 0.18;
+  mix-blend-mode: screen;
+}
+
+.night-map-page .night-map-audio-player__play {
+  border-color: var(--descent-ink) !important;
+  background: var(--descent-ink) !important;
+  color: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  accent-color: var(--descent-ink);
+}
+
+@media (max-width: 700px) {
+  .night-map-page .night-map-arrival--compact {
+    display: block;
+    min-height: 34rem;
+    padding-top: 4.5rem;
+  }
+
+  .night-map-page .night-map-arrival__mirror {
+    top: 9rem;
+    right: -4rem;
+    width: 24rem;
+    opacity: 0.46;
+  }
+
+  .night-map-page .night-map-arrival__card-copy {
+    max-width: 19rem;
+  }
+
+  .night-map-page .night-map-arrival--compact h1 {
+    max-width: 8ch;
+    font-size: clamp(3.2rem, 18vw, 5rem);
+  }
+
+  .night-map-page .night-map-content {
+    width: calc(100% - 2rem);
+  }
+
+  .night-map-page .night-map-section-nav {
+    top: 0;
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
+  }
+
+  .night-map-page .night-map-section-nav a {
+    min-width: 0;
+    flex: 1;
+    padding-inline: 0.35rem;
+    font-size: 0.56rem;
+  }
+
+  .night-map-page .night-map-section-nav a span {
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  .night-map-page .night-map-lucid-checklist {
+    padding-left: 1.8rem;
+  }
+
+  .night-map-page .night-map-lucid-checklist::before {
+    left: 0.35rem;
+  }
+
+  .night-map-page .night-map-checklist-toggle {
+    left: -2.05rem;
+  }
+
+  .night-map-page .night-map-checklist-card {
+    padding-bottom: 3.25rem;
+  }
+
+  .night-map-page .night-map-checklist-card h3 {
+    font-size: 1.75rem;
+  }
+
+  .night-map-page .night-map-reflection__grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.writing-prompts-editor {
+  border-top: 1px solid hsl(var(--border));
+  border-bottom: 1px solid hsl(var(--border));
+  padding: clamp(1.5rem, 4vw, 3rem) 0;
+  scroll-margin-top: 1rem;
+}
+
+.writing-prompts-editor__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.writing-prompts-editor__eyebrow,
+.writing-prompts-response-row__date {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.writing-prompts-editor__close {
+  border-bottom: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+  font-size: 0.78rem;
+  padding-bottom: 0.2rem;
+}
+
+.writing-prompts-editor__prompt {
+  max-width: 45rem;
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3.25rem);
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.writing-prompts-editor__hint {
+  margin: 0.8rem 0 1.5rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.writing-prompts-editor__textarea {
+  min-height: min(48vh, 26rem);
+  resize: vertical;
+  border-color: hsl(var(--border));
+  background: hsl(var(--card));
+  padding: 1.1rem;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.writing-prompts-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.writing-prompts-editor__status {
+  min-height: 1.25rem;
+  margin-top: 0.75rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8rem;
+}
+
+.writing-prompts-response-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.writing-prompts-response-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid hsl(var(--border));
+  padding: 1rem 0;
+}
+
+.writing-prompts-response-row__prompt {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.writing-prompts-response-row__excerpt {
+  max-width: 46rem;
+  margin: 0.35rem 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.writing-prompts-response-empty {
+  border-top: 1px solid hsl(var(--border));
+  padding: 1.5rem 0;
+}
+
+@media (max-width: 560px) {
+  .writing-prompts-page {
+    padding-inline: 1.1rem !important;
+  }
+
+  .writing-prompts-editor__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .writing-prompts-editor__actions > * {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .writing-prompts-response-row {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .psyra-loading-key img {
+    animation-duration: 0.01ms;
+  }
+}

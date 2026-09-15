@@ -7,6 +7,8 @@ import {
   type InsertWritingPrompt,
   type SavedWritingPrompt,
   type InsertSavedWritingPrompt,
+  type WritingResponse,
+  type InsertWritingResponse,
   type DreamStats,
   type CelestialData,
   type MoonPhase,
@@ -30,7 +32,11 @@ import OpenAI from "openai";
 import { normalizeArchetypeId } from "@shared/psyra";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db";
-import { dreams as dreamsTable, savedWritingPrompts as savedWritingPromptsTable } from "@shared/schema";
+import {
+  dreams as dreamsTable,
+  savedWritingPrompts as savedWritingPromptsTable,
+  writingResponses as writingResponsesTable,
+} from "@shared/schema";
 import {
   getAstronomicalSnapshot,
   getCurrentCelestialData,
@@ -139,6 +145,9 @@ export interface IStorage {
   getSavedPrompts(userId: string): Promise<SavedWritingPrompt[]>;
   savePrompt(userId: string, prompt: InsertSavedWritingPrompt): Promise<SavedWritingPrompt>;
   deleteSavedPrompt(userId: string, id: string): Promise<boolean>;
+  getWritingResponses(userId: string): Promise<WritingResponse[]>;
+  createWritingResponse(userId: string, response: InsertWritingResponse): Promise<WritingResponse>;
+  updateWritingResponse(userId: string, id: string, response: string): Promise<WritingResponse | undefined>;
   
   getCelestialData(): Promise<CelestialData>;
   getMonthlyLunarCalendar(year: number, month: number): Promise<MonthlyLunarCalendar>;
@@ -693,6 +702,7 @@ export class MemStorage implements IStorage {
   private dreams: Map<string, Map<string, Dream>>;
   private prompts: Map<string, WritingPrompt>;
   private savedPrompts: Map<string, SavedWritingPrompt[]>;
+  private writingResponses: Map<string, WritingResponse[]>;
   private numerologyProfiles: Map<string, NumerologyProfile>;
   private moodEntries: Map<string, MoodEntry[]>;
   private sleepIntentions: Map<string, SleepIntention[]>;
@@ -702,6 +712,7 @@ export class MemStorage implements IStorage {
     this.dreams = new Map();
     this.prompts = new Map();
     this.savedPrompts = new Map();
+    this.writingResponses = new Map();
     this.numerologyProfiles = new Map();
     this.moodEntries = new Map();
     this.sleepIntentions = new Map();
@@ -736,6 +747,7 @@ export class MemStorage implements IStorage {
     this.moodEntries.delete(userId);
     this.sleepIntentions.delete(userId);
     this.savedPrompts.delete(userId);
+    this.writingResponses.delete(userId);
   }
 
   private getDreamStore(userId: string): Map<string, Dream> {
@@ -921,6 +933,45 @@ export class MemStorage implements IStorage {
     const next = saved.filter((prompt) => prompt.id !== id);
     this.savedPrompts.set(userId, next);
     return next.length !== saved.length;
+  }
+
+  async getWritingResponses(userId: string): Promise<WritingResponse[]> {
+    return [...(this.writingResponses.get(userId) ?? [])].sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+  }
+
+  async createWritingResponse(
+    userId: string,
+    insertResponse: InsertWritingResponse,
+  ): Promise<WritingResponse> {
+    const now = new Date();
+    const response: WritingResponse = {
+      id: randomUUID(),
+      userId,
+      ...insertResponse,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const responses = this.writingResponses.get(userId) ?? [];
+    this.writingResponses.set(userId, [response, ...responses]);
+    return response;
+  }
+
+  async updateWritingResponse(
+    userId: string,
+    id: string,
+    responseText: string,
+  ): Promise<WritingResponse | undefined> {
+    const responses = this.writingResponses.get(userId) ?? [];
+    const existing = responses.find((response) => response.id === id);
+    if (!existing) return undefined;
+    const updated = { ...existing, response: responseText, updatedAt: new Date() };
+    this.writingResponses.set(
+      userId,
+      responses.map((response) => (response.id === id ? updated : response)),
+    );
+    return updated;
   }
 
   async getCelestialData(): Promise<CelestialData> {
@@ -1363,6 +1414,43 @@ class DatabaseStorage extends MemStorage {
       )
       .returning({ id: savedWritingPromptsTable.id });
     return deleted.length > 0;
+  }
+
+  async getWritingResponses(userId: string): Promise<WritingResponse[]> {
+    return db
+      .select()
+      .from(writingResponsesTable)
+      .where(eq(writingResponsesTable.userId, userId))
+      .orderBy(desc(writingResponsesTable.updatedAt));
+  }
+
+  async createWritingResponse(
+    userId: string,
+    insertResponse: InsertWritingResponse,
+  ): Promise<WritingResponse> {
+    const [response] = await db
+      .insert(writingResponsesTable)
+      .values({ userId, ...insertResponse })
+      .returning();
+    return response;
+  }
+
+  async updateWritingResponse(
+    userId: string,
+    id: string,
+    responseText: string,
+  ): Promise<WritingResponse | undefined> {
+    const [response] = await db
+      .update(writingResponsesTable)
+      .set({ response: responseText, updatedAt: new Date() })
+      .where(
+        and(
+          eq(writingResponsesTable.userId, userId),
+          eq(writingResponsesTable.id, id),
+        ),
+      )
+      .returning();
+    return response;
   }
 }
 
