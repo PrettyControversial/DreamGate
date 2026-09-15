@@ -73,14 +73,6 @@ const lucidPractices = [
     steps: ["Recall a recent dream or choose one familiar dream sign.", "Picture yourself noticing it, breathing once, and becoming lucid.", "Repeat, “When I dream tonight, I will remember that I am dreaming.”"],
   },
   {
-    id: "recall",
-    icon: BookOpen,
-    eyebrow: "Morning practice",
-    title: "Build Recall · 3 min",
-    description: "Lucid dreaming begins with remembering. Keep the first fragments close before the waking world takes over.",
-    steps: ["Keep your eyes closed for a few breaths when you wake.", "Follow the last feeling, image, or person back through the dream.", "Write three words before you reach for your phone."],
-  },
-  {
     id: "intention",
     icon: Headphones,
     eyebrow: "Bedtime practice",
@@ -95,6 +87,14 @@ const lucidPractices = [
     title: "Box Breathing for Sleep · 6 min",
     description: "Settle your body before lucid dreaming. A steady four-count rhythm gives your attention one gentle place to rest as sleep begins.",
     steps: ["Get comfortable and let your jaw, shoulders, and hands soften.", "Follow the four-count rhythm without trying to force sleep.", "Let the final breath carry you toward the dream state."],
+  },
+  {
+    id: "recall",
+    icon: BookOpen,
+    eyebrow: "Morning practice",
+    title: "Build Recall · 3 min",
+    description: "Lucid dreaming begins with remembering. Keep the first fragments close before the waking world takes over.",
+    steps: ["Keep your eyes closed for a few breaths when you wake.", "Follow the last feeling, image, or person back through the dream.", "Write three words before you reach for your phone."],
   },
 ];
 
