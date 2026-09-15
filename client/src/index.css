@@ -7260,3 +7260,658 @@
   .atlas-record__story, .atlas-timeline { margin-left: 6.3rem; }
   .atlas-record__story { font-size: .95rem; }
 }
+
+/* The Descent — current DreamGate editorial treatment.
+   Keep the interaction model intact while removing the older card-grid styling. */
+.night-map-page {
+  --descent-paper: #f6f3ec;
+  --descent-paper-deep: #ebe8df;
+  --descent-ink: #0e0c06;
+  --descent-muted: rgba(14, 12, 6, 0.62);
+  --descent-faint: rgba(14, 12, 6, 0.4);
+  --descent-line: rgba(14, 12, 6, 0.2);
+  min-height: calc(100dvh - 4rem);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 7%, rgba(188, 199, 195, 0.3), transparent 28%),
+    linear-gradient(180deg, var(--descent-paper) 0%, var(--descent-paper-deep) 58%, var(--descent-paper) 100%) !important;
+  color: var(--descent-ink) !important;
+  color-scheme: light;
+}
+
+.night-map-page::before {
+  display: block;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 17% 38%, rgba(255, 255, 255, 0.46), transparent 25%),
+    linear-gradient(105deg, transparent 0 55%, rgba(177, 188, 183, 0.08) 76%, transparent 100%);
+  content: "";
+  pointer-events: none;
+}
+
+.night-map-page .night-map-arrival--compact {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(19rem, 1.1fr);
+  align-items: center;
+  width: min(100% - 2rem, 76rem);
+  min-height: min(42rem, calc(100dvh - 4rem));
+  margin-inline: auto;
+  padding: clamp(4.5rem, 9vw, 7rem) clamp(0.5rem, 4vw, 3rem);
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-arrival--compact .night-map-arrival__copy {
+  position: relative;
+  z-index: 4;
+  width: auto;
+  max-width: 34rem;
+}
+
+.night-map-page .night-map-arrival__card {
+  display: contents;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-arrival__card-copy {
+  position: relative;
+  z-index: 4;
+  min-height: 0;
+  padding: 0 !important;
+}
+
+.night-map-page .night-map-arrival--compact h1 {
+  max-width: 11ch;
+  margin: 1rem 0 0;
+  color: var(--descent-ink) !important;
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 7vw, 6.6rem);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+
+.night-map-page .night-map-arrival--compact .night-map-deck {
+  max-width: 31rem;
+  margin-top: 1.8rem;
+  color: var(--descent-muted) !important;
+  font-size: clamp(0.95rem, 1.35vw, 1.08rem);
+  line-height: 1.78;
+}
+
+.night-map-page .night-map-arrival--compact .night-map-text-link {
+  margin-top: 2rem;
+  border-bottom-color: var(--descent-line);
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-arrival__mirror {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: -7rem;
+  width: min(50vw, 43rem);
+  height: auto;
+  overflow: visible;
+  opacity: 0.67;
+  mix-blend-mode: multiply;
+  transform: translateY(-50%);
+}
+
+.night-map-page .night-map-arrival__mirror::after {
+  position: absolute;
+  inset: 8% 0 4%;
+  z-index: -1;
+  background: rgba(186, 198, 193, 0.32);
+  filter: blur(42px);
+  content: "";
+}
+
+.night-map-page .night-map-arrival__mirror img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: saturate(0.56) contrast(0.92) brightness(1.08);
+  mask-image: radial-gradient(ellipse 48% 49% at 52% 50%, #000 52%, rgba(0, 0, 0, 0.7) 74%, transparent 98%);
+}
+
+.night-map-page .night-map-arrival__column,
+.night-map-page .night-map-arrival__ivy {
+  opacity: 0.26;
+}
+
+.night-map-page .night-map-content {
+  position: relative;
+  z-index: 2;
+  width: min(100% - 2rem, 66rem);
+  margin-inline: auto;
+}
+
+.night-map-page .night-map-section-nav {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 8;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 4.5rem;
+  overflow-x: auto;
+  border: 0 !important;
+  border-bottom: 1px solid var(--descent-line) !important;
+  border-radius: 0 !important;
+  background: rgba(246, 243, 236, 0.82) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(12px);
+}
+
+.night-map-page .night-map-section-nav a {
+  flex: 0 0 auto;
+  min-width: 7rem;
+  padding: 0.8rem 1rem;
+  border: 0 !important;
+  border-right: 1px solid var(--descent-line) !important;
+  color: var(--descent-faint) !important;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-section-nav a:first-child {
+  border-left: 1px solid var(--descent-line) !important;
+}
+
+.night-map-page .night-map-section-nav a:hover,
+.night-map-page .night-map-section-nav a:focus-visible {
+  background: rgba(14, 12, 6, 0.05) !important;
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-section-nav a span {
+  color: inherit !important;
+}
+
+.night-map-page .night-map-content > .night-map-compact-section,
+.night-map-page .night-map-content > .night-map-meditation-compact,
+.night-map-page .night-map-content > .night-map-reflection,
+.night-map-page .night-map-content > .night-map-complete {
+  border: 0 !important;
+  border-top: 1px solid var(--descent-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-compact-section,
+.night-map-page .night-map-reflection {
+  padding: clamp(4.5rem, 9vw, 7rem) 0;
+}
+
+.night-map-page .night-map-compact-heading {
+  align-items: end;
+}
+
+.night-map-page .night-map-kicker,
+.night-map-page .night-map-progress {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-compact-heading h2,
+.night-map-page .night-map-meditation-compact h2,
+.night-map-page .night-map-reflection h2,
+.night-map-page .night-map-complete h2 {
+  color: var(--descent-ink) !important;
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+.night-map-page .night-map-checklist-intro,
+.night-map-page .night-map-sound-note {
+  max-width: 39rem;
+  color: var(--descent-muted) !important;
+  font-size: 0.94rem;
+  line-height: 1.75;
+}
+
+.night-map-page .night-map-checklist-intro {
+  margin-top: 1.1rem !important;
+}
+
+.night-map-page .night-map-lucid-checklist {
+  position: relative;
+  display: block;
+  margin-top: 3rem;
+  padding-left: clamp(2.5rem, 7vw, 5rem);
+}
+
+.night-map-page .night-map-lucid-checklist::before {
+  position: absolute;
+  top: 0.8rem;
+  bottom: 1rem;
+  left: 0.7rem;
+  width: 1px;
+  background: var(--descent-line);
+  content: "";
+}
+
+.night-map-page .night-map-checklist-card {
+  position: relative;
+  display: block;
+  min-height: 0;
+  padding: 0 0 clamp(2.75rem, 6vw, 4.5rem);
+  overflow: visible;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card {
+  padding-top: 0.25rem;
+}
+
+.night-map-page .night-map-checklist-toggle {
+  position: absolute;
+  top: 0;
+  left: clamp(-3.6rem, -5.8vw, -2.5rem);
+  display: grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 1px solid var(--descent-ink) !important;
+  border-radius: 50% !important;
+  background: var(--descent-paper) !important;
+  color: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-checklist-toggle:hover,
+.night-map-page .night-map-checklist-toggle:focus-visible,
+.night-map-page .night-map-checklist-card.is-complete .night-map-checklist-toggle {
+  border-color: var(--descent-ink) !important;
+  background: var(--descent-ink) !important;
+  color: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-checklist-number {
+  display: inline-block;
+  margin: 0 !important;
+  color: var(--descent-faint) !important;
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+}
+
+.night-map-page .night-map-checklist-icon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin: 0 0 0 0.8rem;
+  color: var(--descent-muted);
+  vertical-align: middle;
+  stroke-width: 1.25;
+}
+
+.night-map-page .night-map-checklist-eyebrow {
+  margin: 0.8rem 0 0 !important;
+  color: var(--descent-faint) !important;
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-checklist-card h3 {
+  max-width: 30rem;
+  margin: 0.5rem 0 0;
+  color: var(--descent-ink) !important;
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.night-map-page .night-map-checklist-description,
+.night-map-page .night-map-checklist-card li {
+  color: var(--descent-muted) !important;
+}
+
+.night-map-page .night-map-checklist-description {
+  max-width: 39rem;
+  margin: 0.8rem 0 0 !important;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.night-map-page .night-map-checklist-card ol {
+  max-width: 41rem;
+  margin: 1.2rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.night-map-page .night-map-checklist-card li {
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.night-map-page .night-map-checklist-card li + li {
+  margin-top: 0.35rem;
+}
+
+.night-map-page .night-map-checklist-link,
+.night-map-page .night-map-text-button {
+  border-bottom-color: var(--descent-line);
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-checklist-meditation {
+  max-width: 41rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--descent-line);
+}
+
+.night-map-page .night-map-checklist-meditation__label,
+.night-map-page .night-map-meditation-track__heading p,
+.night-map-page .night-map-audio-player__times {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-checklist-meditation__label {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-checklist-meditation__label svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.night-map-page .night-map-meditation-track__heading {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  justify-content: space-between;
+  margin: 0.8rem 0;
+}
+
+.night-map-page .night-map-meditation-track__heading p {
+  margin: 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-meditation-track__heading h4 {
+  margin: 0.35rem 0 0;
+  color: var(--descent-ink);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.night-map-page .night-map-audio-player__play {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-color: var(--descent-ink);
+  background: var(--descent-ink);
+  color: var(--descent-paper);
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  accent-color: var(--descent-ink);
+}
+
+.night-map-page .night-map-meditation-track__guidance {
+  margin: 1rem 0 0;
+  color: var(--descent-muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.night-map-page .night-map-meditation-compact {
+  position: relative;
+  display: block;
+  min-height: 19rem;
+  padding: clamp(3.5rem, 8vw, 6rem) 0;
+  overflow: hidden;
+}
+
+.night-map-page .night-map-meditation-compact__heading {
+  position: relative;
+  z-index: 2;
+  max-width: 29rem;
+}
+
+.night-map-page .night-map-meditation-compact__heading h2 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.night-map-page .night-map-meditation-compact__heading > span {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-sound-note {
+  position: relative;
+  z-index: 2;
+  max-width: 32rem;
+  margin-top: 1rem;
+}
+
+.night-map-page .night-map-object-stage {
+  pointer-events: none;
+  opacity: 0.3;
+  filter: grayscale(0.5) saturate(0.55) contrast(0.95);
+  mix-blend-mode: multiply;
+}
+
+.night-map-page .night-map-object-stage--relief {
+  top: 0;
+  right: -2rem;
+  width: min(30rem, 55%);
+}
+
+.night-map-page .night-map-object-stage--ivy {
+  right: 20%;
+  bottom: -5rem;
+  width: 8rem;
+}
+
+.night-map-page .night-map-reflection__grid {
+  gap: clamp(2.5rem, 7vw, 6rem);
+  margin-top: 2.5rem;
+}
+
+.night-map-page .night-map-reflection__grid > div {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-reflection__label {
+  color: var(--descent-ink);
+  font-family: var(--font-display);
+}
+
+.night-map-page .night-map-moods button {
+  color: var(--descent-muted);
+}
+
+.night-map-page .night-map-moods button:hover,
+.night-map-page .night-map-moods button.is-selected {
+  border-bottom-color: var(--descent-ink);
+  background: transparent;
+  color: var(--descent-ink);
+}
+
+.night-map-page .night-map-intention {
+  border: 0 !important;
+  border-bottom: 1px solid var(--descent-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-intention::placeholder {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-saved,
+.night-map-page .night-map-previous {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-complete {
+  position: relative;
+  min-height: 0;
+  padding: clamp(4.5rem, 9vw, 7rem) 0 6rem;
+  text-align: left;
+}
+
+.night-map-page .night-map-complete__heading {
+  position: relative;
+  z-index: 2;
+}
+
+.night-map-page .night-map-complete h2 {
+  max-width: 32rem;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  line-height: 0.98;
+}
+
+.night-map-page .night-map-complete__button {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  margin-top: 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--descent-ink) !important;
+  border-radius: 0 !important;
+  background: var(--descent-ink) !important;
+  color: var(--descent-paper) !important;
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+}
+
+.night-map-page .night-map-object-stage--steps {
+  right: -2rem;
+  bottom: -1rem;
+  width: min(20rem, 35%);
+  opacity: 0.2;
+}
+
+@media (max-width: 767px) {
+  .night-map-page .night-map-arrival--compact {
+    display: block;
+    width: 100%;
+    min-height: 38rem;
+    padding: 4.5rem 1.35rem 2rem;
+  }
+
+  .night-map-page .night-map-arrival--compact h1 {
+    max-width: 9ch;
+    font-size: clamp(3.3rem, 16vw, 5rem);
+  }
+
+  .night-map-page .night-map-arrival--compact .night-map-deck {
+    max-width: 20rem;
+    font-size: 0.92rem;
+  }
+
+  .night-map-page .night-map-arrival__mirror {
+    top: auto;
+    right: -7rem;
+    bottom: -2rem;
+    width: 28rem;
+    transform: none;
+    opacity: 0.58;
+  }
+
+  .night-map-page .night-map-arrival__ivy {
+    top: 0;
+    right: 1rem;
+    left: auto;
+    width: 4rem;
+  }
+
+  .night-map-page .night-map-content {
+    width: calc(100% - 2.7rem);
+  }
+
+  .night-map-page .night-map-section-nav {
+    top: 0;
+    width: calc(100% + 2.7rem);
+    margin-left: -1.35rem;
+    border-top: 1px solid var(--descent-line) !important;
+  }
+
+  .night-map-page .night-map-section-nav a {
+    min-width: 6.3rem;
+    padding-inline: 0.7rem;
+    font-size: 0.56rem;
+  }
+
+  .night-map-page .night-map-lucid-checklist {
+    padding-left: 2.35rem;
+  }
+
+  .night-map-page .night-map-lucid-checklist::before {
+    left: 0.55rem;
+  }
+
+  .night-map-page .night-map-checklist-toggle {
+    left: -2.28rem;
+  }
+
+  .night-map-page .night-map-checklist-card {
+    padding-bottom: 3.25rem;
+  }
+
+  .night-map-page .night-map-checklist-description {
+    font-size: 0.86rem;
+  }
+
+  .night-map-page .night-map-meditation-compact {
+    min-height: 22rem;
+  }
+
+  .night-map-page .night-map-object-stage--relief {
+    right: -5rem;
+    width: 20rem;
+    opacity: 0.24;
+  }
+
+  .night-map-page .night-map-object-stage--ivy {
+    right: 4%;
+    bottom: -2rem;
+    width: 5rem;
+  }
+
+  .night-map-page .night-map-reflection__grid {
+    gap: 3rem;
+  }
+
+  .night-map-page .night-map-complete {
+    padding-bottom: 4.5rem;
+  }
+
+  .night-map-page .night-map-object-stage--steps {
+    right: -4rem;
+    width: 15rem;
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .night-map-page .night-map-arrival__mirror img,
+  .night-map-page .night-map-object-stage--relief img {
+    animation: none;
+  }
+}
