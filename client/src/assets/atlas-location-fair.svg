@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="fair-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#252745"/>
+      <stop offset=".52" stop-color="#b4655a"/>
+      <stop offset="1" stop-color="#e8b276"/>
+    </linearGradient>
+    <linearGradient id="fair-ground" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#7a5545"/>
+      <stop offset="1" stop-color="#211d26"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#fair-sky)"/>
+  <circle cx="454" cy="165" r="78" fill="#f8d59a" opacity=".58"/>
+  <path d="M0 373h600v227H0Z" fill="url(#fair-ground)"/>
+  <circle cx="197" cy="286" r="132" fill="none" stroke="#f5d18c" stroke-width="9" opacity=".85"/>
+  <circle cx="197" cy="286" r="18" fill="#e6b15f"/>
+  <path d="m197 154 0 264M65 286h264M104 193l186 186M104 379l186-186" stroke="#f5d18c" stroke-width="5" opacity=".68"/>
+  <path d="M197 286 90 399M197 286l110 115M197 286 197 419" stroke="#f5d18c" stroke-width="4" opacity=".58"/>
+  <path d="M352 374V241h169v133" fill="#8f493c"/>
+  <path d="M338 244 436 167l99 77Z" fill="#dd9a62"/>
+  <path d="M363 244h145" stroke="#ffe0a4" stroke-width="12" stroke-dasharray="9 18"/>
+  <path d="M349 396h190" stroke="#e9bb7d" stroke-width="7"/>
+  <circle cx="106" cy="112" r="8" fill="#ffe5aa"/><circle cx="270" cy="82" r="7" fill="#ffe5aa"/>
+  <circle cx="540" cy="98" r="6" fill="#ffe5aa"/><circle cx="390" cy="64" r="5" fill="#ffe5aa"/>
+</svg>

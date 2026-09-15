@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="mall-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dfe8e7"/>
+      <stop offset=".42" stop-color="#78959b"/>
+      <stop offset="1" stop-color="#273d51"/>
+    </linearGradient>
+    <linearGradient id="mall-floor" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#d9cdbb"/>
+      <stop offset="1" stop-color="#8a7565"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="#263746"/>
+  <path d="M0 0h600v278L337 238 0 286Z" fill="url(#mall-glass)"/>
+  <path d="M0 277h600v323H0Z" fill="url(#mall-floor)"/>
+  <path d="M0 268 302 224l298 48v42L302 282 0 316Z" fill="#edf0e7" opacity=".68"/>
+  <path d="M52 42 52 276M174 22v236M304 7v230M437 18v247M558 38v254" stroke="#f4f5eb" stroke-width="10" opacity=".6"/>
+  <path d="M84 600 280 278h42l-76 322M514 600 335 278h42l222 322" fill="#70645e" opacity=".45"/>
+  <path d="M124 422h102v95H124zM378 386h111v112H378z" fill="#6b5048" opacity=".78"/>
+  <path d="M110 426h130M371 390h126" stroke="#e9c487" stroke-width="14" opacity=".8"/>
+  <circle cx="300" cy="282" r="18" fill="#d1a15f"/>
+</svg>

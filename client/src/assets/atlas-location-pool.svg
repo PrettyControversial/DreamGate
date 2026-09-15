@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="pool-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e3e2"/>
+      <stop offset=".48" stop-color="#86aeb0"/>
+      <stop offset="1" stop-color="#315f67"/>
+    </linearGradient>
+    <linearGradient id="pool-water" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b7e0db"/>
+      <stop offset=".5" stop-color="#4b9b9e"/>
+      <stop offset="1" stop-color="#173e52"/>
+    </linearGradient>
+    <filter id="pool-soft"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+  <rect width="600" height="600" fill="url(#pool-sky)"/>
+  <rect x="-40" y="70" width="680" height="130" rx="28" fill="#edf0e7" opacity=".7" filter="url(#pool-soft)"/>
+  <path d="M0 244c115-27 214-17 304 2 106 23 184 21 296-9v363H0Z" fill="url(#pool-water)"/>
+  <path d="M0 296c95-22 181-17 275 5 103 24 209 26 325-5M0 365c98-20 196-14 287 7 102 24 206 22 313-7M0 439c108-20 199-14 299 8 96 21 197 20 301-7" fill="none" stroke="#d8f2e8" stroke-width="7" opacity=".45"/>
+  <path d="M0 236h600v34H0z" fill="#d7cdbb"/>
+  <path d="M0 232h600" stroke="#fff9e8" stroke-width="9" opacity=".7"/>
+  <path d="M72 0v230M208 0v230M392 0v230M528 0v230" stroke="#fffaf0" stroke-width="8" opacity=".48"/>
+  <path d="M0 530c121-24 220-17 310 5 112 28 183 20 290-5v70H0Z" fill="#172f35" opacity=".35"/>
+</svg>

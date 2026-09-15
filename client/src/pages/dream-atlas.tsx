@@ -4,6 +4,14 @@ import { Link } from "wouter";
 import { ChevronDown, MapPin, Search } from "lucide-react";
 import type { Dream } from "@shared/schema";
 import atlasBackground from "@assets/dream-atlas-background.png";
+import atlasPool from "@/assets/atlas-location-pool.svg";
+import atlasFair from "@/assets/atlas-location-fair.svg";
+import atlasMall from "@/assets/atlas-location-mall.svg";
+import atlasPark from "@/assets/dream-atlas-park.webp";
+import atlasWater from "@/assets/atlas-detail-water.webp";
+import atlasForest from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
+import atlasDesert from "@assets/stock_images/desert_sand_dunes_go_b71b71c5.jpg";
+import atlasLake from "@assets/stock_images/misty_mountain_lake__396c4e5f.jpg";
 
 type AtlasRecord = {
   name: string;
@@ -14,6 +22,11 @@ type LocationFamily = {
   name: string;
   terms: string[];
   exclude?: string[];
+};
+
+type LocationImage = {
+  src: string;
+  alt: string;
 };
 
 // These are physical places only. Do not add objects, characters, emotions,
@@ -50,6 +63,43 @@ const locationFamilies = [
   { name: "The Mountain", terms: ["mountain", "mountainside", "summit"] },
   { name: "The Threshold", terms: ["doorway", "threshold", "entrance", "stairwell", "elevator"] },
 ] satisfies LocationFamily[];
+
+const locationImages: Record<string, LocationImage> = {
+  "The Pool": { src: atlasPool, alt: "An indoor swimming pool beneath tall windows" },
+  "The Fair": { src: atlasFair, alt: "A fairground with a ferris wheel and illuminated stalls at dusk" },
+  "The Mall": { src: atlasMall, alt: "A glass-roofed shopping mall interior" },
+  "Childhood Home": { src: atlasMall, alt: "A warmly lit interior passage" },
+  Home: { src: atlasMall, alt: "A warmly lit interior passage" },
+  School: { src: atlasMall, alt: "A bright public interior with long architectural lines" },
+  "The Hospital": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
+  "The Ocean": { src: atlasWater, alt: "A quiet waterside landscape" },
+  "The Park": { src: atlasPark, alt: "A stone path through a leafy hillside park" },
+  "The Forest": { src: atlasForest, alt: "A dark, misty forest" },
+  "The City": { src: atlasMall, alt: "A glass-roofed urban interior" },
+  "The Hotel": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
+  "The Airport": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
+  "The Store": { src: atlasMall, alt: "A glass-roofed shopping mall interior" },
+  "The Restaurant": { src: atlasMall, alt: "A warmly lit public interior" },
+  "The Road": { src: atlasPark, alt: "A stone path leading through a broad landscape" },
+  "The Train Station": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
+  "The Library": { src: atlasMall, alt: "A quiet public interior with tall architectural lines" },
+  "The Church": { src: atlasMall, alt: "A tall, quiet public interior" },
+  "The Theater": { src: atlasFair, alt: "A warmly lit public venue at dusk" },
+  "The Office": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
+  "The Rooftop": { src: atlasMall, alt: "A broad view across an urban interior" },
+  "The Bridge": { src: atlasLake, alt: "A mountain landscape beside still water" },
+  "The Lake": { src: atlasLake, alt: "A still mountain lake" },
+  "The Cave": { src: atlasForest, alt: "A dark, textured natural landscape" },
+  "The Desert": { src: atlasDesert, alt: "Dunes stretching across a desert" },
+  "The Mountain": { src: atlasLake, alt: "A mountain landscape beside still water" },
+  "The Threshold": { src: atlasMall, alt: "A bright architectural passage" },
+};
+
+const locationImageFor = (name: string): LocationImage =>
+  locationImages[name] ?? { src: atlasMall, alt: `${name} recurring location` };
+
+const locationId = (name: string) =>
+  `atlas-record-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
 
 const containsPhrase = (text: string, phrase: string) => {
   const escaped = phrase
@@ -103,6 +153,28 @@ export default function DreamAtlas() {
         </div>
       </header>
 
+      {records.length > 0 && (
+        <section className="atlas-world-path" aria-label="Recurring locations">
+          <div className="atlas-world-path__line" aria-hidden="true" />
+          <div className="atlas-world-path__locations">
+            {records.map((record) => {
+              const image = locationImageFor(record.name);
+              return (
+                <button
+                  className="atlas-world-path__location"
+                  key={record.name}
+                  type="button"
+                  onClick={() => document.getElementById(locationId(record.name))?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                >
+                  <img src={image.src} alt="" aria-hidden="true" />
+                  <span>{record.name.replace(/^The /, "")}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="atlas-tools" aria-label="Atlas controls">
         <label><Search aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search your dreamworld" /></label>
         <div>
@@ -118,10 +190,12 @@ export default function DreamAtlas() {
           {filtered.map((record) => {
             const isOpen = openLocation === record.name;
             const dates = record.dreams.slice(-3).map((dream) => formatDate(dream.date));
+            const image = locationImageFor(record.name);
             return (
-              <article className={`atlas-record${isOpen ? " is-open" : ""}`} key={record.name}>
+              <article className={`atlas-record${isOpen ? " is-open" : ""}`} id={locationId(record.name)} key={record.name}>
                 <button className="atlas-record__summary" onClick={() => setOpenLocation(isOpen ? null : record.name)} aria-expanded={isOpen}>
-                   <span><strong>{record.name}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
+                  <img className="atlas-record__image" src={image.src} alt={image.alt} />
+                  <span className="atlas-record__summary-copy"><strong>{record.name}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
                   <ChevronDown aria-hidden="true" />
                 </button>
                 <p className="atlas-record__story">An evolving storyline from the dreams that took place here, in the order they were remembered.</p>

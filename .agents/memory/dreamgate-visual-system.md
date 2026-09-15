@@ -9,11 +9,11 @@ Use the current Discover section as the source of truth for authenticated DreamG
 
 **How to apply:** Reuse Discover’s tokens and shared primitives across authenticated pages. Keep the public Welcome/Login composition and the post-login Home intro video visually isolated unless the user explicitly asks to change them.
 
-The Dream Atlas is an intentional exception to the plain authenticated surface: use the supplied antique parchment artwork as the full-page background, and do not add overlay illustrations or duplicate its compass/castle. Keep Atlas content textual and layered in the artwork’s open areas.
+The Dream Atlas is an intentional exception to the plain authenticated surface: use the supplied antique parchment artwork as the full-page background, do not add overlay illustrations or duplicate its compass/castle, and keep physical-location imagery inside the interactive content records/path.
 
 **Why:** The Atlas artwork is a supplied composition with fixed decorative placement; extra imagery changes the map and competes with the content.
 
-**How to apply:** Preserve the asset exactly, remove decorative card thumbnails and overlay scenes, and keep recurring physical locations as the interactive content layer.
+**How to apply:** Preserve the parchment asset exactly; use consistent circular, location-specific imagery for recurring places, and keep those images within the content layer rather than treating them as page decoration.
 
 Authenticated pages use a clean, solid cream Day Mode surface with no wallpaper, texture, grain, pattern, or gradient behind functional content. The Home collage is the exception: preserve its decorative subjects as transparent cut-outs, never as rectangular image tiles. Discover and the bottom navigation remain near-black with cream typography and controls, while the navigation stays in normal page flow rather than floating over content.
 

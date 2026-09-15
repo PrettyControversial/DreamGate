@@ -1,4 +1,4 @@
-import loadingKey from "@assets/dreamgate-loading-key.webp";
+import loadingKey from "@/assets/psyra-loading-key-transparent.png";
 
 type PsyraLoadingKeyProps = {
   active?: boolean;
