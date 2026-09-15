@@ -104,13 +104,12 @@ export default function MoonTracker() {
   const [openPracticeId, setOpenPracticeId] = useState("reality-check");
   const [dreamRecall, setDreamRecall] = useState("");
   const [dailyIntention, setDailyIntention] = useState("");
-  const [moodSaved, setMoodSaved] = useState(false);
-  const [intentionSaved, setIntentionSaved] = useState(false);
   const [activeMeditationId, setActiveMeditationId] = useState<string | null>(null);
   const [nightMeditationPlaying, setNightMeditationPlaying] = useState(false);
   const [nightMeditationCurrentTime, setNightMeditationCurrentTime] = useState(0);
   const [nightMeditationDuration, setNightMeditationDuration] = useState(0);
   const [ritualComplete, setRitualComplete] = useState(false);
+  const [ritualSaveError, setRitualSaveError] = useState<string | null>(null);
   const nightMeditationRef = useRef<HTMLAudioElement | null>(null);
   const { data: recentMoods } = useQuery<MoodEntry[]>({ queryKey: ["/api/moods"] });
   const { data: recentIntentions } = useQuery<SleepIntention[]>({ queryKey: ["/api/intentions"] });
@@ -119,17 +118,12 @@ export default function MoonTracker() {
     mutationFn: (mood: number) => apiRequest("POST", "/api/moods", { mood }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/moods"] });
-      setMoodSaved(true);
-      window.setTimeout(() => setMoodSaved(false), 2200);
     },
   });
   const intentionMutation = useMutation({
     mutationFn: (intention: string) => apiRequest("POST", "/api/intentions", { intention }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/intentions"] });
-      setIntentionSaved(true);
-      setDailyIntention("");
-      window.setTimeout(() => setIntentionSaved(false), 2200);
     },
   });
 
@@ -199,9 +193,30 @@ export default function MoonTracker() {
 
   const togglePractice = (id: string) => {
     setRitualComplete(false);
+    setRitualSaveError(null);
     setCompletedPractices((current) =>
       current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
     );
+  };
+
+  const completeTonightRitual = async () => {
+    if (ritualComplete || moodMutation.isPending || intentionMutation.isPending) return;
+
+    const intention = dailyIntention.trim();
+    const completedPracticeIds = lucidPractices.map((practice) => practice.id);
+    setRitualSaveError(null);
+    setCompletedPractices(completedPracticeIds);
+
+    try {
+      await Promise.all([
+        selectedMood === null ? Promise.resolve() : moodMutation.mutateAsync(selectedMood),
+        intention ? intentionMutation.mutateAsync(intention) : Promise.resolve(),
+      ]);
+      setDailyIntention("");
+      setRitualComplete(true);
+    } catch {
+      setRitualSaveError("We couldn't save tonight's ritual. Please try again.");
+    }
   };
 
   return (
@@ -374,14 +389,12 @@ export default function MoonTracker() {
           <div className="night-map-reflection__grid">
             <div>
               <div className="night-map-reflection__label"><Heart aria-hidden="true" /><span className="night-map-reflection__label-text night-map-reflection__label-text--squiggle">How are you feeling?</span></div>
-              <div className="night-map-moods">{moodOptions.map((option) => <button key={option.value} type="button" onClick={() => { setSelectedMood(option.value); moodMutation.mutate(option.value); }} className={selectedMood === option.value ? "is-selected" : ""} aria-pressed={selectedMood === option.value} data-testid={`button-mood-${option.value}`}>{option.label}</button>)}</div>
-              {moodSaved && <p className="night-map-saved"><Check aria-hidden="true" /> Saved for tonight.</p>}
+              <div className="night-map-moods">{moodOptions.map((option) => <button key={option.value} type="button" onClick={() => { setSelectedMood(option.value); setRitualComplete(false); setRitualSaveError(null); }} className={selectedMood === option.value ? "is-selected" : ""} aria-pressed={selectedMood === option.value} data-testid={`button-mood-${option.value}`}>{option.label}</button>)}</div>
               {recentMoods?.length ? <p className="night-map-previous">Last check-in: {moodOptions.find((option) => option.value === recentMoods[0].mood)?.label ?? "Noted"}.</p> : null}
             </div>
             <div>
               <div className="night-map-reflection__label"><Feather aria-hidden="true" /><span className="night-map-reflection__label-text night-map-reflection__label-text--squiggle">Tonight&apos;s intention</span></div>
-              <Textarea value={dailyIntention} onChange={(event) => setDailyIntention(event.target.value)} placeholder="I want to remember..." className="night-map-intention" data-testid="textarea-daily-intention" />
-              <div className="night-map-intention__actions"><button type="button" onClick={() => dailyIntention.trim() && intentionMutation.mutate(dailyIntention.trim())} disabled={!dailyIntention.trim() || intentionMutation.isPending} className="night-map-text-button" data-testid="button-save-intention">Save intention</button>{intentionSaved && <span className="night-map-saved"><Check aria-hidden="true" /> Saved</span>}</div>
+              <Textarea value={dailyIntention} onChange={(event) => { setDailyIntention(event.target.value); setRitualComplete(false); setRitualSaveError(null); }} placeholder="I want to remember..." className="night-map-intention" data-testid="textarea-daily-intention" />
               {recentIntentions?.length ? <p className="night-map-previous">Last intention: “{recentIntentions[0].intention}”</p> : null}
             </div>
           </div>
@@ -395,7 +408,10 @@ export default function MoonTracker() {
             <p className="night-map-kicker">04 / Sleep</p>
             <h2>{ritualComplete ? "The night is yours." : "Let the day become a dream."}</h2>
           </div>
-          <button type="button" onClick={() => { setCompletedPractices(lucidPractices.map((practice) => practice.id)); setRitualComplete(true); }} className="night-map-complete__button" data-testid="button-complete-ritual">{ritualComplete ? "Ritual complete" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span></button>
+          <button type="button" onClick={() => void completeTonightRitual()} disabled={ritualComplete || moodMutation.isPending || intentionMutation.isPending} className="night-map-complete__button" data-testid="button-complete-ritual">
+            {ritualComplete ? "Ritual complete" : moodMutation.isPending || intentionMutation.isPending ? "Saving Tonight's Ritual" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span>
+          </button>
+          {ritualSaveError && <p className="night-map-save-error" role="alert">{ritualSaveError}</p>}
         </section>
       </div>
     </main>
