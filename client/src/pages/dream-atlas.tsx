@@ -22,6 +22,7 @@ const locationFamilies = [
   { name: "School", terms: ["school", "classroom", "college", "university", "campus"] },
   { name: "The Hospital", terms: ["hospital", "clinic", "doctor's office", "nurse's station"] },
   { name: "The Ocean", terms: ["ocean", "sea", "beach", "shore"] },
+  { name: "The Park", terms: ["park", "playground", "public garden", "city park"], exclude: ["amusement park"] },
   { name: "The Forest", terms: ["forest", "woods", "woodland"] },
   { name: "The City", terms: ["city", "downtown", "street", "sidewalk"] },
   { name: "The Hotel", terms: ["hotel", "motel", "resort"] },
@@ -30,6 +31,13 @@ const locationFamilies = [
   { name: "The Restaurant", terms: ["restaurant", "cafe", "diner"] },
   { name: "The Road", terms: ["road", "highway", "driving", "parking lot"] },
 ];
+
+const containsPhrase = (text: string, phrase: string) => {
+  const escaped = phrase
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\s+/g, "\\s+");
+  return new RegExp(`(^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`, "i").test(text);
+};
 
 const locationImage = (name: string) => {
   if (/pool|ocean/i.test(name)) return poolImage;
@@ -56,7 +64,8 @@ export default function DreamAtlas() {
     const grouped = locationFamilies.map((family) => {
       const matches = activeDreams.filter((dream) => {
         const text = `${dream.title} ${dream.content}`.toLocaleLowerCase();
-        return family.terms.some((term) => text.includes(term));
+        const isExcluded = family.exclude?.some((term) => containsPhrase(text, term)) ?? false;
+        return !isExcluded && family.terms.some((term) => containsPhrase(text, term));
       });
       return { name: family.name, dreams: matches.sort((a, b) => +new Date(a.date) - +new Date(b.date)), image: locationImage(family.name) };
     }).filter((record) => record.dreams.length > 0);
