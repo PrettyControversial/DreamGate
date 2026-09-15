@@ -11,7 +11,7 @@ import mallDetail from "@assets/atlas-detail-mall.webp";
 import waterDetail from "@assets/atlas-detail-water.webp";
 import keyDetail from "@assets/atlas-detail-key.webp";
 import villageDetail from "@assets/atlas-detail-village.webp";
-import atlasBackground from "@assets/dream-atlas-background.png";
+import atlasBackground from "@assets/dream-atlas-background.jpg";
 
 type AtlasRecord = {
   name: string;
