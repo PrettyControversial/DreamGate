@@ -1500,6 +1500,7 @@ function AuthenticatedApp() {
   const [isOpening, setIsOpening] = useState(true);
   const { paywallRequest, closePaywall } = useSubscription();
   const isDiscover = location === "/discover";
+  const isAtlas = location === "/atlas";
 
   const isDreamDecoder =
     location === "/dream" ||
@@ -1584,7 +1585,7 @@ function AuthenticatedApp() {
             />
           </header>
           <LunarNotificationSync />
-          <DreamGateSymbolBackground />
+          {!isAtlas && <DreamGateSymbolBackground />}
           <main className="relative z-10 min-h-0 flex-1">
             <AppRoutes />
           </main>

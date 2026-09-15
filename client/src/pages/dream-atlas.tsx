@@ -86,7 +86,6 @@ export default function DreamAtlas() {
 
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
-      <img className="atlas-detail atlas-detail--mall" src={mallDetail} alt="" aria-hidden="true" />
       <img className="atlas-detail atlas-detail--key" src={keyDetail} alt="" aria-hidden="true" />
       <img className="atlas-detail atlas-detail--village" src={villageDetail} alt="" aria-hidden="true" />
       <header className="atlas-header">
@@ -102,6 +101,7 @@ export default function DreamAtlas() {
       <section className="atlas-tools" aria-label="Atlas controls">
         <label><Search aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search your dreamworld" /></label>
         <div><button className={sort === "visited" ? "is-active" : ""} onClick={() => setSort("visited")}>Most visited</button><button className={sort === "recent" ? "is-active" : ""} onClick={() => setSort("recent")}>Recently visited</button></div>
+        <img className="atlas-detail atlas-detail--mall" src={mallDetail} alt="" aria-hidden="true" />
       </section>
 
       {isLoading ? <p className="atlas-empty">Opening your dreamworld…</p> : filtered.length === 0 ? (
