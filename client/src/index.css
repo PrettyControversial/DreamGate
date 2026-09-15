@@ -7133,12 +7133,12 @@
 
 .descent-atmosphere__moon {
   position: absolute;
-  top: 12rem;
-  right: -13rem;
-  width: 28rem;
+  top: 8rem;
+  right: -8rem;
+  width: 22rem;
   max-width: none;
   border-radius: 50%;
-  opacity: .2;
+  opacity: .28;
   filter: grayscale(1) contrast(1.05) brightness(.7);
   mix-blend-mode: screen;
   -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 73%);
@@ -7147,13 +7147,13 @@
 
 .descent-atmosphere__plant {
   position: absolute;
-  top: 38rem;
-  left: -5.5rem;
-  width: 15rem;
+  top: 34rem;
+  right: -2rem;
+  width: 12rem;
   max-width: none;
-  opacity: .19;
-  filter: grayscale(1) brightness(1.35);
-  transform: rotate(12deg);
+  opacity: .34;
+  filter: grayscale(1) contrast(1.12) brightness(1.05);
+  transform: rotate(-8deg);
 }
 
 .descent-progress,
@@ -7268,8 +7268,8 @@
   .descent-hero h1 { font-size: 2.25rem; line-height: .92; letter-spacing: -.025em; }
   .descent-hero__copy > p:last-child { margin-top: 1rem; font-size: .875rem; line-height: 1.625; }
   .descent-progress { align-items: flex-start; flex-direction: column; }
-  .descent-atmosphere__moon { top: 10rem; right: -9.5rem; width: 20rem; opacity: .18; }
-  .descent-atmosphere__plant { top: 35rem; left: -5rem; width: 12rem; opacity: .17; }
+  .descent-atmosphere__moon { top: 7rem; right: -7rem; width: 17rem; opacity: .24; }
+  .descent-atmosphere__plant { top: 32rem; right: -3rem; width: 10rem; opacity: .3; }
   .descent-progress i { width: 3rem; }
   .descent-journey { padding-inline: 1.1rem; }
   .descent-practice { margin-left: 1.9rem; }
