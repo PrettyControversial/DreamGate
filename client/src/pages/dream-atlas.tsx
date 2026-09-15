@@ -6,9 +6,11 @@ import type { Dream } from "@shared/schema";
 import poolImage from "@assets/stock_images/ocean_waves_texture__8ce19598.jpg";
 import natureImage from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
 import portalImage from "@assets/night-map-portal.webp";
-import atlasCollage from "@assets/dream-atlas-collage.webp";
 import parkImage from "@assets/dream-atlas-park.webp";
-import cornerKey from "@assets/dreamgate-loading-key.webp";
+import mallDetail from "@assets/atlas-detail-mall.webp";
+import waterDetail from "@assets/atlas-detail-water.webp";
+import keyDetail from "@assets/atlas-detail-key.webp";
+import villageDetail from "@assets/atlas-detail-village.webp";
 
 type AtlasRecord = {
   name: string;
@@ -84,9 +86,9 @@ export default function DreamAtlas() {
 
   return (
     <main className="atlas-page" data-testid="dream-atlas-page">
-      <img className="atlas-background-art" src={atlasCollage} alt="" aria-hidden="true" />
-      <img className="atlas-corner-key" src={cornerKey} alt="" aria-hidden="true" />
-      <img className="atlas-bottom-place" src={portalImage} alt="" aria-hidden="true" />
+      <img className="atlas-detail atlas-detail--mall" src={mallDetail} alt="" aria-hidden="true" />
+      <img className="atlas-detail atlas-detail--key" src={keyDetail} alt="" aria-hidden="true" />
+      <img className="atlas-detail atlas-detail--village" src={villageDetail} alt="" aria-hidden="true" />
       <header className="atlas-header">
         <div>
           <p className="atlas-kicker">Your dreamworld</p>
@@ -117,6 +119,7 @@ export default function DreamAtlas() {
                   <ChevronDown aria-hidden="true" />
                 </button>
                 <p className="atlas-record__story">Across {record.dreams.length} {record.dreams.length === 1 ? "visit" : "visits"}, this place has gathered a story of return, change, and unfinished moments.</p>
+                {record.name === "The Pool" && isOpen && <img className="atlas-detail atlas-detail--water" src={waterDetail} alt="" aria-hidden="true" />}
                 {isOpen && (
                   <div className="atlas-timeline">
                     {record.dreams.map((dream) => (
