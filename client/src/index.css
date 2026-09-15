@@ -8739,3 +8739,143 @@
     font-size: 1rem;
   }
 }
+
+/* Final Descent contrast pass. Keep the atmospheric surface, but never let
+   inherited Day Mode text colors win inside the dark ritual. */
+.night-map-page {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 18% 26%, rgba(119, 137, 105, 0.12), transparent 24rem),
+    radial-gradient(ellipse at 88% 54%, rgba(95, 116, 91, 0.1), transparent 28rem),
+    radial-gradient(ellipse at 44% 84%, rgba(77, 93, 77, 0.08), transparent 30rem),
+    linear-gradient(180deg, #070806 0%, #0b0d0a 52%, #060706 100%) !important;
+}
+
+.night-map-page::after {
+  position: fixed;
+  z-index: 0;
+  inset: -12%;
+  background:
+    radial-gradient(ellipse at 14% 32%, rgba(174, 185, 157, 0.13), transparent 19%),
+    radial-gradient(ellipse at 84% 25%, rgba(144, 161, 129, 0.1), transparent 20%),
+    radial-gradient(ellipse at 59% 66%, rgba(129, 151, 127, 0.09), transparent 26%),
+    linear-gradient(108deg, transparent 18%, rgba(137, 157, 126, 0.055) 42%, transparent 68%);
+  filter: blur(2rem);
+  opacity: 0.75;
+  pointer-events: none;
+  content: "";
+  animation: night-map-fog-drift 22s ease-in-out infinite alternate;
+}
+
+.night-map-page .night-map-content {
+  z-index: 3;
+}
+
+.night-map-page .night-map-arrival--compact {
+  z-index: 2;
+}
+
+.night-map-page .night-map-arrival--compact h1,
+.night-map-page .night-map-compact-heading h2,
+.night-map-page .night-map-meditation-compact h2,
+.night-map-page .night-map-reflection h2,
+.night-map-page .night-map-complete h2,
+.night-map-page .night-map-checklist-card h3,
+.night-map-page .night-map-meditation-track__heading h4 {
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-arrival--compact .night-map-deck,
+.night-map-page .night-map-checklist-description,
+.night-map-page .night-map-checklist-card li,
+.night-map-page .night-map-meditation-track__guidance,
+.night-map-page .night-map-sound-note,
+.night-map-page .night-map-reflection__label,
+.night-map-page .night-map-moods button,
+.night-map-page .night-map-mark-complete,
+.night-map-page .night-map-previous {
+  color: rgba(242, 239, 231, 0.86) !important;
+}
+
+.night-map-page .night-map-kicker,
+.night-map-page .night-map-progress,
+.night-map-page .night-map-checklist-eyebrow,
+.night-map-page .night-map-checklist-number,
+.night-map-page .night-map-audio-player__times,
+.night-map-page .night-map-meditation-compact__heading > span,
+.night-map-page .night-map-saved {
+  color: rgba(242, 239, 231, 0.72) !important;
+}
+
+.night-map-page .night-map-reflection__label svg,
+.night-map-page .night-map-practice-expand,
+.night-map-page .night-map-checklist-icon,
+.night-map-page .night-map-mark-complete span {
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-moods button {
+  border-color: rgba(242, 239, 231, 0.38);
+}
+
+.night-map-page .night-map-moods button:hover,
+.night-map-page .night-map-moods button.is-selected {
+  border-color: var(--descent-ink);
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-intention {
+  color: var(--descent-ink) !important;
+  caret-color: var(--descent-ink);
+}
+
+.night-map-page .night-map-intention::placeholder {
+  color: rgba(242, 239, 231, 0.62) !important;
+}
+
+.night-map-page .night-map-audio-player__play {
+  background: transparent !important;
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  color: var(--descent-ink);
+  accent-color: var(--descent-ink);
+}
+
+.night-map-page .night-map-mark-complete {
+  border: 0;
+  background: transparent;
+}
+
+.night-map-page .night-map-mark-complete span {
+  border-color: rgba(242, 239, 231, 0.72);
+}
+
+.night-map-page .night-map-continue,
+.night-map-page .night-map-complete__button {
+  background: #f4efe5 !important;
+  color: #090a08 !important;
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.26);
+}
+
+.night-map-page .night-map-continue:hover,
+.night-map-page .night-map-complete__button:hover {
+  background: #fffaf0 !important;
+  color: #090a08 !important;
+}
+
+@keyframes night-map-fog-drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 1%, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .night-map-page::after {
+    animation: none;
+  }
+}
