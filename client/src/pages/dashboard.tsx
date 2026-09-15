@@ -715,7 +715,7 @@ export default function Dashboard() {
               </div>
             </Link>
             
-            <Link href="/decoder">
+            <Link href="/prompts">
               <div
                 className="relative overflow-hidden rounded-2xl bg-card border border-border p-5 hover-elevate cursor-pointer"
                 data-testid="daily-prompt"
