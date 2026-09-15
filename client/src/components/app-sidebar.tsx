@@ -66,6 +66,11 @@ const menuItems: SidebarItem[] = [
     url: "/archive",
     symbol: "archive",
   },
+  {
+    title: "Dream Atlas",
+    url: "/atlas",
+    symbol: "archive",
+  },
 ];
 
 const trackerItems: SidebarItem[] = [

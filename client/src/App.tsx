@@ -94,6 +94,7 @@ const DreamDecoder = lazy(() => import("@/pages/dream-decoder"));
 const WritingPrompts = lazy(() => import("@/pages/writing-prompts"));
 const DreamArchive = lazy(() => import("@/pages/dream-archive"));
 const DreamWrapped = lazy(() => import("@/pages/dream-wrapped"));
+const DreamAtlas = lazy(() => import("@/pages/dream-atlas"));
 const MoonTracker = lazy(() => import("@/pages/moon-tracker"));
 const MoonCalendar = lazy(() => import("@/pages/moon-calendar"));
 const DreamDictionary = lazy(() => import("@/pages/dream-dictionary"));
@@ -1470,6 +1471,7 @@ function AppRoutes() {
         <Route path="/prompts" component={WritingPrompts} />
         <Route path="/archive" component={DreamArchive} />
         <Route path="/wrapped" component={DreamWrapped} />
+        <Route path="/atlas" component={DreamAtlas} />
         <Route path="/night-map" component={MoonTracker} />
         <Route path="/tracker" component={MoonTracker} />
         <Route path="/lunar-calendar" component={MoonCalendar} />
@@ -1494,6 +1496,13 @@ function AuthenticatedApp() {
   const { toast } = useToast();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [isOpening, setIsOpening] = useState(() => {
+    try {
+      return sessionStorage.getItem("dreamgate-intro-seen-v3") !== "true";
+    } catch {
+      return true;
+    }
+  });
   const { paywallRequest, closePaywall } = useSubscription();
   const isDiscover = location === "/discover";
 
@@ -1502,6 +1511,14 @@ function AuthenticatedApp() {
     location.startsWith("/dream/") ||
     location.startsWith("/decoder");
   const isHome = location === "/user-portal";
+  const completeOpening = () => {
+    try {
+      sessionStorage.setItem("dreamgate-intro-seen-v3", "true");
+    } catch {
+      // The opening can still finish when session storage is unavailable.
+    }
+    setIsOpening(false);
+  };
   const handleSignOut = () => {
     try {
       sessionStorage.removeItem("dreamgate-intro-seen-v3");
@@ -1583,6 +1600,12 @@ function AuthenticatedApp() {
             request={paywallRequest}
             onClose={closePaywall}
           />
+          {isOpening && (
+            <DreamgateIntro
+              onComplete={completeOpening}
+              onError={completeOpening}
+            />
+          )}
           {isSigningOut && (
             <DreamgateIntro
               onComplete={completeSignOut}

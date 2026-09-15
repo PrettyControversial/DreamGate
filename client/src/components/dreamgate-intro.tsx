@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { KeyRound } from "lucide-react";
 import introImage from "@assets/Copy_of_Holistic_Coach_Instagram_Kit_(Square_Posts)_1788595169788.png";
 
 interface DreamgateIntroProps {
@@ -30,10 +31,12 @@ export function DreamgateIntro({ onComplete, onError }: DreamgateIntroProps) {
     >
       <img
         src={introImage}
-        alt=""
-        aria-hidden="true"
+        alt="Who looks outside, dreams; who looks inside, awakes. — Carl Jung"
         onError={onError}
       />
+      <div className="dashboard-intro__loader" aria-label="Opening DreamGate">
+        <KeyRound aria-hidden="true" />
+      </div>
     </div>
   );
 }

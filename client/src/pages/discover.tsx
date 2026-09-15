@@ -114,6 +114,14 @@ const allContent: ContentCard[] = [
     category: "Dreams",
   },
   {
+    id: "atlas",
+    title: "Dream Atlas",
+    description: "Return to the places that recur across your dreams",
+    icon: <DreamGateFunctionSymbol kind="archive" className="h-6 w-6" />,
+    href: "/atlas",
+    category: "Dreams",
+  },
+  {
     id: "night-map",
     title: "The Descent",
     description: "A nightly lucid-dream checklist",
