@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@clerk/react";
-import { Check, Headphones, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Headphones, LockKeyhole, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
 import { trackDiscoverToolCompleted, trackEvent } from "@/lib/analytics";
 import { setMeditationMediaSession } from "@/lib/meditation-media-session";
+import { useSubscription } from "@/lib/subscription";
+import { Button } from "@/components/ui/button";
 
 import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.mp3";
 import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.mp3";
@@ -87,6 +89,7 @@ function formatAudioTime(seconds: number) {
 
 export default function Meditation() {
   const { user } = useUser();
+  const { canAccess, openPaywall } = useSubscription();
   const [journeyState, setJourneyState] = useState<JourneyState>(emptyJourneyState);
   const [activeAudioId, setActiveAudioId] = useState<JourneyStepId | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -152,6 +155,17 @@ export default function Meditation() {
 
   const toggleAudio = (step: JourneyStep) => {
     if (!step.audioFile) return;
+    if (!canAccess("fullMeditationLibrary")) {
+      openPaywall({
+        feature: "fullMeditationLibrary",
+        eyebrow: "Psyra+ Meditation",
+        title: "Unlock the Full Meditation Library",
+        description:
+          "Meet your guide, sit with your shadow, and return to the symbols that keep appearing in your dreams.",
+      });
+      return;
+    }
+
     if (activeAudioId === step.id && audioRef.current) {
       if (audioRef.current.paused) {
         void audioRef.current.play();
@@ -234,6 +248,37 @@ export default function Meditation() {
             aria-hidden="true"
           />
         </header>
+
+        {!canAccess("fullMeditationLibrary") && (
+          <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="font-medium">The meditation audio library is part of Psyra+</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Your journey notes remain here. Unlock Psyra+ to play the guided sessions.
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="shrink-0"
+              onClick={() =>
+                openPaywall({
+                  feature: "fullMeditationLibrary",
+                  eyebrow: "Psyra+ Meditation",
+                  title: "Unlock the Full Meditation Library",
+                  description:
+                    "Meet your guide, sit with your shadow, and return to the symbols that keep appearing in your dreams.",
+                })
+              }
+              data-testid="button-unlock-meditation"
+            >
+              Unlock Meditation
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </section>
+        )}
 
         <section className="dream-journey-path" aria-label="Dream Journey steps">
           {journeySteps.map((step) => {

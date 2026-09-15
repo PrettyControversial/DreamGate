@@ -47,7 +47,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
-import { PsyraPaywall } from "@/components/psyra-paywall";
 import { SubscriptionProvider, useSubscription } from "@/lib/subscription";
 import { BottomNav } from "@/components/bottom-nav";
 import { DreamGateLogo } from "@/components/dreamgate-logo";
@@ -110,6 +109,11 @@ const Stats = lazy(() => import("@/pages/stats"));
 const Discover = lazy(() => import("@/pages/discover"));
 const Psyche = lazy(() => import("@/pages/psyche"));
 const HelpFaq = lazy(() => import("@/pages/help-faq"));
+const PsyraPaywall = lazy(() =>
+  import("@/components/psyra-paywall").then(({ PsyraPaywall: component }) => ({
+    default: component,
+  })),
+);
 
 const isNativePlatform = Capacitor.isNativePlatform();
 
@@ -1662,11 +1666,15 @@ function AuthenticatedApp() {
           </main>
           <div className="dreamgate-bottom-nav-spacer shrink-0" aria-hidden="true" />
           <BottomNav />
-          <PsyraPaywall
-            open={paywallRequest !== null}
-            request={paywallRequest}
-            onClose={closePaywall}
-          />
+          {paywallRequest !== null && (
+            <Suspense fallback={null}>
+              <PsyraPaywall
+                open
+                request={paywallRequest}
+                onClose={closePaywall}
+              />
+            </Suspense>
+          )}
           <AppReviewPrompt
             open={isReviewPromptOpen}
             onOpenChange={setIsReviewPromptOpen}

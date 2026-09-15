@@ -17,7 +17,7 @@ import {
 export const isDevelopmentBuild = import.meta.env.DEV;
 
 const DEV_SUBSCRIPTION_STORAGE_KEY = "dreamgate-development-subscription";
-const DEV_USAGE_STORAGE_KEY = "dreamgate-ask-psyra-usage";
+const ASK_PSYRA_USAGE_STORAGE_KEY = "dreamgate-ask-psyra-usage";
 
 export interface PaywallRequest {
   feature?: SubscriptionFeature;
@@ -91,10 +91,8 @@ function loadDevelopmentState(): DevelopmentSubscriptionState {
 }
 
 function loadAskPsyraUsage() {
-  if (!isDevelopmentBuild) return 0;
-
   try {
-    const stored = localStorage.getItem(DEV_USAGE_STORAGE_KEY);
+    const stored = localStorage.getItem(ASK_PSYRA_USAGE_STORAGE_KEY);
     if (!stored) return 0;
     const parsed = JSON.parse(stored) as { month?: string; count?: number };
     return parsed.month === currentMonthKey() && typeof parsed.count === "number"
@@ -115,10 +113,9 @@ function saveDevelopmentState(state: DevelopmentSubscriptionState) {
 }
 
 function saveAskPsyraUsage(count: number) {
-  if (!isDevelopmentBuild) return;
   try {
     localStorage.setItem(
-      DEV_USAGE_STORAGE_KEY,
+      ASK_PSYRA_USAGE_STORAGE_KEY,
       JSON.stringify({ month: currentMonthKey(), count }),
     );
   } catch {
@@ -145,7 +142,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   );
 
   const recordAskPsyraInterpretation = useCallback(() => {
-    if (!isDevelopmentBuild || isPremiumEntitlement(developmentState.entitlement)) {
+    if (isPremiumEntitlement(developmentState.entitlement)) {
       return;
     }
     setAskPsyraUsage((current) => {

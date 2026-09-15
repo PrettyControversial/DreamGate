@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, RotateCcw, Eye, Heart, Star, Shuffle, Moon, Flame, MessageCircle, AlertTriangle, History, ChevronRight } from "lucide-react";
+import { ArrowRight, LockKeyhole, Sparkles, RotateCcw, Eye, Heart, Star, Shuffle, Moon, Flame, MessageCircle, AlertTriangle, History, ChevronRight } from "lucide-react";
 import tarotImage from "@assets/dreamgate_backgrounds/tarot-reading-face.webp";
+import { useSubscription } from "@/lib/subscription";
 import {
   consumeTarotEntrySource,
   trackDiscoverToolCompleted,
@@ -351,6 +352,7 @@ function saveReading(reading: TarotReading) {
 }
 
 export default function Tarot() {
+  const { canAccess, openPaywall } = useSubscription();
   const [selectedSpread, setSelectedSpread] = useState<string | null>(null);
   const [drawnCards, setDrawnCards] = useState<{ card: TarotCard; reversed: boolean; position: string }[]>([]);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -365,6 +367,17 @@ export default function Tarot() {
   }, []);
 
   const shuffleAndDraw = (spreadId: string) => {
+    if (!canAccess("premiumTarot")) {
+      openPaywall({
+        feature: "premiumTarot",
+        eyebrow: "Psyra+ Tarot",
+        title: "Unlock Tarot Readings",
+        description:
+          "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
+      });
+      return;
+    }
+
     const spread = spreadTypes.find(s => s.id === spreadId);
     if (!spread) return;
 
@@ -496,6 +509,37 @@ export default function Tarot() {
                   from the innocent Fool to the integrated World. Each card speaks in the symbolic language of 
                   your dreams, offering not fortune-telling but a mirror for self-reflection.
                 </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/25 bg-primary/5">
+              <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div>
+                    <p className="font-medium">Tarot readings are part of Psyra+</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Choose a spread below to open the subscription options.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={() =>
+                    openPaywall({
+                      feature: "premiumTarot",
+                      eyebrow: "Psyra+ Tarot",
+                      title: "Unlock Tarot Readings",
+                      description:
+                        "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
+                    })
+                  }
+                  data-testid="button-unlock-tarot"
+                >
+                  Unlock Tarot
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </CardContent>
             </Card>
 
