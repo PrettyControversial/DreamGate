@@ -8879,3 +8879,62 @@
     animation: none;
   }
 }
+
+/* Do not use muted gray text on the dark Descent surface. This intentionally
+   overrides the older Day Mode selectors above, several of which carry
+   !important declarations. */
+.night-map-page,
+.night-map-page p,
+.night-map-page h1,
+.night-map-page h2,
+.night-map-page h3,
+.night-map-page h4,
+.night-map-page span,
+.night-map-page li,
+.night-map-page a,
+.night-map-page label,
+.night-map-page button,
+.night-map-page input,
+.night-map-page textarea {
+  color: #f8f3e9 !important;
+  opacity: 1 !important;
+}
+
+.night-map-page .night-map-arrival__mirror img,
+.night-map-page .night-map-object-stage img {
+  opacity: 1;
+}
+
+.night-map-page .night-map-arrival__mirror img {
+  filter: saturate(0.68) contrast(1.08) brightness(0.78);
+}
+
+.night-map-page .night-map-intention::placeholder {
+  color: #ded7ca !important;
+  opacity: 1 !important;
+}
+
+.night-map-page .night-map-checklist-toggle,
+.night-map-page .night-map-practice-expand,
+.night-map-page .night-map-audio-player__play,
+.night-map-page .night-map-mark-complete,
+.night-map-page .night-map-moods button,
+.night-map-page .night-map-text-button,
+.night-map-page .night-map-checklist-link {
+  color: #f8f3e9 !important;
+}
+
+.night-map-page .night-map-continue,
+.night-map-page .night-map-continue span,
+.night-map-page .night-map-complete__button,
+.night-map-page .night-map-complete__button span {
+  color: #090a08 !important;
+}
+
+.dreamgate-app-shell:has(.night-map-page) .dreamgate-night-footer,
+.dreamgate-app-shell:has(.night-map-page) .dreamgate-night-footer *,
+.dreamgate-app-shell:has(.night-map-page) .dreamgate-night-footer .text-muted-foreground,
+.dreamgate-app-shell:has(.night-map-page) .dreamgate-night-footer .text-foreground {
+  color: #f8f3e9 !important;
+  opacity: 1 !important;
+}
