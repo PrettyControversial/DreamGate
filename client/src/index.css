@@ -3707,13 +3707,6 @@
   --collage-rotation: 5deg;
 }
 
-.home-collage-piece--study-7 {
-  top: 70%;
-  right: -2%;
-  width: clamp(10rem, 17vw, 15rem);
-  --collage-rotation: -4deg;
-}
-
 .home-collage-piece--study-8 {
   top: 78%;
   left: -2%;
@@ -3733,13 +3726,6 @@
   left: 1%;
   width: clamp(8rem, 13vw, 11rem);
   --collage-rotation: -4deg;
-}
-
-.home-collage-piece--study-11 {
-  top: 96%;
-  right: -4%;
-  width: clamp(9rem, 15vw, 13rem);
-  --collage-rotation: 7deg;
 }
 
 .quick-access-heading {
@@ -3968,12 +3954,6 @@
     width: 6.5rem;
   }
 
-  .home-collage-piece--study-7 {
-    top: 69%;
-    right: -2.5rem;
-    width: 8rem;
-  }
-
   .home-collage-piece--study-8 {
     top: 77%;
     left: -2rem;
@@ -3992,11 +3972,6 @@
     width: 6rem;
   }
 
-  .home-collage-piece--study-11 {
-    top: 97%;
-    right: -2rem;
-    width: 7.5rem;
-  }
 }
 
 .dark .dream-decoder-header {
