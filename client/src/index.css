@@ -7214,8 +7214,9 @@
   font-family: var(--font-sans);
 }
 .atlas-background-art { position: absolute; z-index: 0; top: 0; left: 50%; width: min(100%, 64rem); height: auto; opacity: .46; pointer-events: none; transform: translateX(-50%); }
-.atlas-corner-key { position: absolute; z-index: 0; top: .65rem; left: -1.15rem; width: clamp(5.5rem, 16vw, 8rem); height: auto; border-radius: 50%; opacity: .34; pointer-events: none; transform: rotate(-12deg); }
-.atlas-page > :not(.atlas-background-art):not(.atlas-corner-key) { position: relative; z-index: 1; }
+.atlas-corner-key { position: absolute; z-index: 0; bottom: 6.25rem; left: -1.15rem; width: clamp(5.5rem, 16vw, 8rem); height: auto; border-radius: 50%; opacity: .34; pointer-events: none; transform: rotate(-12deg); }
+.atlas-bottom-place { position: absolute; z-index: 0; right: -1.75rem; bottom: 4.75rem; width: clamp(9rem, 26vw, 14rem); height: auto; opacity: .25; pointer-events: none; filter: grayscale(1) sepia(.18); }
+.atlas-page > :not(.atlas-background-art):not(.atlas-corner-key):not(.atlas-bottom-place) { position: relative; z-index: 1; }
 .atlas-header { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 15rem; gap: 2rem; width: min(100%, 64rem); margin: 0 auto 2rem; }
 .atlas-kicker { margin: 0 0 .55rem; font-size: .72rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; }
 .atlas-header h1 { margin: 0; font-family: var(--font-display); font-size: clamp(3.5rem, 9vw, 6.75rem); font-weight: 400; line-height: .88; letter-spacing: -.05em; }
@@ -7269,7 +7270,8 @@
 @media (max-width: 640px) {
   .atlas-page { padding-top: 1.6rem; }
   .atlas-background-art { width: 100%; opacity: .42; }
-  .atlas-corner-key { top: .35rem; left: -1.3rem; width: 5.75rem; opacity: .3; }
+  .atlas-corner-key { bottom: 6.5rem; left: -1.3rem; width: 5.75rem; opacity: .3; }
+  .atlas-bottom-place { right: -2rem; bottom: 5rem; width: 10rem; opacity: .22; }
   .atlas-header { display: block; }
   .atlas-header h1 { font-size: 3.25rem; }
   .atlas-deck { font-size: 1.15rem; }

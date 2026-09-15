@@ -86,6 +86,7 @@ export default function DreamAtlas() {
     <main className="atlas-page" data-testid="dream-atlas-page">
       <img className="atlas-background-art" src={atlasCollage} alt="" aria-hidden="true" />
       <img className="atlas-corner-key" src={cornerKey} alt="" aria-hidden="true" />
+      <img className="atlas-bottom-place" src={portalImage} alt="" aria-hidden="true" />
       <header className="atlas-header">
         <div>
           <p className="atlas-kicker">Your dreamworld</p>
