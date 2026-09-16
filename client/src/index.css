@@ -8459,6 +8459,156 @@
   }
 }
 
+.night-map-page .night-map-journey-path {
+  --journey-line: var(--descent-line);
+  --journey-accent: #d9b875;
+}
+
+.night-map-page::after {
+  position: absolute;
+  top: 2rem;
+  right: -8rem;
+  z-index: 0;
+  width: clamp(18rem, 38vw, 30rem);
+  height: clamp(18rem, 38vw, 30rem);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 34%, rgba(246, 243, 236, 0.2), rgba(213, 207, 188, 0.1) 38%, rgba(213, 207, 188, 0.035) 59%, transparent 73%);
+  filter: blur(0.4rem);
+  content: "";
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.night-map-page > .mx-auto {
+  position: relative;
+  z-index: 1;
+}
+
+.night-map-page .night-map-journey-path .night-map-step {
+  min-height: 0;
+  margin-bottom: 3.25rem;
+  padding: 0 0 0 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-step:last-child {
+  margin-bottom: 0;
+}
+
+.night-map-page .night-map-step__content {
+  position: relative;
+  z-index: 2;
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker {
+  border-color: var(--descent-ink);
+  background: var(--descent-paper);
+  color: var(--journey-accent);
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker span {
+  background: var(--descent-faint);
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker.is-active {
+  box-shadow: 0 0 0 0.3rem rgba(217, 184, 117, 0.12);
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker.is-complete {
+  border-color: var(--journey-accent);
+  background: color-mix(in srgb, var(--journey-accent) 18%, var(--descent-paper));
+}
+
+.night-map-page .night-map-journey-path .night-map-kicker,
+.night-map-page .night-map-journey-path .night-map-progress,
+.night-map-page .night-map-journey-path .night-map-checklist-eyebrow,
+.night-map-page .night-map-journey-path .night-map-checklist-number {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-journey-path h2,
+.night-map-page .night-map-journey-path h3,
+.night-map-page .night-map-journey-path h4 {
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-journey-path h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+.night-map-page .night-map-journey-path .night-map-checklist-card {
+  border-color: var(--descent-line) !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-step-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--descent-line);
+}
+
+.night-map-page .night-map-journey-path .night-map-step-nav a {
+  display: inline-flex;
+  gap: 0.8rem;
+  align-items: center;
+  color: var(--descent-ink) !important;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-journey-path .night-map-step-nav a:first-child:last-child {
+  margin-left: auto;
+}
+
+.night-map-page .night-map-journey-path .night-map-step-nav a:hover,
+.night-map-page .night-map-journey-path .night-map-step-nav a:focus-visible {
+  color: var(--journey-accent) !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-object-stage {
+  z-index: 0;
+}
+
+.night-map-page .night-map-journey-footer {
+  margin-top: 2rem;
+  border-top-color: var(--descent-line);
+}
+
+.night-map-page .night-map-journey-footer .dream-journey-save-note {
+  color: var(--descent-muted);
+}
+
+@media (max-width: 767px) {
+  .night-map-page .night-map-journey-path .night-map-step {
+    margin-bottom: 2.75rem;
+  }
+
+  .night-map-page .night-map-journey-path .night-map-step-nav {
+    gap: 0.75rem;
+  }
+
+  .night-map-page .night-map-journey-path .night-map-step-nav a {
+    font-size: 0.58rem;
+  }
+
+  .night-map-page::after {
+    top: 4rem;
+    right: -7rem;
+    width: 19rem;
+    height: 19rem;
+    opacity: 0.58;
+  }
+}
+
 .writing-prompts-editor {
   border-top: 1px solid hsl(var(--border));
   border-bottom: 1px solid hsl(var(--border));

@@ -286,14 +286,19 @@ export default function MoonTracker() {
         </header>
 
         <div className="night-map-content">
-        <nav className="night-map-section-nav" aria-label="The Descent sections">
-          <a href="#night-practices">01 <span>Practice</span></a>
-          <a href="#night-meditation">02 <span>Sound</span></a>
-          <a href="#night-reflection">03 <span>Reflect</span></a>
-          <a href="#night-sleep">04 <span>Sleep</span></a>
-        </nav>
-
-        <section id="night-practices" className="night-map-compact-section night-map-practices-compact" aria-labelledby="night-map-practices-title">
+        <div className="dream-journey-path night-map-journey-path" aria-label="The Descent steps">
+        <section id="night-practices" className="dream-journey-step night-map-step night-map-compact-section night-map-practices-compact" aria-labelledby="night-map-practices-title">
+          <button
+            type="button"
+            className={`dream-journey-marker${descentStepComplete["night-practices"] ? " is-complete" : ""}${activeDescentStep === "night-practices" ? " is-active" : ""}`}
+            onClick={() => focusDescentStep("night-practices")}
+            aria-current={activeDescentStep === "night-practices" ? "step" : undefined}
+            aria-pressed={descentStepComplete["night-practices"]}
+            aria-label={`${descentStepComplete["night-practices"] ? "Completed" : "Open"} practice step`}
+          >
+            {descentStepComplete["night-practices"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
+          </button>
+          <div className="night-map-step__content">
           <div className="night-map-compact-heading">
             <div><p className="night-map-kicker">01 / Lucid dream training</p><h2 id="night-map-practices-title">Lucid Dream Checklist</h2></div>
             <span className="night-map-progress">{completedPractices.length}/{lucidPractices.length} complete</span>
@@ -408,10 +413,24 @@ export default function MoonTracker() {
               );
             })}
           </div>
-           <a className="night-map-continue" href="#night-meditation">Continue the Descent <span aria-hidden="true">→</span></a>
+           <nav className="night-map-step-nav" aria-label="Practice step navigation">
+             <a href="#night-meditation" onClick={() => setActiveDescentStep("night-meditation")}>Continue the Descent <span aria-hidden="true">→</span></a>
+           </nav>
+          </div>
         </section>
 
-        <section id="night-meditation" className="night-map-meditation-compact" data-testid="night-meditation" aria-labelledby="night-map-meditation-title">
+         <section id="night-meditation" className="dream-journey-step night-map-step night-map-meditation-compact" data-testid="night-meditation" aria-labelledby="night-map-meditation-title">
+           <button
+             type="button"
+             className={`dream-journey-marker${descentStepComplete["night-meditation"] ? " is-complete" : ""}${activeDescentStep === "night-meditation" ? " is-active" : ""}`}
+             onClick={() => focusDescentStep("night-meditation")}
+             aria-current={activeDescentStep === "night-meditation" ? "step" : undefined}
+             aria-pressed={descentStepComplete["night-meditation"]}
+             aria-label={`${descentStepComplete["night-meditation"] ? "Completed" : "Open"} sound step`}
+           >
+             {descentStepComplete["night-meditation"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
+           </button>
+           <div className="night-map-step__content">
           <div className="night-map-object-stage night-map-object-stage--relief" aria-hidden="true">
             <img src={nightMapHeaderRelief} alt="" />
           </div>
@@ -420,9 +439,25 @@ export default function MoonTracker() {
           </div>
           <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">02 / Sound</p><h2 id="night-map-meditation-title">Choose one path into sleep.</h2><span>One meditation is enough for tonight.</span></div>
           <p className="night-map-sound-note">Use Reality Check to sharpen your awareness of the present moment. Use Theta Realm to rehearse recognizing a dream sign as your body settles. Each recording now lives with the practice it supports, so you can read, listen, and continue without losing your place.</p>
+           <nav className="night-map-step-nav" aria-label="Sound step navigation">
+             <a href="#night-practices" onClick={() => setActiveDescentStep("night-practices")}><span aria-hidden="true">←</span> Previous</a>
+             <a href="#night-reflection" onClick={() => setActiveDescentStep("night-reflection")}>Continue <span aria-hidden="true">→</span></a>
+           </nav>
+           </div>
         </section>
 
-        <section id="night-reflection" className="night-map-reflection" aria-labelledby="night-map-reflection-title">
+         <section id="night-reflection" className="dream-journey-step night-map-step night-map-reflection" aria-labelledby="night-map-reflection-title">
+           <button
+             type="button"
+             className={`dream-journey-marker${descentStepComplete["night-reflection"] ? " is-complete" : ""}${activeDescentStep === "night-reflection" ? " is-active" : ""}`}
+             onClick={() => focusDescentStep("night-reflection")}
+             aria-current={activeDescentStep === "night-reflection" ? "step" : undefined}
+             aria-pressed={descentStepComplete["night-reflection"]}
+             aria-label={`${descentStepComplete["night-reflection"] ? "Completed" : "Open"} reflection step`}
+           >
+             {descentStepComplete["night-reflection"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
+           </button>
+           <div className="night-map-step__content">
           <div className="night-map-compact-heading"><div><p className="night-map-kicker">03 / Reflection</p><h2 id="night-map-reflection-title">Arrive as you are.</h2></div></div>
           <div className="night-map-reflection__grid">
             <div>
@@ -436,9 +471,25 @@ export default function MoonTracker() {
               {recentIntentions?.length ? <p className="night-map-previous">Last intention: “{recentIntentions[0].intention}”</p> : null}
             </div>
           </div>
+           <nav className="night-map-step-nav" aria-label="Reflection step navigation">
+             <a href="#night-meditation" onClick={() => setActiveDescentStep("night-meditation")}><span aria-hidden="true">←</span> Previous</a>
+             <a href="#night-sleep" onClick={() => setActiveDescentStep("night-sleep")}>Continue <span aria-hidden="true">→</span></a>
+           </nav>
+           </div>
         </section>
 
-        <section id="night-sleep" className="night-map-complete">
+         <section id="night-sleep" className="dream-journey-step night-map-step night-map-complete">
+           <button
+             type="button"
+             className={`dream-journey-marker${descentStepComplete["night-sleep"] ? " is-complete" : ""}${activeDescentStep === "night-sleep" ? " is-active" : ""}`}
+             onClick={() => focusDescentStep("night-sleep")}
+             aria-current={activeDescentStep === "night-sleep" ? "step" : undefined}
+             aria-pressed={descentStepComplete["night-sleep"]}
+             aria-label={`${descentStepComplete["night-sleep"] ? "Completed" : "Open"} sleep step`}
+           >
+             {descentStepComplete["night-sleep"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
+           </button>
+           <div className="night-map-step__content">
           <div className="night-map-object-stage night-map-object-stage--steps" aria-hidden="true">
             <img src={nightMapStoneSteps} alt="" />
           </div>
@@ -450,7 +501,15 @@ export default function MoonTracker() {
             {ritualComplete ? "Ritual complete" : moodMutation.isPending || intentionMutation.isPending ? "Saving Tonight's Ritual" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span>
           </button>
           {ritualSaveError && <p className="night-map-save-error" role="alert">{ritualSaveError}</p>}
+           <nav className="night-map-step-nav" aria-label="Sleep step navigation">
+             <a href="#night-reflection" onClick={() => setActiveDescentStep("night-reflection")}><span aria-hidden="true">←</span> Previous</a>
+           </nav>
+           </div>
         </section>
+         </div>
+         <div className="dream-journey-footer night-map-journey-footer">
+           <p className="dream-journey-save-note"><Sparkles aria-hidden="true" /> Your Descent progress stays available while you continue tonight.</p>
+         </div>
         </div>
       </div>
     </main>
