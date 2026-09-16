@@ -3442,6 +3442,9 @@
 .meditation-page .home-capsule-button,
 .lunar-calendar-page .home-capsule-button,
 .dream-decoder-light-surface .home-capsule-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 3.25rem;
   border: 2px solid #0e0c06;
   border-radius: 9999px;

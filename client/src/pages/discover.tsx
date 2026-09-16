@@ -126,12 +126,14 @@ const allContent: ContentCard[] = [
     title: "Dream Atlas",
     description: "Return to the places that recur across your dreams",
     icon: (
-      <img
-        src={atlasSymbol}
-        alt=""
-        aria-hidden="true"
-        className="aspect-square h-8 w-8 object-cover brightness-0 invert"
-      />
+      <span className="flex aspect-square h-8 w-8 items-center justify-center overflow-hidden">
+        <img
+          src={atlasSymbol}
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-contain brightness-0 invert"
+        />
+      </span>
     ),
     href: "/atlas",
     category: "Dreams",
