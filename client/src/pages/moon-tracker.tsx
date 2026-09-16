@@ -74,7 +74,7 @@ const lucidPractices = [
     icon: Headphones,
     eyebrow: "Final sleep preparation",
     title: "Box Breathing for Sleep · 6 min",
-    description: "Settle your body before lucid dreaming. A steady four-count rhythm gives your attention one gentle place to rest as sleep begins.",
+    description: "",
     steps: ["Get comfortable and let your jaw, shoulders, and hands soften.", "Follow the four-count rhythm without trying to force sleep.", "Let the final breath carry you toward the dream state."],
   },
   {
@@ -314,7 +314,9 @@ export default function MoonTracker() {
                   <h3 className="dream-journey-step-title">{practice.title}</h3>
                    {openPracticeId === practice.id && (
                      <div className="night-map-practice-body">
-                        <p className="dream-journey-description night-map-checklist-description">{practice.description}</p>
+                         {practice.description && (
+                           <p className="dream-journey-description night-map-checklist-description">{practice.description}</p>
+                         )}
                         <ol className={practice.id === "recall" ? "night-map-recall-steps" : undefined}>
                          {practice.steps.map((step) => <li key={step}>{step}</li>)}
                        </ol>
