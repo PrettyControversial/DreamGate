@@ -8139,6 +8139,261 @@
   }
 }
 
+/* The Descent shares Guided Journey's narrow editorial layout, with Discover's
+   near-black surface and cream type. Keep the dream imagery atmospheric. */
+.night-map-page {
+  --descent-paper: #0e0c06;
+  --descent-paper-deep: #16130d;
+  --descent-ink: #f6f3ec;
+  --descent-muted: rgba(246, 243, 236, 0.68);
+  --descent-faint: rgba(246, 243, 236, 0.46);
+  --descent-line: rgba(246, 243, 236, 0.24);
+  position: relative;
+  min-height: calc(100dvh - 4rem);
+  background:
+    radial-gradient(circle at 76% 8%, rgba(111, 102, 83, 0.18), transparent 27%),
+    linear-gradient(180deg, var(--descent-paper) 0%, var(--descent-paper-deep) 56%, var(--descent-paper) 100%) !important;
+  color: var(--descent-ink) !important;
+  color-scheme: dark;
+}
+
+.night-map-page::before {
+  background:
+    radial-gradient(ellipse at 17% 38%, rgba(246, 243, 236, 0.07), transparent 25%),
+    linear-gradient(105deg, transparent 0 55%, rgba(206, 191, 158, 0.08) 76%, transparent 100%);
+}
+
+.night-map-page .night-map-arrival--compact {
+  display: block;
+  width: min(100% - 2rem, 48rem);
+  min-height: 0;
+  margin-inline: auto;
+  padding: 2rem 0 0;
+}
+
+.night-map-page .night-map-arrival__copy,
+.night-map-page .night-map-arrival__card-copy {
+  width: auto;
+  max-width: none;
+}
+
+.night-map-page .night-map-arrival__card {
+  display: contents;
+}
+
+.night-map-page .night-map-arrival__card-copy {
+  position: relative;
+  z-index: 4;
+  min-height: 0;
+  padding: 0;
+}
+
+.night-map-page .night-map-arrival--compact h1 {
+  max-width: 12ch;
+  margin: 0.75rem 0 0;
+  color: var(--descent-ink) !important;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+}
+
+.night-map-page .night-map-brand,
+.night-map-page .night-map-kicker,
+.night-map-page .night-map-progress {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-deck,
+.night-map-page .night-map-headphones-note,
+.night-map-page .night-map-checklist-intro,
+.night-map-page .night-map-sound-note {
+  color: var(--descent-muted) !important;
+}
+
+.night-map-page .night-map-deck {
+  max-width: 38rem;
+  margin-top: 1.4rem;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.night-map-page .night-map-headphones-note {
+  margin-top: 1rem;
+}
+
+.night-map-page .night-map-text-link,
+.night-map-page .night-map-checklist-link,
+.night-map-page .night-map-text-button {
+  color: var(--descent-ink) !important;
+  border-bottom-color: var(--descent-line) !important;
+}
+
+.night-map-page .night-map-arrival__mirror {
+  top: -1.5rem;
+  right: -4.5rem;
+  z-index: 1;
+  width: min(19rem, 43%);
+  height: calc(100% + 3rem);
+  opacity: 0.2;
+  mix-blend-mode: screen;
+}
+
+.night-map-page .night-map-arrival__mirror::after {
+  background: rgba(180, 153, 103, 0.14);
+}
+
+.night-map-page .night-map-arrival__mirror img {
+  filter: saturate(0.38) contrast(1.05) brightness(0.8);
+}
+
+.night-map-page .night-map-content {
+  width: min(100% - 2rem, 48rem);
+  margin-inline: auto;
+}
+
+.night-map-page .night-map-section-nav {
+  margin: 2rem auto 3.5rem;
+  border-color: var(--descent-line) !important;
+  background: rgba(14, 12, 6, 0.86) !important;
+  backdrop-filter: blur(16px);
+}
+
+.night-map-page .night-map-section-nav a {
+  color: var(--descent-faint) !important;
+  border-color: var(--descent-line) !important;
+}
+
+.night-map-page .night-map-section-nav a:hover,
+.night-map-page .night-map-section-nav a:focus-visible {
+  background: color-mix(in srgb, var(--descent-ink) 8%, var(--descent-paper)) !important;
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-content > .night-map-compact-section,
+.night-map-page .night-map-content > .night-map-meditation-compact,
+.night-map-page .night-map-content > .night-map-reflection,
+.night-map-page .night-map-content > .night-map-complete {
+  border-color: var(--descent-line) !important;
+  background: transparent !important;
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-checklist-card h3,
+.night-map-page .night-map-meditation-track__heading h4,
+.night-map-page .night-map-complete h2 {
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-checklist-description,
+.night-map-page .night-map-checklist-card li,
+.night-map-page .night-map-meditation-track__guidance,
+.night-map-page .night-map-previous {
+  color: var(--descent-muted) !important;
+}
+
+.night-map-page .night-map-lucid-checklist::before,
+.night-map-page .night-map-checklist-meditation,
+.night-map-page .night-map-intention {
+  border-color: var(--descent-line) !important;
+}
+
+.night-map-page .night-map-checklist-toggle {
+  border-color: var(--descent-ink) !important;
+  background: var(--descent-paper) !important;
+  color: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-checklist-toggle:hover,
+.night-map-page .night-map-checklist-toggle:focus-visible,
+.night-map-page .night-map-checklist-card.is-complete .night-map-checklist-toggle {
+  background: var(--descent-ink) !important;
+  color: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-moods button {
+  color: var(--descent-muted);
+}
+
+.night-map-page .night-map-moods button:hover,
+.night-map-page .night-map-moods button.is-selected {
+  border-bottom-color: var(--descent-ink);
+  color: var(--descent-ink);
+}
+
+.night-map-page .night-map-intention {
+  background: transparent !important;
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-intention::placeholder {
+  color: var(--descent-faint) !important;
+}
+
+.night-map-page .night-map-audio-player__play {
+  border-color: var(--descent-ink) !important;
+  background: var(--descent-ink) !important;
+  color: var(--descent-paper) !important;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  accent-color: var(--descent-ink);
+}
+
+.night-map-page .night-map-object-stage {
+  opacity: 0.18;
+  mix-blend-mode: screen;
+  filter: grayscale(0.55) saturate(0.5) contrast(0.9);
+}
+
+.night-map-page .night-map-object-stage--relief {
+  top: 0;
+  right: -2rem;
+  width: min(30rem, 62%);
+}
+
+.night-map-page .night-map-complete__button {
+  border-color: var(--descent-ink) !important;
+  background: var(--descent-ink) !important;
+  color: var(--descent-paper) !important;
+}
+
+@media (max-width: 767px) {
+  .night-map-page .night-map-arrival--compact {
+    width: calc(100% - 2rem);
+    min-height: 0;
+    padding: 2rem 0 0;
+  }
+
+  .night-map-page .night-map-arrival--compact h1 {
+    max-width: 10ch;
+    font-size: clamp(2.8rem, 14vw, 4rem);
+  }
+
+  .night-map-page .night-map-arrival__mirror {
+    top: -0.75rem;
+    right: -4rem;
+    width: 15rem;
+    height: calc(100% + 1.5rem);
+    opacity: 0.16;
+  }
+
+  .night-map-page .night-map-content {
+    width: calc(100% - 2rem);
+  }
+
+  .night-map-page .night-map-section-nav {
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .night-map-page .night-map-reflection__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .writing-prompts-editor {
   border-top: 1px solid hsl(var(--border));
   border-bottom: 1px solid hsl(var(--border));

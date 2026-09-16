@@ -8,7 +8,6 @@ import type { MoodEntry, SleepIntention } from "@shared/schema";
 import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.m4a";
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.m4a";
 import boxBreathingAudio from "@/assets/box-breathing-for-sleep.m4a";
-import nightMapPaperTexture from "@assets/night-map-paper-texture.webp";
 import nightMapHeaderRelief from "@assets/night-map-stone-cutout.png";
 import nightMapPortal from "@assets/night-map-portal.webp";
 import nightMapIvy from "@assets/night-map-ivy.webp";
@@ -222,7 +221,6 @@ export default function MoonTracker() {
   return (
     <main
       className="night-map-page min-h-[calc(100dvh-4rem)] overflow-hidden"
-      style={{ backgroundImage: `url(${nightMapPaperTexture})` }}
       data-testid="night-map-page"
     >
       <header className="night-map-arrival night-map-arrival--compact">

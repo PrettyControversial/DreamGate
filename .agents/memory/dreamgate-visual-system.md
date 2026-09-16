@@ -33,6 +33,12 @@ The Descent is an intentional dark authenticated exception: use a near-black for
 
 **How to apply:** Keep the first practice open with its audio controls, collapse the remaining practices until selected, preserve the completion/reflection/sleep behavior below, and keep the bottom navigation dark and in normal page flow. Fog belongs behind the content and must not be used as a text color.
 
+The Descent now follows the Guided Journey narrow editorial column while keeping Discover's near-black #0E0C06 and cream #F6F3EC palette. Its portal mirror, moon/fog relief, and meditation artwork remain faded atmospheric layers behind readable content.
+
+**Why:** The user asked for the Descent to feel like the Journey layout while sharing Discover's dark colorway, without losing the existing dream imagery.
+
+**How to apply:** Keep the Descent content in a centered narrow column, use cream type and thin cream rules on near-black, and preserve imagery as low-opacity background atmosphere rather than cards or competing foreground content.
+
 The numbered dream glyph system is the approved decorative language: background glyphs use #62, #55, #59, #85, #96, #126, #141, and #150; footer glyphs map Home #16, Dream #38, Tarot #54, and Stats #139.
 
 **Why:** The user wants symbolic markings that feel embedded in DreamGate rather than generic iconography or rectangular image tiles.
