@@ -237,8 +237,18 @@ export default function Meditation() {
       <div className="mx-auto max-w-3xl">
         <header className="meditation-header meditation-header--object dream-journey-header">
           <div className="meditation-header__copy space-y-3">
-            <p className="meditation-kicker text-xs uppercase tracking-[0.28em]">Guided Journey</p>
-            <h1 className="font-display text-4xl tracking-tight md:text-5xl">Dream Journey</h1>
+            <div className="dream-journey-heading-row">
+              <div className="dream-journey-heading-copy">
+                <p className="meditation-kicker text-xs uppercase tracking-[0.28em]">Guided Journey</p>
+                <h1 className="font-display text-4xl tracking-tight md:text-5xl">Dream Journey</h1>
+              </div>
+              <img
+                className="meditation-header__object"
+                src={meditationSymbolRelief}
+                alt=""
+                aria-hidden="true"
+              />
+            </div>
             <p className="meditation-muted max-w-xl text-sm leading-relaxed">
               A gentle practice for the space between waking and sleep. Meet a guide, sit with a shadow,
               welcome a symbol, and settle the breath.
@@ -248,12 +258,6 @@ export default function Meditation() {
               Headphones are recommended for maximum benefit.
             </p>
           </div>
-          <img
-            className="meditation-header__object"
-            src={meditationSymbolRelief}
-            alt=""
-            aria-hidden="true"
-          />
         </header>
 
         {!isPremium && (

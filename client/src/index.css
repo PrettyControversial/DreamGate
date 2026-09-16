@@ -978,8 +978,43 @@
   padding-bottom: 0;
 }
 
+.dream-journey-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dream-journey-heading-copy {
+  min-width: 0;
+}
+
+.dream-journey-header .dream-journey-heading-row .meditation-header__object {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 0;
+  flex: 0 0 auto;
+  width: min(12rem, 24vw);
+  max-height: 10rem;
+  margin: -0.8rem 0 0;
+  transform: rotate(4deg);
+}
+
 .dream-journey-headphones {
   color: var(--meditation-ink);
+}
+
+@media (max-width: 767px) {
+  .dream-journey-heading-row {
+    gap: 0.45rem;
+  }
+
+  .dream-journey-header .dream-journey-heading-row .meditation-header__object {
+    width: min(7rem, 24vw);
+    max-height: 7rem;
+    margin-top: -0.5rem;
+  }
 }
 
 .dream-journey-path {
