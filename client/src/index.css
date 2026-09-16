@@ -8634,6 +8634,445 @@
   }
 }
 
+/* Descent keeps its own content and interactions, but uses Guided Journey's
+   light editorial surface without the journey graph. */
+.night-map-page {
+  --meditation-ink: #0e0c06;
+  --meditation-muted: rgba(14, 12, 6, 0.62);
+  --journey-line: rgba(14, 12, 6, 0.22);
+  --journey-accent: hsl(var(--gold));
+  --descent-ink: #0e0c06;
+  --descent-muted: rgba(14, 12, 6, 0.62);
+  --descent-faint: rgba(14, 12, 6, 0.56);
+  background: #f6f3ec !important;
+  background-image: none !important;
+  color: var(--meditation-ink) !important;
+  color-scheme: light;
+}
+
+.night-map-page::before,
+.night-map-page::after {
+  display: none;
+}
+
+.night-map-page > .mx-auto {
+  position: relative;
+  z-index: 1;
+}
+
+.night-map-page,
+.night-map-page p,
+.night-map-page h1,
+.night-map-page h2,
+.night-map-page h3,
+.night-map-page h4,
+.night-map-page span,
+.night-map-page li,
+.night-map-page a,
+.night-map-page label,
+.night-map-page button,
+.night-map-page input,
+.night-map-page textarea {
+  color: var(--meditation-ink) !important;
+  opacity: 1 !important;
+}
+
+.night-map-page .meditation-muted,
+.night-map-page .dream-journey-description,
+.night-map-page .dream-journey-headphones,
+.night-map-page .night-map-checklist-description,
+.night-map-page .night-map-checklist-card li,
+.night-map-page .night-map-meditation-track__guidance,
+.night-map-page .night-map-sound-note,
+.night-map-page .night-map-meditation-compact__heading > span,
+.night-map-page .dream-journey-save-note,
+.night-map-page .dream-journey-audio__header,
+.night-map-page .dream-journey-audio__time {
+  color: var(--meditation-muted) !important;
+}
+
+.night-map-page .night-map-sections {
+  padding-left: 0;
+}
+
+.night-map-page .night-map-sections::before,
+.night-map-page .night-map-lucid-checklist::before {
+  display: none !important;
+  content: none;
+}
+
+.night-map-page .night-map-step,
+.night-map-page .night-map-step:last-child {
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 2.9rem !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-step + .night-map-step {
+  padding-top: 2.9rem !important;
+  border-top: 1px solid var(--journey-line) !important;
+}
+
+.night-map-page .night-map-compact-heading,
+.night-map-page .night-map-meditation-compact__heading,
+.night-map-page .night-map-complete__heading {
+  display: block;
+  min-height: 0;
+  margin: 0 0 1rem;
+}
+
+.night-map-page .night-map-compact-heading > div {
+  display: block;
+}
+
+.night-map-page .night-map-kicker,
+.night-map-page .night-map-checklist-eyebrow,
+.night-map-page .night-map-checklist-number {
+  color: var(--meditation-muted) !important;
+  font-family: var(--font-accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-compact-heading h2,
+.night-map-page .night-map-meditation-compact__heading h2,
+.night-map-page .night-map-complete h2 {
+  margin: 0 0 0.55rem;
+  color: var(--meditation-ink) !important;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.night-map-page .night-map-checklist-intro,
+.night-map-page .night-map-sound-note {
+  display: block;
+  max-width: 42rem;
+  margin: 0 0 1.5rem !important;
+  color: var(--meditation-muted) !important;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.night-map-page .night-map-lucid-checklist {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border-left: 0 !important;
+}
+
+.night-map-page .night-map-checklist-card {
+  position: relative;
+  min-height: 0;
+  margin: 0;
+  padding: 0 3rem 1.75rem 2.9rem !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--journey-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card {
+  padding-top: 1.75rem !important;
+}
+
+.night-map-page .night-map-checklist-number {
+  position: absolute;
+  top: 0.1rem;
+  left: 0;
+  margin: 0 !important;
+  color: var(--meditation-muted) !important;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-checklist-number {
+  top: 1.85rem;
+}
+
+.night-map-page .night-map-checklist-eyebrow {
+  margin: 0 0 0.35rem !important;
+  color: var(--meditation-muted) !important;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.night-map-page .night-map-checklist-card h3 {
+  max-width: 30rem;
+  margin: 0 0 0.55rem;
+  color: var(--meditation-ink) !important;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.night-map-page .night-map-checklist-toggle {
+  position: absolute;
+  top: 0.1rem;
+  right: 2rem;
+  left: auto;
+  display: grid;
+  width: 1.1rem;
+  height: 1.1rem;
+  place-items: center;
+  border: 1px solid var(--journey-line) !important;
+  border-radius: 0.2rem !important;
+  background: transparent !important;
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-checklist-toggle {
+  top: 1.85rem;
+}
+
+.night-map-page .night-map-checklist-toggle:hover,
+.night-map-page .night-map-checklist-toggle:focus-visible,
+.night-map-page .night-map-checklist-card.is-complete .night-map-checklist-toggle {
+  border-color: var(--meditation-ink) !important;
+  background: color-mix(in srgb, var(--meditation-ink) 8%, transparent) !important;
+}
+
+.night-map-page .night-map-checklist-toggle svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.night-map-page .night-map-checklist-icon {
+  position: absolute;
+  top: 0.1rem;
+  right: 0;
+  left: auto;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  color: var(--meditation-muted) !important;
+  stroke-width: 1.2;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-checklist-icon {
+  top: 1.85rem;
+}
+
+.night-map-page .night-map-practice-expand {
+  position: absolute;
+  top: 2.35rem;
+  right: 0;
+  display: grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-practice-expand {
+  top: 4.1rem;
+}
+
+.night-map-page .night-map-practice-expand svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.night-map-page .night-map-practice-body {
+  display: block;
+  padding-bottom: 0.2rem;
+}
+
+.night-map-page .night-map-checklist-description {
+  margin: 0 0 0.8rem !important;
+}
+
+.night-map-page .night-map-checklist-card ol {
+  max-width: 30rem;
+  margin: 0.7rem 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.night-map-page .night-map-checklist-card li {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.night-map-page .night-map-checklist-card li + li {
+  margin-top: 0.1rem;
+}
+
+.night-map-page .night-map-checklist-card li::before {
+  content: "";
+}
+
+.night-map-page .night-map-checklist-meditation {
+  max-width: 38rem;
+  margin-top: 1.5rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.night-map-page .night-map-checklist-meditation__label {
+  display: none;
+}
+
+.night-map-page .night-map-meditation-track__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.night-map-page .night-map-meditation-track__heading p,
+.night-map-page .night-map-meditation-track__heading h4,
+.night-map-page .night-map-meditation-track__heading > span {
+  margin: 0;
+}
+
+.night-map-page .night-map-meditation-track__heading p,
+.night-map-page .night-map-meditation-track__heading > span {
+  color: var(--meditation-muted) !important;
+  font-size: 0.78rem;
+}
+
+.night-map-page .night-map-meditation-track__heading h4 {
+  color: var(--meditation-ink) !important;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.night-map-page .night-map-audio-player {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  border-top: 0;
+  border-bottom: 0;
+  padding: 0;
+}
+
+.night-map-page .night-map-audio-player__play {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--meditation-ink) !important;
+  border-radius: 999px;
+  background: transparent !important;
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .night-map-audio-player__track {
+  flex: 1;
+  min-width: 0;
+}
+
+.night-map-page .night-map-audio-player__times {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+  color: var(--meditation-muted) !important;
+  font-size: 0.72rem;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  width: 100%;
+  height: 1rem;
+  accent-color: var(--meditation-ink);
+  background: transparent;
+}
+
+.night-map-page .night-map-meditation-track__guidance {
+  margin: 0.9rem 0 0;
+  color: var(--meditation-muted) !important;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.night-map-page .night-map-step-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--journey-line);
+}
+
+.night-map-page .night-map-step-nav a {
+  display: inline-flex;
+  gap: 0.8rem;
+  align-items: center;
+  color: var(--meditation-ink) !important;
+  font-family: var(--font-accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-journey-note {
+  max-width: 32rem;
+  margin-top: 0;
+}
+
+.night-map-page .night-map-journey-note > label {
+  color: var(--meditation-muted) !important;
+}
+
+.night-map-page .night-map-journey-note .night-map-intention {
+  border-color: color-mix(in srgb, var(--meditation-ink) 42%, transparent) !important;
+  background: color-mix(in srgb, var(--meditation-ink) 4%, transparent) !important;
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .night-map-journey-note .night-map-intention::placeholder {
+  color: var(--meditation-muted) !important;
+}
+
+.night-map-page .night-map-journey-note .dream-journey-note-save,
+.night-map-page .night-map-complete__button {
+  border-color: color-mix(in srgb, var(--meditation-ink) 38%, transparent) !important;
+  background: transparent !important;
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .night-map-complete__button:hover,
+.night-map-page .night-map-complete__button:focus-visible,
+.night-map-page .night-map-journey-note .dream-journey-note-save:hover:not(:disabled),
+.night-map-page .night-map-journey-note .dream-journey-note-save:focus-visible {
+  background: color-mix(in srgb, var(--meditation-ink) 8%, transparent) !important;
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .night-map-checklist-link,
+.night-map-page .night-map-mark-complete,
+.night-map-page .night-map-save-error {
+  color: var(--meditation-ink) !important;
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-step,
+  .night-map-page .night-map-step:last-child {
+    padding-bottom: 2.25rem !important;
+  }
+
+  .night-map-page .night-map-step + .night-map-step {
+    padding-top: 2.25rem !important;
+  }
+
+  .night-map-page .night-map-checklist-card {
+    padding-right: 2.5rem !important;
+  }
+}
+
 .writing-prompts-editor {
   border-top: 1px solid hsl(var(--border));
   border-bottom: 1px solid hsl(var(--border));
@@ -10014,6 +10453,362 @@
 
   .night-map-page .night-map-journey-path .dream-journey-marker {
     left: -2rem;
+  }
+}
+
+/* Last-word Descent overrides: these intentionally come after the legacy
+   dark treatment above so the page stays on Guided Journey's cream surface. */
+.night-map-page {
+  --meditation-ink: #0e0c06 !important;
+  --meditation-muted: rgba(14, 12, 6, 0.62) !important;
+  --journey-line: rgba(14, 12, 6, 0.22) !important;
+  --journey-accent: hsl(var(--gold)) !important;
+  --descent-ink: #0e0c06 !important;
+  --descent-muted: rgba(14, 12, 6, 0.62) !important;
+  --descent-faint: rgba(14, 12, 6, 0.56) !important;
+  --descent-line: rgba(14, 12, 6, 0.22) !important;
+  --descent-paper: #f6f3ec !important;
+  background: #f6f3ec !important;
+  background-image: none !important;
+  color: #0e0c06 !important;
+  color-scheme: light !important;
+}
+
+.night-map-page::before,
+.night-map-page::after {
+  display: none !important;
+}
+
+.night-map-page,
+.night-map-page p,
+.night-map-page h1,
+.night-map-page h2,
+.night-map-page h3,
+.night-map-page h4,
+.night-map-page span,
+.night-map-page li,
+.night-map-page a,
+.night-map-page label,
+.night-map-page button,
+.night-map-page input,
+.night-map-page textarea {
+  color: #0e0c06 !important;
+  opacity: 1 !important;
+}
+
+.night-map-page .meditation-muted,
+.night-map-page .dream-journey-description,
+.night-map-page .dream-journey-headphones,
+.night-map-page .dream-journey-save-note,
+.night-map-page .night-map-checklist-description,
+.night-map-page .night-map-checklist-card li,
+.night-map-page .night-map-meditation-track__guidance,
+.night-map-page .night-map-sound-note,
+.night-map-page .night-map-meditation-compact__heading > span,
+.night-map-page .dream-journey-audio__header,
+.night-map-page .dream-journey-audio__time,
+.night-map-page .night-map-kicker,
+.night-map-page .night-map-checklist-eyebrow,
+.night-map-page .night-map-checklist-number,
+.night-map-page .night-map-audio-player__times {
+  color: rgba(14, 12, 6, 0.62) !important;
+}
+
+.night-map-page .night-map-text-link {
+  display: inline-flex !important;
+  color: #0e0c06 !important;
+  border-bottom-color: rgba(14, 12, 6, 0.5) !important;
+}
+
+.night-map-page .night-map-sections {
+  padding-left: 0 !important;
+}
+
+.night-map-page .night-map-sections::before,
+.night-map-page .night-map-lucid-checklist::before {
+  display: none !important;
+  content: none !important;
+}
+
+.night-map-page .night-map-step,
+.night-map-page .night-map-step:last-child {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 0 2.9rem !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-step + .night-map-step {
+  padding-top: 2.9rem !important;
+  border-top: 1px solid rgba(14, 12, 6, 0.22) !important;
+}
+
+.night-map-page .night-map-compact-heading,
+.night-map-page .night-map-meditation-compact__heading,
+.night-map-page .night-map-complete__heading {
+  display: block !important;
+  min-height: 0 !important;
+  margin: 0 0 1rem !important;
+}
+
+.night-map-page .night-map-compact-heading > div {
+  display: block !important;
+}
+
+.night-map-page .night-map-compact-heading h2,
+.night-map-page .night-map-meditation-compact__heading h2,
+.night-map-page .night-map-complete h2,
+.night-map-page .night-map-checklist-card h3 {
+  color: #0e0c06 !important;
+  font-family: var(--font-display) !important;
+  font-size: 1.45rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+}
+
+.night-map-page .night-map-checklist-intro,
+.night-map-page .night-map-sound-note {
+  display: block !important;
+  max-width: 42rem !important;
+  margin: 0 0 1.5rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-size: 0.92rem !important;
+  line-height: 1.65 !important;
+}
+
+.night-map-page .night-map-lucid-checklist {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-left: 0 !important;
+}
+
+.night-map-page .night-map-checklist-card {
+  position: relative !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 3rem 1.75rem 2.9rem !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(14, 12, 6, 0.22) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card {
+  padding-top: 1.75rem !important;
+}
+
+.night-map-page .night-map-checklist-number {
+  position: absolute !important;
+  top: 0.1rem !important;
+  left: 0 !important;
+  margin: 0 !important;
+  font-size: 0.7rem !important;
+  line-height: 1.4 !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-checklist-number {
+  top: 1.85rem !important;
+}
+
+.night-map-page .night-map-checklist-eyebrow {
+  margin: 0 0 0.35rem !important;
+  font-size: 0.7rem !important;
+  line-height: 1.4 !important;
+}
+
+.night-map-page .night-map-checklist-card h3 {
+  max-width: 30rem !important;
+  margin: 0 0 0.55rem !important;
+}
+
+.night-map-page .night-map-checklist-toggle {
+  top: 0.1rem !important;
+  right: 2rem !important;
+  left: auto !important;
+  width: 1.1rem !important;
+  height: 1.1rem !important;
+  border: 1px solid rgba(14, 12, 6, 0.22) !important;
+  border-radius: 0.2rem !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-checklist-toggle {
+  top: 1.85rem !important;
+}
+
+.night-map-page .night-map-checklist-card.is-complete .night-map-checklist-toggle,
+.night-map-page .night-map-checklist-toggle:hover,
+.night-map-page .night-map-checklist-toggle:focus-visible {
+  border-color: #0e0c06 !important;
+  background: rgba(14, 12, 6, 0.08) !important;
+}
+
+.night-map-page .night-map-checklist-icon {
+  top: 0.1rem !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 1rem !important;
+  height: 1rem !important;
+  margin: 0 !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-checklist-icon {
+  top: 1.85rem !important;
+}
+
+.night-map-page .night-map-practice-expand {
+  top: 2.35rem !important;
+  right: 0 !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-checklist-card + .night-map-checklist-card .night-map-practice-expand {
+  top: 4.1rem !important;
+}
+
+.night-map-page .night-map-checklist-card ol {
+  max-width: 30rem !important;
+  margin: 0.7rem 0 0 !important;
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.night-map-page .night-map-checklist-card li {
+  font-size: 0.92rem !important;
+  line-height: 1.65 !important;
+}
+
+.night-map-page .night-map-checklist-meditation {
+  max-width: 38rem !important;
+  margin-top: 1.5rem !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+.night-map-page .night-map-checklist-meditation__label {
+  display: none !important;
+}
+
+.night-map-page .night-map-meditation-track__heading {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 0.75rem !important;
+  margin-bottom: 0.65rem !important;
+}
+
+.night-map-page .night-map-meditation-track__heading p,
+.night-map-page .night-map-meditation-track__heading h4,
+.night-map-page .night-map-meditation-track__heading > span {
+  margin: 0 !important;
+}
+
+.night-map-page .night-map-meditation-track__heading p,
+.night-map-page .night-map-meditation-track__heading > span {
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-size: 0.78rem !important;
+}
+
+.night-map-page .night-map-meditation-track__heading h4 {
+  color: #0e0c06 !important;
+  font-family: var(--font-display) !important;
+  font-size: 1.05rem !important;
+  font-weight: 500 !important;
+}
+
+.night-map-page .night-map-audio-player {
+  display: flex !important;
+  gap: 0.75rem !important;
+  align-items: center !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+.night-map-page .night-map-audio-player__play {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  border: 1px solid #0e0c06 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-audio-player__track {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.night-map-page .night-map-audio-player__times {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-bottom: 0.3rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-size: 0.72rem !important;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  width: 100% !important;
+  height: 1rem !important;
+  accent-color: #0e0c06 !important;
+  background: transparent !important;
+}
+
+.night-map-page .night-map-meditation-track__guidance {
+  margin: 0.9rem 0 0 !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.6 !important;
+}
+
+.night-map-page .night-map-step-nav {
+  border-top: 1px solid rgba(14, 12, 6, 0.22) !important;
+}
+
+.night-map-page .night-map-step-nav a {
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-journey-note .night-map-intention {
+  border-color: rgba(14, 12, 6, 0.42) !important;
+  background: rgba(14, 12, 6, 0.04) !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-journey-note .night-map-intention::placeholder {
+  color: rgba(14, 12, 6, 0.62) !important;
+}
+
+.night-map-page .night-map-journey-note .dream-journey-note-save,
+.night-map-page .night-map-complete__button {
+  border-color: rgba(14, 12, 6, 0.38) !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-checklist-link,
+.night-map-page .night-map-mark-complete,
+.night-map-page .night-map-save-error {
+  color: #0e0c06 !important;
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-step,
+  .night-map-page .night-map-step:last-child {
+    padding-bottom: 2.25rem !important;
+  }
+
+  .night-map-page .night-map-step + .night-map-step {
+    padding-top: 2.25rem !important;
+  }
+
+  .night-map-page .night-map-checklist-card {
+    padding-right: 2.5rem !important;
   }
 }
 
