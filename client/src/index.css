@@ -9073,6 +9073,83 @@
   }
 }
 
+/* Recall entry: a cream Guided Journey note field, not a dark card. */
+.night-map-page .night-map-recall {
+  max-width: 32rem !important;
+  margin-top: 1.25rem !important;
+}
+
+.night-map-page .night-map-recall label {
+  display: block !important;
+  margin-bottom: 0.45rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  line-height: 1.3 !important;
+  text-transform: uppercase !important;
+}
+
+.night-map-page .night-map-recall__textarea {
+  min-height: 8rem !important;
+  resize: vertical;
+  border: 1px solid rgba(14, 12, 6, 0.42) !important;
+  border-radius: 0.35rem !important;
+  background: #f6f3ec !important;
+  padding: 0.85rem 0.9rem !important;
+  color: #0e0c06 !important;
+  font-size: 0.88rem !important;
+  line-height: 1.65 !important;
+}
+
+.night-map-page .night-map-recall__textarea::placeholder {
+  color: rgba(14, 12, 6, 0.62) !important;
+  opacity: 1 !important;
+}
+
+.night-map-page .night-map-recall__textarea:focus {
+  border-color: #0e0c06 !important;
+  background: #f6f3ec !important;
+  outline: none;
+}
+
+.night-map-page .night-map-mark-complete {
+  display: inline-flex !important;
+  min-height: 2rem !important;
+  margin-top: 0.9rem !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+  font-size: 0.8rem !important;
+  line-height: 1.2 !important;
+}
+
+.night-map-page .night-map-mark-complete span {
+  display: grid !important;
+  width: 1.3rem !important;
+  height: 1.3rem !important;
+  flex: 0 0 auto;
+  place-items: center !important;
+  border: 1px solid #0e0c06 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+  font-size: 0.75rem !important;
+  line-height: 1 !important;
+}
+
+.night-map-page .night-map-checklist-card.is-complete .night-map-mark-complete span {
+  background: #0e0c06 !important;
+  color: #f6f3ec !important;
+}
+
+.night-map-page .night-map-practices-compact + .night-map-reflection {
+  padding-top: 1.5rem !important;
+}
+
 .writing-prompts-editor {
   border-top: 1px solid hsl(var(--border));
   border-bottom: 1px solid hsl(var(--border));

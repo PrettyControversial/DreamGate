@@ -356,7 +356,7 @@ export default function MoonTracker() {
                      )}
                      {practice.id === "recall" && (
                        <div className="night-map-recall">
-                         <label htmlFor="night-recall">Three things that come to mind when you wake</label>
+                          <label htmlFor="night-recall">Journey Note.</label>
                          <Textarea
                            id="night-recall"
                            value={dreamRecall}
@@ -383,16 +383,7 @@ export default function MoonTracker() {
             })}
           </div>
            <nav className="night-map-step-nav" aria-label="Practice step navigation">
-              <a href="#night-meditation">Continue the Descent <span aria-hidden="true">→</span></a>
-           </nav>
-         </article>
-
-           <article id="night-meditation" className="dream-journey-step night-map-step night-map-meditation-compact" data-testid="night-meditation" aria-labelledby="night-map-meditation-title">
-           <div className="night-map-meditation-compact__heading"><p className="dream-journey-eyebrow night-map-kicker">02 / Sound</p><h2 className="dream-journey-step-title" id="night-map-meditation-title">Choose one path into sleep.</h2><span>One meditation is enough for tonight.</span></div>
-           <p className="dream-journey-description night-map-sound-note">Use Reality Check to sharpen your awareness of the present moment. Use Theta Realm to rehearse recognizing a dream sign as your body settles. Each recording now lives with the practice it supports, so you can read, listen, and continue without losing your place.</p>
-            <nav className="night-map-step-nav" aria-label="Sound step navigation">
-              <a href="#night-practices"><span aria-hidden="true">←</span> Previous</a>
-              <a href="#night-reflection">Continue <span aria-hidden="true">→</span></a>
+               <a href="#night-reflection">Continue the Descent <span aria-hidden="true">→</span></a>
            </nav>
          </article>
 
@@ -444,7 +435,7 @@ export default function MoonTracker() {
              </div>
            </div>
             <nav className="night-map-step-nav" aria-label="Reflection step navigation">
-              <a href="#night-meditation"><span aria-hidden="true">←</span> Previous</a>
+              <a href="#night-practices"><span aria-hidden="true">←</span> Previous</a>
               <a href="#night-sleep">Continue <span aria-hidden="true">→</span></a>
            </nav>
          </article>
