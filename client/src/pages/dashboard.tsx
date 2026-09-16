@@ -13,13 +13,10 @@ import { achievementSymbols } from "@/data/achievement-symbols";
 import { markTarotEntrySource } from "@/lib/analytics";
 
 
-import dreamDictionaryImage from "@assets/dreamgate_cards/dream-dictionary.webp";
 import restRestoreImage from "@assets/dreamgate_cards/rest-restore.webp";
-import tarotReadingImage from "@assets/dreamgate_cards/tarot-reading-hand.webp";
+import birdImage from "@assets/dreamgate-bird.webp";
 import moonCalendarImage from "@assets/dreamgate_cards/moon-calendar.webp";
 import dreamDecoderImage from "@assets/dreamgate_cards/dream-decoder.webp";
-import writingPromptsImage from "@assets/dreamgate_cards/writing-prompts.webp";
-import dreamArchiveImage from "@assets/dreamgate_cards/dream-archive.webp";
 import nightMapImage from "@assets/dreamgate_cards/night-map.webp";
 import dreamJournalAwaitsIcon from "@assets/dreamgate_icons/dream-journal-icon.webp";
 import mirrorPortalImage from "@assets/night-map-portal.webp";
@@ -251,29 +248,27 @@ function FeatureCard({ title, subtitle, image, href, badge, testId }: FeatureCar
   );
 }
 
-type CategoryTab = "featured" | "dreams" | "wellness" | "explore";
+type CategoryTab = "featured" | "dreams" | "rest" | "explore";
 
-function CategoryTabs({ activeTab, onTabChange }: { activeTab: CategoryTab; onTabChange: (tab: CategoryTab) => void }) {
-  const tabs: { id: CategoryTab; label: string }[] = [
-    { id: "featured", label: "Featured" },
-    { id: "dreams", label: "Dreams" },
-    { id: "wellness", label: "Wellness" },
-    { id: "explore", label: "Explore" },
+function CategoryTabs() {
+  const tabs: { id: CategoryTab; label: string; href: string }[] = [
+    { id: "featured", label: "Featured", href: "/discover" },
+    { id: "dreams", label: "Dreams", href: "/dream" },
+    { id: "rest", label: "Rest", href: "/meditation" },
+    { id: "explore", label: "Explore", href: "/atlas" },
   ];
   
   return (
     <div className="carousel-scroll py-2" data-testid="tabs-category">
       {tabs.map((tab) => (
-        <button
+        <Link
           key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={`home-capsule-button whitespace-nowrap no-default-hover-elevate no-default-active-elevate ${
-            activeTab === tab.id ? 'home-capsule-button--solid' : 'home-capsule-button--outline'
-          }`}
+          href={tab.href}
+          className="home-capsule-button home-capsule-button--outline whitespace-nowrap no-default-hover-elevate no-default-active-elevate"
           data-testid={`tab-${tab.id}`}
         >
           {tab.label}
-        </button>
+        </Link>
       ))}
     </div>
   );
@@ -537,8 +532,6 @@ function EmptyDreamsState() {
 }
 
 export default function Dashboard() {
-  const [activeCategory, setActiveCategory] = useState<CategoryTab>("featured");
-  
   const { data: dreams, isLoading: dreamsLoading } = useQuery<Dream[]>({
     queryKey: ["/api/dreams"],
   });
@@ -611,36 +604,10 @@ export default function Dashboard() {
   const featuredCards = [
     { title: "Ask Psyra", subtitle: "Jungian dream analysis", image: dreamDecoderImage, href: "/decoder", testId: "card-decoder" },
     { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar" },
-    { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot" },
+    { title: "Tarot Reading", subtitle: "Divine guidance", image: birdImage, href: "/tarot", badge: "New", testId: "card-tarot" },
     { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
     { title: "The Descent", subtitle: "Lucid dream preparation", image: nightMapImage, href: "/night-map", testId: "card-night-map" },
   ];
-
-  const dreamsCards = [
-    { title: "Ask Psyra", subtitle: "Jungian dream analysis", image: dreamDecoderImage, href: "/decoder", testId: "card-decoder" },
-    { title: "Dream Archive", subtitle: "Your journal", image: dreamArchiveImage, href: "/archive", testId: "card-archive" },
-    { title: "Writing Prompts", subtitle: "Get inspired", image: writingPromptsImage, href: "/prompts", testId: "card-prompts" },
-  ];
-
-  const wellnessCards = [
-    { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot-2" },
-    { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation-2" },
-  ];
-
-  const exploreCards = [
-    { title: "Dream Dictionary", subtitle: "Symbol meanings", image: dreamDictionaryImage, href: "/dictionary", testId: "card-dictionary" },
-    { title: "The Descent", subtitle: "Lucid dream preparation", image: nightMapImage, href: "/night-map", testId: "card-tracker" },
-    { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar-2" },
-  ];
-
-  const getActiveCards = () => {
-    switch (activeCategory) {
-      case "dreams": return dreamsCards;
-      case "wellness": return wellnessCards;
-      case "explore": return exploreCards;
-      default: return featuredCards;
-    }
-  };
 
   return (
     <div className="home-dashboard min-h-screen bg-background relative overflow-x-hidden">
@@ -665,9 +632,9 @@ export default function Dashboard() {
           <h2 className="font-display text-xl text-foreground" data-testid="text-popular">
             Popular on Psyra
           </h2>
-          <CategoryTabs activeTab={activeCategory} onTabChange={setActiveCategory} />
+           <CategoryTabs />
           <div className="carousel-scroll -mx-4 px-4">
-            {getActiveCards().map((card) => (
+             {featuredCards.map((card) => (
               <FeatureCard
                 key={card.testId}
                 title={card.title}
