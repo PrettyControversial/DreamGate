@@ -9268,6 +9268,52 @@
   }
 }
 
+/* Recall prompts are read-only guidance; the completion action belongs at
+   the end of the full Descent rather than inside the Recall card. */
+.night-map-page .night-map-checklist-card .night-map-recall-steps {
+  margin-top: 1rem !important;
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.night-map-page .night-map-checklist-card .night-map-recall-steps li {
+  color: #0e0c06 !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+}
+
+.night-map-page .night-map-checklist-card .night-map-recall-steps li::before {
+  display: none !important;
+  content: none !important;
+}
+
+.night-map-page .night-map-final-ritual {
+  max-width: 38rem;
+  margin: 2.75rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(14, 12, 6, 0.28);
+}
+
+.night-map-page .night-map-final-ritual .night-map-complete__button {
+  width: min(100%, 32rem) !important;
+}
+
+.night-map-page .night-map-final-ritual .night-map-save-error {
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-checklist-card .night-map-recall-steps li {
+    font-size: 0.95rem !important;
+  }
+
+  .night-map-page .night-map-final-ritual {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+  }
+}
+
 /* Final Descent layout: the audio reference is a calm editorial card, and
    Recall carries the saved note and ritual finish without another section. */
 .night-map-page .night-map-checklist-meditation {
