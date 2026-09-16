@@ -67,7 +67,7 @@ const lucidPractices = [
     eyebrow: "Bedtime practice",
     title: "Set a Dream Intention · 2 min",
     description: "Give the dreaming mind one clear instruction to carry across the threshold of sleep. Keep it kind and easy to remember.",
-    steps: ["Choose one short intention you can remember easily.", "Write it below before getting into bed.", "Repeat it slowly three times with your eyes closed."],
+    steps: ["Write it below before getting into bed.", "Repeat it slowly three times with your eyes closed."],
   },
   {
     id: "box-breathing",

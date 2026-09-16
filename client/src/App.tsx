@@ -1427,7 +1427,7 @@ function AppReviewPrompt({
   const finishReview = (choice: "review" | "later") => {
     trackEvent("app_review_prompt_responded", {
       choice,
-      rating: rating || undefined,
+      ...(rating > 0 ? { rating } : {}),
     });
     onOpenChange(false);
   };

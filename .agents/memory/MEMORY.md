@@ -15,4 +15,5 @@
 - [DreamGate response budget](dreamgate-response-budget.md) — keep the first usable screen under two seconds; decorative media must never block interaction.
 - [Autoscale startup readiness](autoscale-startup-readiness.md) — bind the HTTP port before async app setup so root health probes do not fail during cold starts.
 - [Development schema sync](db-schema-sync.md) — inspect additive Drizzle changes before approving a non-TTY push that reports a named-schema conflict.
+- [Drizzle PostgreSQL type compatibility](drizzle-pg-type-compatibility.md) — use validated connection config instead of unsafe Pool casts when pg declaration versions disagree.
 - [Descent Journey Note](descent-journey-note.md) — Tonight’s Intention is the editable saved note; reopen the latest record and update it instead of creating duplicates.
