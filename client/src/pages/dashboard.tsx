@@ -14,7 +14,7 @@ import { markTarotEntrySource } from "@/lib/analytics";
 
 
 import restRestoreImage from "@assets/dreamgate_cards/rest-restore.webp";
-import birdImage from "@assets/dreamgate-bird.webp";
+import tarotReadingImage from "@assets/dreamgate_cards/tarot-reading-hand.webp";
 import moonCalendarImage from "@assets/dreamgate_cards/moon-calendar.webp";
 import dreamDecoderImage from "@assets/dreamgate_cards/dream-decoder.webp";
 import nightMapImage from "@assets/dreamgate_cards/night-map.webp";
@@ -604,7 +604,7 @@ export default function Dashboard() {
   const featuredCards = [
     { title: "Ask Psyra", subtitle: "Jungian dream analysis", image: dreamDecoderImage, href: "/decoder", testId: "card-decoder" },
     { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar" },
-    { title: "Tarot Reading", subtitle: "Divine guidance", image: birdImage, href: "/tarot", badge: "New", testId: "card-tarot" },
+    { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot" },
     { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
     { title: "The Descent", subtitle: "Lucid dream preparation", image: nightMapImage, href: "/night-map", testId: "card-night-map" },
   ];
