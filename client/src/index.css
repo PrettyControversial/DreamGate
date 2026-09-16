@@ -8497,6 +8497,22 @@
   margin-bottom: 0;
 }
 
+.night-map-page .night-map-journey-path .night-map-practices-compact {
+  margin-bottom: 0.75rem;
+}
+
+.night-map-page .night-map-journey-path .night-map-meditation-compact {
+  min-height: 0 !important;
+  margin-top: 0 !important;
+  padding: 0 0 2rem !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-meditation-compact > .night-map-object-stage--relief {
+  top: 0 !important;
+  bottom: auto !important;
+  height: 7rem;
+}
+
 .night-map-page .night-map-step__content {
   position: relative;
   z-index: 2;
