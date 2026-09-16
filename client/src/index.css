@@ -11618,3 +11618,30 @@
   }
 }
 
+/* Keep the intention note directly beneath its single instruction. */
+.night-map-page .night-map-inline-journey-note {
+  margin-top: 0.8rem !important;
+  padding-top: 0 !important;
+  border-top: 0 !important;
+}
+
+/* Keep the card control beside the heading with a comfortable touch target. */
+.night-map-page .night-map-practice-expand {
+  z-index: 3;
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  padding: 0 !important;
+  border: 1px solid rgba(14, 12, 6, 0.22) !important;
+  border-radius: 50% !important;
+  background: rgba(246, 243, 236, 0.72) !important;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.night-map-page .night-map-practice-expand:hover,
+.night-map-page .night-map-practice-expand:focus-visible {
+  border-color: #0e0c06 !important;
+  background: rgba(14, 12, 6, 0.08) !important;
+  outline: none;
+}
+

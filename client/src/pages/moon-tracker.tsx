@@ -66,8 +66,8 @@ const lucidPractices = [
     icon: Headphones,
     eyebrow: "Bedtime practice",
     title: "Set a Dream Intention · 2 min",
-    description: "Give the dreaming mind one clear instruction to carry across the threshold of sleep. Keep it kind and easy to remember.",
-    steps: ["Write it below before getting into bed.", "Repeat it slowly three times with your eyes closed."],
+    description: "",
+    steps: ["Choose one short intention you can remember easily."],
   },
   {
     id: "box-breathing",
@@ -307,6 +307,7 @@ export default function MoonTracker() {
                      onClick={() => setOpenPracticeId((current) => current === practice.id ? "" : practice.id)}
                      aria-expanded={openPracticeId === practice.id}
                      aria-label={`${openPracticeId === practice.id ? "Collapse" : "Expand"} ${practice.title}`}
+                      title={`${openPracticeId === practice.id ? "Collapse" : "Expand"} ${practice.title}`}
                    >
                      <ChevronDown aria-hidden="true" />
                    </button>
