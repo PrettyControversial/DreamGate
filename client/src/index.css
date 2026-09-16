@@ -8394,6 +8394,71 @@
   }
 }
 
+/* Use the exact Guided Journey header geometry for The Descent. */
+.night-map-page .night-map-journey-header {
+  position: relative;
+  min-height: 0;
+  margin-bottom: 2.75rem;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.night-map-page .night-map-journey-header .meditation-header__copy {
+  position: relative;
+  z-index: 2;
+}
+
+.night-map-page .night-map-journey-header .meditation-kicker,
+.night-map-page .night-map-journey-header .dream-journey-headphones {
+  color: var(--descent-ink) !important;
+}
+
+.night-map-page .night-map-journey-header .meditation-muted {
+  color: var(--descent-muted) !important;
+}
+
+.night-map-page .night-map-journey-header .night-map-text-link {
+  position: relative;
+  z-index: 3;
+  width: fit-content;
+  margin-top: 0.25rem;
+}
+
+.night-map-page .night-map-journey-header .night-map-arrival__mirror {
+  position: absolute;
+  top: -2rem;
+  right: -1.25rem;
+  z-index: 1;
+  width: min(16rem, 38%);
+  height: calc(100% + 3rem);
+  overflow: hidden;
+  opacity: 0.18;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.night-map-page .night-map-journey-header .night-map-arrival__mirror img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(0.55) saturate(0.35) contrast(1.05) brightness(0.7);
+}
+
+@media (max-width: 767px) {
+  .night-map-page .night-map-journey-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .night-map-page .night-map-journey-header .night-map-arrival__mirror {
+    top: -1rem;
+    right: -2.5rem;
+    width: 12rem;
+    height: calc(100% + 2rem);
+    opacity: 0.14;
+  }
+}
+
 .writing-prompts-editor {
   border-top: 1px solid hsl(var(--border));
   border-bottom: 1px solid hsl(var(--border));

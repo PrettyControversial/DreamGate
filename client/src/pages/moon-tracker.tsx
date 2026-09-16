@@ -220,32 +220,33 @@ export default function MoonTracker() {
 
   return (
     <main
-      className="night-map-page min-h-[calc(100dvh-4rem)] overflow-hidden"
+      className="night-map-page min-h-screen px-4 py-8 md:px-8 md:py-10"
       data-testid="night-map-page"
     >
-      <header className="night-map-arrival night-map-arrival--compact">
-        <div className="night-map-arrival__copy">
-          <div className="night-map-arrival__card">
-            <div className="night-map-arrival__card-copy">
-              <p className="night-map-brand">PSYRA</p>
-              <h1>The Descent</h1>
-              <p className="night-map-deck">
-                A nightly checklist for training awareness, preparing for lucid dreams, and crossing gently into sleep.
-              </p>
-              <div className="night-map-headphones-note">
-                <Headphones aria-hidden="true" />
-                <span>Headphones are recommended</span>
+      <div className="mx-auto max-w-3xl">
+        <header className="meditation-header meditation-header--object dream-journey-header night-map-journey-header">
+          <div className="meditation-header__copy space-y-3">
+            <div className="dream-journey-heading-row">
+              <div className="dream-journey-heading-copy">
+                <p className="meditation-kicker text-xs uppercase tracking-[0.28em]">Nightly Ritual</p>
+                <h1 className="font-display text-4xl tracking-tight md:text-5xl">The Descent</h1>
               </div>
-              <a href="#night-practices" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
             </div>
-            <div className="night-map-arrival__mirror" aria-hidden="true">
-              <img src={nightMapPortal} alt="" />
-            </div>
+            <p className="meditation-muted max-w-xl text-sm leading-relaxed">
+              A nightly checklist for training awareness, preparing for lucid dreams, and crossing gently into sleep.
+            </p>
+            <p className="dream-journey-headphones text-sm font-medium">
+              <Headphones aria-hidden="true" className="mr-2 inline-block h-4 w-4" />
+              Headphones are recommended.
+            </p>
+            <a href="#night-practices" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
           </div>
-        </div>
-      </header>
+          <div className="night-map-arrival__mirror" aria-hidden="true">
+            <img src={nightMapPortal} alt="" />
+          </div>
+        </header>
 
-      <div className="night-map-content">
+        <div className="night-map-content">
         <nav className="night-map-section-nav" aria-label="The Descent sections">
           <a href="#night-practices">01 <span>Practice</span></a>
           <a href="#night-meditation">02 <span>Sound</span></a>
@@ -411,6 +412,7 @@ export default function MoonTracker() {
           </button>
           {ritualSaveError && <p className="night-map-save-error" role="alert">{ritualSaveError}</p>}
         </section>
+        </div>
       </div>
     </main>
   );
