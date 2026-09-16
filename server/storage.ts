@@ -43,14 +43,22 @@ import {
   getMonthlyAstronomicalCalendar,
 } from "./lunar-astronomy";
 
-// Use Replit's managed OpenAI integration so usage is charged to this app's
-// Replit account credits rather than a separately configured provider key.
-const useDirectOpenAI = false;
-console.log("Initializing OpenAI - using Replit-managed AI integration");
+// Prefer the explicitly configured OpenAI key when available. The managed
+// passthrough credentials can be present but unauthorized when no OpenAI
+// integration is attached to the workspace.
+const directOpenAIKey = process.env.OPENAI_API_KEY?.trim() || "";
+const managedOpenAIKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY?.trim() || "";
+const managedOpenAIBaseUrl = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL?.trim() || "";
+const useDirectOpenAI = Boolean(directOpenAIKey);
+console.log(
+  `Initializing OpenAI - using ${useDirectOpenAI ? "direct OpenAI credentials" : "Replit-managed AI integration"}`,
+);
 
 const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: useDirectOpenAI ? directOpenAIKey : managedOpenAIKey,
+  ...(useDirectOpenAI || !managedOpenAIBaseUrl
+    ? {}
+    : { baseURL: managedOpenAIBaseUrl }),
 });
 
 function getRecurringSymbolsThisMonth(
