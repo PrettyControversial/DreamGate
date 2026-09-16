@@ -1123,7 +1123,8 @@
   text-transform: uppercase;
 }
 
-.dream-journey-reflection input {
+.dream-journey-reflection input,
+.dream-journey-reflection textarea {
   width: 100%;
   min-height: 2.65rem;
   border: 2px solid color-mix(in srgb, var(--meditation-ink) 42%, transparent);
@@ -1137,11 +1138,13 @@
   transition: border-color 180ms ease, background-color 180ms ease;
 }
 
-.dream-journey-reflection input::placeholder {
+.dream-journey-reflection input::placeholder,
+.dream-journey-reflection textarea::placeholder {
   color: var(--meditation-muted);
 }
 
-.dream-journey-reflection input:focus {
+.dream-journey-reflection input:focus,
+.dream-journey-reflection textarea:focus {
   border-color: var(--journey-accent);
   background: transparent;
 }
@@ -8445,7 +8448,7 @@
 
 @media (max-width: 767px) {
   .night-map-page .night-map-journey-header {
-    margin-bottom: 2.5rem;
+    margin-bottom: 2.75rem;
   }
 
   .night-map-page .night-map-journey-header .night-map-arrival__mirror {
@@ -8605,7 +8608,7 @@
 
 @media (max-width: 767px) {
   .night-map-page .night-map-journey-path .night-map-step {
-    margin-bottom: 2.75rem;
+    margin-bottom: 2.9rem;
   }
 
   .night-map-page .night-map-journey-path .night-map-step-nav {
@@ -8622,6 +8625,12 @@
     width: 19rem;
     height: 19rem;
     opacity: 0.58;
+  }
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-journey-header {
+    margin-bottom: 2.25rem;
   }
 }
 
@@ -9616,5 +9625,96 @@
   color: #f8f3e9 !important;
   font-size: 0.78rem;
   line-height: 1.45;
+}
+
+/* Tonight's Intention reuses Guided Journey's note geometry on the dark
+   Descent surface. It stays a real multiline writing space on small screens. */
+.night-map-page .night-map-journey-note {
+  max-width: 32rem;
+  margin-top: 0;
+}
+
+.night-map-page .night-map-journey-note > label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+  color: #f8f3e9 !important;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-journey-note > label svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: #f8f3e9 !important;
+}
+
+.night-map-page .night-map-journey-note .night-map-intention {
+  min-height: 8rem;
+  resize: vertical;
+  border: 2px solid rgba(248, 243, 233, 0.42) !important;
+  border-radius: 0.35rem !important;
+  background: rgba(248, 243, 233, 0.04) !important;
+  padding: 0.7rem 0.8rem;
+  color: #f8f3e9 !important;
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  outline: none;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.night-map-page .night-map-journey-note .night-map-intention::placeholder {
+  color: rgba(248, 243, 233, 0.62) !important;
+}
+
+.night-map-page .night-map-journey-note .night-map-intention:focus {
+  border-color: #f8f3e9 !important;
+  background: transparent !important;
+}
+
+.night-map-page .night-map-journey-note .dream-journey-reflection__actions {
+  flex-wrap: wrap;
+}
+
+.night-map-page .night-map-journey-note .dream-journey-note-save {
+  min-height: 2.5rem;
+  border: 1px solid rgba(248, 243, 233, 0.62);
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.55rem 1rem;
+  color: #f8f3e9 !important;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.night-map-page .night-map-journey-note .dream-journey-note-save:hover:not(:disabled),
+.night-map-page .night-map-journey-note .dream-journey-note-save:focus-visible {
+  border-color: #f8f3e9;
+  color: #ffffff !important;
+}
+
+.night-map-page .night-map-journey-note .dream-journey-note-save:disabled {
+  cursor: default;
+  opacity: 0.42 !important;
+}
+
+.night-map-page .night-map-journey-note .dream-journey-note-saved {
+  color: #f8f3e9 !important;
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-journey-note .night-map-intention {
+    min-height: 9rem;
+  }
+
+  .night-map-page .night-map-journey-note .dream-journey-reflection__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
