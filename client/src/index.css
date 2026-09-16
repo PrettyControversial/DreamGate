@@ -9073,6 +9073,400 @@
   }
 }
 
+/* Final cascade for the one-page Descent reference treatment. */
+.night-map-page .night-map-checklist-meditation {
+  max-width: 38rem !important;
+  margin-top: 1.5rem !important;
+  padding: 1.6rem 1.75rem 1.45rem !important;
+  border: 2px solid rgba(14, 12, 6, 0.3) !important;
+  background: rgba(246, 243, 236, 0.78) !important;
+}
+
+.night-map-page .night-map-meditation-track__heading {
+  align-items: flex-start !important;
+  margin-bottom: 0 !important;
+}
+
+.night-map-page .night-map-meditation-track__heading p {
+  margin-bottom: 0.35rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1.35 !important;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-meditation-track__heading h4 {
+  color: #0e0c06 !important;
+  font-size: clamp(1.35rem, 3vw, 1.75rem) !important;
+  line-height: 1.15 !important;
+}
+
+.night-map-page .night-map-meditation-track__heading > span {
+  flex: 0 0 auto;
+  padding-top: 0.1rem;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+
+.night-map-page .night-map-audio-player {
+  display: grid !important;
+  grid-template-columns: 4.65rem minmax(0, 1fr) !important;
+  gap: 1.15rem !important;
+  align-items: center !important;
+  margin-top: 1.55rem !important;
+}
+
+.night-map-page .night-map-audio-player__play {
+  display: grid !important;
+  width: 4.65rem !important;
+  height: 4.65rem !important;
+  place-items: center !important;
+  border: 2px solid #0e0c06 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-audio-player__play svg {
+  width: 1.7rem !important;
+  height: 1.7rem !important;
+  stroke-width: 1.8;
+}
+
+.night-map-page .night-map-audio-player__track {
+  width: 100% !important;
+}
+
+.night-map-page .night-map-audio-player__times {
+  margin-bottom: 0.45rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.8rem !important;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  display: block;
+  width: 100% !important;
+  height: 1.15rem !important;
+  margin: 0 !important;
+  appearance: none;
+  accent-color: #0e0c06 !important;
+  background: transparent !important;
+  cursor: pointer;
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-webkit-slider-runnable-track {
+  height: 0.38rem;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: rgba(14, 12, 6, 0.14);
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-webkit-slider-thumb {
+  width: 3.2rem;
+  height: 1.35rem;
+  margin-top: -0.49rem;
+  appearance: none;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0.1rem 0.35rem rgba(14, 12, 6, 0.16);
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-moz-range-track {
+  height: 0.38rem;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: rgba(14, 12, 6, 0.14);
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-moz-range-thumb {
+  width: 3.2rem;
+  height: 1.35rem;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0.1rem 0.35rem rgba(14, 12, 6, 0.16);
+}
+
+.night-map-page .night-map-meditation-track__guidance {
+  max-width: 34rem;
+  margin: 1.45rem 0 0 !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-size: 1rem !important;
+  line-height: 1.58 !important;
+}
+
+.night-map-page .night-map-inline-journey-note {
+  max-width: 38rem !important;
+  margin-top: 2rem !important;
+  padding-top: 1.35rem;
+  border-top: 2px solid rgba(14, 12, 6, 0.24) !important;
+}
+
+.night-map-page .night-map-inline-journey-note > label {
+  margin-bottom: 0.55rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-inline-journey-note .night-map-intention {
+  min-height: 5.25rem !important;
+  background: rgba(246, 243, 236, 0.74) !important;
+}
+
+.night-map-page .night-map-inline-ritual {
+  max-width: 38rem;
+  margin-top: 2rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid rgba(14, 12, 6, 0.22) !important;
+}
+
+.night-map-page .night-map-inline-ritual .night-map-complete__heading {
+  margin-bottom: 0.9rem;
+}
+
+.night-map-page .night-map-inline-ritual .night-map-complete__button {
+  width: min(100%, 32rem) !important;
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-checklist-meditation {
+    padding: 1.25rem 1rem 1.15rem !important;
+  }
+
+  .night-map-page .night-map-meditation-track__heading > span {
+    font-size: 0.75rem !important;
+  }
+
+  .night-map-page .night-map-audio-player {
+    grid-template-columns: 3.9rem minmax(0, 1fr) !important;
+    gap: 0.8rem !important;
+  }
+
+  .night-map-page .night-map-audio-player__play {
+    width: 3.9rem !important;
+    height: 3.9rem !important;
+  }
+
+  .night-map-page .night-map-audio-player__play svg {
+    width: 1.45rem !important;
+    height: 1.45rem !important;
+  }
+
+  .night-map-page .night-map-meditation-track__guidance {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Final Descent layout: the audio reference is a calm editorial card, and
+   Recall carries the saved note and ritual finish without another section. */
+.night-map-page .night-map-checklist-meditation {
+  max-width: 38rem !important;
+  margin-top: 1.5rem !important;
+  padding: 1.6rem 1.75rem 1.45rem !important;
+  border: 2px solid rgba(14, 12, 6, 0.3) !important;
+  background: rgba(246, 243, 236, 0.78) !important;
+}
+
+.night-map-page .night-map-meditation-track__heading {
+  align-items: flex-start !important;
+  margin-bottom: 0 !important;
+}
+
+.night-map-page .night-map-meditation-track__heading > div {
+  min-width: 0;
+}
+
+.night-map-page .night-map-meditation-track__heading p {
+  margin-bottom: 0.35rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1.35 !important;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-meditation-track__heading h4 {
+  font-size: clamp(1.35rem, 3vw, 1.75rem) !important;
+  line-height: 1.15 !important;
+}
+
+.night-map-page .night-map-meditation-track__heading > span {
+  flex: 0 0 auto;
+  padding-top: 0.1rem;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+
+.night-map-page .night-map-audio-player {
+  display: grid !important;
+  grid-template-columns: 4.65rem minmax(0, 1fr) !important;
+  gap: 1.15rem !important;
+  align-items: center !important;
+  margin-top: 1.55rem !important;
+}
+
+.night-map-page .night-map-audio-player__play {
+  display: grid !important;
+  width: 4.65rem !important;
+  height: 4.65rem !important;
+  place-items: center !important;
+  border: 2px solid #0e0c06 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-audio-player__play svg {
+  width: 1.7rem !important;
+  height: 1.7rem !important;
+  stroke-width: 1.8;
+}
+
+.night-map-page .night-map-audio-player__track {
+  width: 100% !important;
+}
+
+.night-map-page .night-map-audio-player__times {
+  margin-bottom: 0.45rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.8rem !important;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  display: block;
+  width: 100% !important;
+  height: 1.15rem !important;
+  margin: 0 !important;
+  appearance: none;
+  accent-color: #0e0c06 !important;
+  background: transparent !important;
+  cursor: pointer;
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-webkit-slider-runnable-track {
+  height: 0.38rem;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: rgba(14, 12, 6, 0.14);
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-webkit-slider-thumb {
+  width: 3.2rem;
+  height: 1.35rem;
+  margin-top: -0.49rem;
+  appearance: none;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0.1rem 0.35rem rgba(14, 12, 6, 0.16);
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-moz-range-track {
+  height: 0.38rem;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: rgba(14, 12, 6, 0.14);
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-moz-range-thumb {
+  width: 3.2rem;
+  height: 1.35rem;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0.1rem 0.35rem rgba(14, 12, 6, 0.16);
+}
+
+.night-map-page .night-map-meditation-track__guidance {
+  max-width: 34rem;
+  margin: 1.45rem 0 0 !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-size: 1rem !important;
+  line-height: 1.58 !important;
+}
+
+.night-map-page .night-map-inline-journey-note {
+  max-width: 38rem !important;
+  margin-top: 2rem !important;
+  padding-top: 1.35rem;
+  border-top: 2px solid rgba(14, 12, 6, 0.24);
+}
+
+.night-map-page .night-map-inline-journey-note > label {
+  margin-bottom: 0.55rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-inline-journey-note .night-map-intention {
+  min-height: 5.25rem !important;
+  background: rgba(246, 243, 236, 0.74) !important;
+}
+
+.night-map-page .night-map-inline-ritual {
+  max-width: 38rem;
+  margin-top: 2rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid rgba(14, 12, 6, 0.22);
+}
+
+.night-map-page .night-map-inline-ritual .night-map-complete__heading {
+  margin-bottom: 0.9rem;
+}
+
+.night-map-page .night-map-inline-ritual .night-map-complete__button {
+  width: min(100%, 32rem) !important;
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-checklist-meditation {
+    padding: 1.25rem 1rem 1.15rem !important;
+  }
+
+  .night-map-page .night-map-meditation-track__heading > span {
+    font-size: 0.75rem !important;
+  }
+
+  .night-map-page .night-map-audio-player {
+    grid-template-columns: 3.9rem minmax(0, 1fr) !important;
+    gap: 0.8rem !important;
+  }
+
+  .night-map-page .night-map-audio-player__play {
+    width: 3.9rem !important;
+    height: 3.9rem !important;
+  }
+
+  .night-map-page .night-map-audio-player__play svg {
+    width: 1.45rem !important;
+    height: 1.45rem !important;
+  }
+
+  .night-map-page .night-map-meditation-track__guidance {
+    font-size: 0.9rem !important;
+  }
+}
+
 /* Recall entry: a cream Guided Journey note field, not a dark card. */
 .night-map-page .night-map-recall {
   max-width: 32rem !important;
@@ -10997,6 +11391,184 @@
 
   .night-map-page .night-map-checklist-card {
     padding-right: 2.5rem !important;
+  }
+}
+
+/* Last-in-file overrides for the one-page Descent reference treatment. */
+.night-map-page .night-map-checklist-meditation {
+  max-width: 38rem !important;
+  margin-top: 1.5rem !important;
+  padding: 1.6rem 1.75rem 1.45rem !important;
+  border: 2px solid rgba(14, 12, 6, 0.3) !important;
+  background: rgba(246, 243, 236, 0.78) !important;
+}
+
+.night-map-page .night-map-meditation-track__heading {
+  align-items: flex-start !important;
+  margin-bottom: 0 !important;
+}
+
+.night-map-page .night-map-meditation-track__heading p {
+  margin-bottom: 0.35rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1.35 !important;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-meditation-track__heading h4 {
+  color: #0e0c06 !important;
+  font-size: clamp(1.35rem, 3vw, 1.75rem) !important;
+  line-height: 1.15 !important;
+}
+
+.night-map-page .night-map-meditation-track__heading > span {
+  flex: 0 0 auto;
+  padding-top: 0.1rem;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+}
+
+.night-map-page .night-map-audio-player {
+  display: grid !important;
+  grid-template-columns: 4.65rem minmax(0, 1fr) !important;
+  gap: 1.15rem !important;
+  align-items: center !important;
+  margin-top: 1.55rem !important;
+}
+
+.night-map-page .night-map-audio-player__play {
+  display: grid !important;
+  width: 4.65rem !important;
+  height: 4.65rem !important;
+  place-items: center !important;
+  border: 2px solid #0e0c06 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #0e0c06 !important;
+}
+
+.night-map-page .night-map-audio-player__play svg {
+  width: 1.7rem !important;
+  height: 1.7rem !important;
+}
+
+.night-map-page .night-map-audio-player__track {
+  width: 100% !important;
+}
+
+.night-map-page .night-map-audio-player__times {
+  margin-bottom: 0.45rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.8rem !important;
+}
+
+.night-map-page .night-map-audio-player input[type="range"] {
+  display: block;
+  width: 100% !important;
+  height: 1.15rem !important;
+  margin: 0 !important;
+  appearance: none;
+  accent-color: #0e0c06 !important;
+  background: transparent !important;
+  cursor: pointer;
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-webkit-slider-runnable-track {
+  height: 0.38rem;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: rgba(14, 12, 6, 0.14);
+}
+
+.night-map-page .night-map-audio-player input[type="range"]::-webkit-slider-thumb {
+  width: 3.2rem;
+  height: 1.35rem;
+  margin-top: -0.49rem;
+  appearance: none;
+  border: 1px solid rgba(14, 12, 6, 0.12);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0.1rem 0.35rem rgba(14, 12, 6, 0.16);
+}
+
+.night-map-page .night-map-meditation-track__guidance {
+  max-width: 34rem;
+  margin: 1.45rem 0 0 !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-size: 1rem !important;
+  line-height: 1.58 !important;
+}
+
+.night-map-page .night-map-inline-journey-note {
+  max-width: 38rem !important;
+  margin-top: 2rem !important;
+  padding-top: 1.35rem;
+  border-top: 2px solid rgba(14, 12, 6, 0.24) !important;
+}
+
+.night-map-page .night-map-inline-journey-note > label {
+  margin-bottom: 0.55rem !important;
+  color: rgba(14, 12, 6, 0.62) !important;
+  font-family: var(--font-accent) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-inline-journey-note .night-map-intention {
+  min-height: 5.25rem !important;
+  background: rgba(246, 243, 236, 0.74) !important;
+}
+
+.night-map-page .night-map-inline-ritual {
+  max-width: 38rem;
+  margin-top: 2rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid rgba(14, 12, 6, 0.22) !important;
+}
+
+.night-map-page .night-map-inline-ritual .night-map-complete__heading {
+  margin-bottom: 0.9rem;
+}
+
+.night-map-page .night-map-inline-ritual .night-map-complete__button {
+  width: min(100%, 32rem) !important;
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-checklist-meditation {
+    padding: 1.25rem 1rem 1.15rem !important;
+  }
+
+  .night-map-page .night-map-meditation-track__heading > span {
+    font-size: 0.75rem !important;
+  }
+
+  .night-map-page .night-map-audio-player {
+    grid-template-columns: 3.9rem minmax(0, 1fr) !important;
+    gap: 0.8rem !important;
+  }
+
+  .night-map-page .night-map-audio-player__play {
+    width: 3.9rem !important;
+    height: 3.9rem !important;
+  }
+
+  .night-map-page .night-map-audio-player__play svg {
+    width: 1.45rem !important;
+    height: 1.45rem !important;
+  }
+
+  .night-map-page .night-map-meditation-track__guidance {
+    font-size: 0.9rem !important;
   }
 }
 

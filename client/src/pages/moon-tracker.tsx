@@ -353,9 +353,6 @@ export default function MoonTracker() {
                        </div>
                      );
                       })()}
-                     {practice.id === "intention" && (
-                       <a href="#night-reflection" className="night-map-checklist-link">Set intention <span aria-hidden="true">↓</span></a>
-                     )}
                      {practice.id === "recall" && (
                        <div className="night-map-recall">
                           <label htmlFor="night-recall">Journey Note.</label>
@@ -369,6 +366,67 @@ export default function MoonTracker() {
                          />
                        </div>
                      )}
+                      {practice.id === "recall" && (
+                        <>
+                          <div className="dream-journey-reflection night-map-journey-note night-map-inline-journey-note">
+                            <label htmlFor="night-intention">
+                              <Feather aria-hidden="true" />
+                              <span>Tonight&apos;s Intention</span>
+                            </label>
+                            <Textarea
+                              id="night-intention"
+                              value={dailyIntention}
+                              onChange={(event) => {
+                                setDailyIntention(event.target.value);
+                                setRitualComplete(false);
+                                setRitualSaveError(null);
+                                setIntentionSaveState("idle");
+                              }}
+                              placeholder="Write your intention for tonight…"
+                              className="night-map-intention"
+                              data-testid="textarea-daily-intention"
+                            />
+                            <div className="dream-journey-reflection__actions">
+                              <button
+                                type="button"
+                                className="dream-journey-note-save"
+                                onClick={() => void saveIntention()}
+                                disabled={
+                                  !dailyIntention.trim() ||
+                                  dailyIntention.trim() === savedIntention ||
+                                  intentionMutation.isPending
+                                }
+                                data-testid="button-save-journey-note-intention"
+                              >
+                                {intentionMutation.isPending ? "Saving…" : "Save Journey Note"}
+                              </button>
+                              {intentionSaveState === "saved" && (
+                                <span className="dream-journey-note-saved">
+                                  <Check aria-hidden="true" />
+                                  Journey note saved
+                                </span>
+                              )}
+                              {intentionSaveState === "error" && (
+                                <span className="night-map-save-error" role="alert">
+                                  We couldn&apos;t save your note. Please try again.
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="night-map-inline-ritual">
+                            <button
+                              type="button"
+                              onClick={() => void completeTonightRitual()}
+                              disabled={ritualComplete || intentionMutation.isPending}
+                              className="night-map-complete__button home-capsule-button home-capsule-button--outline no-default-hover-elevate no-default-active-elevate"
+                              data-testid="button-complete-ritual"
+                            >
+                              {ritualComplete ? "Ritual complete" : intentionMutation.isPending ? "Saving Tonight's Ritual" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span>
+                            </button>
+                            {ritualSaveError && <p className="night-map-save-error" role="alert">{ritualSaveError}</p>}
+                          </div>
+                        </>
+                      )}
                      <button
                        type="button"
                        className="night-map-mark-complete"
@@ -384,76 +442,6 @@ export default function MoonTracker() {
               );
             })}
           </div>
-           <nav className="night-map-step-nav" aria-label="Practice step navigation">
-               <a href="#night-reflection">Continue the Descent <span aria-hidden="true">→</span></a>
-           </nav>
-         </article>
-
-          <article id="night-reflection" className="dream-journey-step night-map-step night-map-reflection" aria-labelledby="night-map-reflection-title">
-           <div className="night-map-compact-heading"><div><p className="dream-journey-eyebrow night-map-kicker">03 / Reflection</p><h2 className="dream-journey-step-title" id="night-map-reflection-title">Arrive as you are.</h2></div></div>
-           <div className="dream-journey-reflection night-map-journey-note">
-             <label htmlFor="night-intention">
-               <Feather aria-hidden="true" />
-               <span>Tonight&apos;s Intention</span>
-             </label>
-             <Textarea
-               id="night-intention"
-               value={dailyIntention}
-               onChange={(event) => {
-                 setDailyIntention(event.target.value);
-                 setRitualComplete(false);
-                 setRitualSaveError(null);
-                 setIntentionSaveState("idle");
-               }}
-               placeholder="Write your intention for tonight…"
-               className="night-map-intention"
-               data-testid="textarea-daily-intention"
-             />
-             <div className="dream-journey-reflection__actions">
-               <button
-                 type="button"
-                 className="dream-journey-note-save"
-                 onClick={() => void saveIntention()}
-                 disabled={
-                   !dailyIntention.trim() ||
-                   dailyIntention.trim() === savedIntention ||
-                   intentionMutation.isPending
-                 }
-                 data-testid="button-save-journey-note-intention"
-               >
-                 {intentionMutation.isPending ? "Saving…" : "Save Journey Note"}
-               </button>
-               {intentionSaveState === "saved" && (
-                 <span className="dream-journey-note-saved">
-                   <Check aria-hidden="true" />
-                   Journey note saved
-                 </span>
-               )}
-               {intentionSaveState === "error" && (
-                 <span className="night-map-save-error" role="alert">
-                   We couldn&apos;t save your note. Please try again.
-                 </span>
-               )}
-             </div>
-           </div>
-            <nav className="night-map-step-nav" aria-label="Reflection step navigation">
-              <a href="#night-practices"><span aria-hidden="true">←</span> Previous</a>
-              <a href="#night-sleep">Continue <span aria-hidden="true">→</span></a>
-           </nav>
-         </article>
-
-          <article id="night-sleep" className="dream-journey-step night-map-step night-map-complete">
-          <div className="night-map-complete__heading">
-             <p className="dream-journey-eyebrow night-map-kicker">04 / Sleep</p>
-             <h2 className="dream-journey-step-title">{ritualComplete ? "The night is yours." : "Let the day become a dream."}</h2>
-          </div>
-          <button type="button" onClick={() => void completeTonightRitual()} disabled={ritualComplete || intentionMutation.isPending} className="night-map-complete__button home-capsule-button home-capsule-button--outline no-default-hover-elevate no-default-active-elevate" data-testid="button-complete-ritual">
-            {ritualComplete ? "Ritual complete" : intentionMutation.isPending ? "Saving Tonight's Ritual" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span>
-          </button>
-          {ritualSaveError && <p className="night-map-save-error" role="alert">{ritualSaveError}</p>}
-            <nav className="night-map-step-nav" aria-label="Sleep step navigation">
-              <a href="#night-reflection"><span aria-hidden="true">←</span> Previous</a>
-           </nav>
          </article>
          </div>
           <div className="dream-journey-footer">
