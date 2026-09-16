@@ -18,8 +18,7 @@ type LucidMeditation = {
   subtitle: string;
   durationLabel: string;
   durationSeconds: number;
-  audioFile?: string;
-  videoFile?: string;
+  mediaFile?: string;
   guidance: string;
 };
 
@@ -31,7 +30,7 @@ const lucidMeditations: LucidMeditation[] = [
     subtitle: "Track 01 · Dream Reality Check",
     durationLabel: "10:04",
     durationSeconds: 604,
-    videoFile: realityCheckVideo,
+    mediaFile: realityCheckVideo,
     guidance: "Use this before sleep when you want to strengthen the habit of checking your surroundings. Let each sense become an honest question, not a test you need to pass.",
   },
   {
@@ -41,7 +40,7 @@ const lucidMeditations: LucidMeditation[] = [
     subtitle: "Track 02 · Theta Realm",
     durationLabel: "8:25",
     durationSeconds: 505,
-    audioFile: thetaRealmAudio,
+    mediaFile: thetaRealmAudio,
     guidance: "Use this when your body is ready for rest. Rehearse meeting one familiar dream sign with calm attention, then let the scene soften without forcing sleep.",
   },
   {
@@ -51,7 +50,7 @@ const lucidMeditations: LucidMeditation[] = [
     subtitle: "Sleep meditation · Headphones recommended",
     durationLabel: "6:40",
     durationSeconds: 400,
-    audioFile: boxBreathingAudio,
+    mediaFile: boxBreathingAudio,
     guidance: "A slow four-count rhythm to settle the body and make the transition into sleep feel less effortful.",
   },
 ];
@@ -114,7 +113,6 @@ export default function MoonTracker() {
   const [ritualComplete, setRitualComplete] = useState(false);
   const [ritualSaveError, setRitualSaveError] = useState<string | null>(null);
   const nightMeditationRef = useRef<HTMLMediaElement | null>(null);
-  const nightMeditationVideoRef = useRef<HTMLVideoElement | null>(null);
   const { data: recentIntentions } = useQuery<SleepIntention[]>({ queryKey: ["/api/intentions"] });
 
   const intentionMutation = useMutation({
@@ -163,11 +161,7 @@ export default function MoonTracker() {
     setNightMeditationCurrentTime(0);
     setNightMeditationDuration(track.durationSeconds);
 
-    const media = track.videoFile
-      ? nightMeditationVideoRef.current
-      : track.audioFile
-        ? new Audio(track.audioFile)
-        : null;
+    const media = track.mediaFile ? new Audio(track.mediaFile) : null;
     if (!media) return;
 
     setMeditationMediaSession(track.title);
@@ -350,16 +344,6 @@ export default function MoonTracker() {
                      return (
                    <div className="night-map-checklist-meditation dream-journey-audio">
                          <div className="night-map-checklist-meditation__label"><Headphones aria-hidden="true" /><span>Belongs to this practice</span></div>
-                          {meditation.videoFile && (
-                            <video
-                              ref={nightMeditationVideoRef}
-                              className="night-map-meditation-video"
-                              src={meditation.videoFile}
-                              playsInline
-                              preload="metadata"
-                              aria-label={meditation.title}
-                            />
-                          )}
                          <div className="night-map-meditation-track__heading">
                            <div><p>{meditation.subtitle}</p><h4>{meditation.title}</h4></div>
                            <span>{meditation.durationLabel}</span>

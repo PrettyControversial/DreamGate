@@ -9085,16 +9085,6 @@
   background: rgba(246, 243, 236, 0.78) !important;
 }
 
-.night-map-page .night-map-meditation-video {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  margin: 1.25rem 0 1.5rem;
-  border: 1px solid rgba(14, 12, 6, 0.22);
-  background: #0e0c06;
-  object-fit: cover;
-}
-
 .night-map-page .night-map-meditation-track__heading {
   align-items: flex-start !important;
   margin-bottom: 0 !important;
