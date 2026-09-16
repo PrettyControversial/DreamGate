@@ -1713,9 +1713,34 @@ function HomeRedirect() {
   );
 }
 
+function DevDescentPreview() {
+  return (
+    <div className="dreamgate-app-shell day-mode-shell flex min-h-[100dvh] w-full flex-col bg-background">
+      <header className="glam-app-header relative z-20 flex items-center justify-between border-b border-border/70 bg-background px-4 py-3">
+        <Link href="/user-portal" className="flex items-center gap-2.5">
+          <DreamGateLogo />
+          <h1 className="dreamgate-wordmark text-base text-foreground">Psyra</h1>
+        </Link>
+        <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+          Development preview
+        </span>
+      </header>
+      <DreamGateSymbolBackground />
+      <main className="relative z-10 min-h-0 flex-1">
+        <MoonTracker />
+      </main>
+      <div className="dreamgate-bottom-nav-spacer shrink-0" aria-hidden="true" />
+      <BottomNav />
+    </div>
+  );
+}
+
 function Router() {
   return (
     <Switch>
+      {import.meta.env.DEV && (
+        <Route path="/dev/descent-preview" component={DevDescentPreview} />
+      )}
       <Route path="/" component={HomeRedirect} />
       <Route path="/sign-in/forgot-password/*?" component={ForgotPasswordPage} />
       <Route path="/sign-in/*?" component={SignInPage} />

@@ -284,7 +284,7 @@ export default function MoonTracker() {
       data-testid="night-map-page"
     >
       <div className="mx-auto max-w-3xl">
-        <header className="meditation-header meditation-header--object dream-journey-header night-map-journey-header">
+        <header className="meditation-header meditation-header--object dream-journey-header">
           <div className="meditation-header__copy space-y-3">
             <div className="dream-journey-heading-row">
               <div className="dream-journey-heading-copy">
@@ -322,13 +322,13 @@ export default function MoonTracker() {
             {descentStepComplete["night-practices"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
           </button>
           <div className="night-map-compact-heading">
-            <div><p className="night-map-kicker">01 / Lucid dream training</p><h2 id="night-map-practices-title">Lucid Dream Checklist</h2></div>
+             <div><p className="dream-journey-eyebrow night-map-kicker">01 / Lucid dream training</p><h2 className="dream-journey-step-title" id="night-map-practices-title">Lucid Dream Checklist</h2></div>
             <span className="night-map-progress">{completedPractices.length}/{lucidPractices.length} complete</span>
           </div>
           <div className="night-map-progress-track" aria-label={`${completedPractices.length} of ${lucidPractices.length} practices complete`}>
             {lucidPractices.map((practice) => <span key={practice.id} className={completedPractices.includes(practice.id) ? "is-complete" : ""} />)}
           </div>
-          <p className="night-map-checklist-intro">Reality checks, intention, meditation, and recall work together. Complete what supports you tonight.</p>
+           <p className="dream-journey-description night-map-checklist-intro">Reality checks, intention, meditation, and recall work together. Complete what supports you tonight.</p>
           <div className="night-map-lucid-checklist" role="list">
             {lucidPractices.map((practice, index) => {
               const PracticeIcon = practice.icon;
@@ -451,8 +451,8 @@ export default function MoonTracker() {
            >
              {descentStepComplete["night-meditation"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
            </button>
-          <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">02 / Sound</p><h2 id="night-map-meditation-title">Choose one path into sleep.</h2><span>One meditation is enough for tonight.</span></div>
-          <p className="night-map-sound-note">Use Reality Check to sharpen your awareness of the present moment. Use Theta Realm to rehearse recognizing a dream sign as your body settles. Each recording now lives with the practice it supports, so you can read, listen, and continue without losing your place.</p>
+           <div className="night-map-meditation-compact__heading"><p className="dream-journey-eyebrow night-map-kicker">02 / Sound</p><h2 className="dream-journey-step-title" id="night-map-meditation-title">Choose one path into sleep.</h2><span>One meditation is enough for tonight.</span></div>
+           <p className="dream-journey-description night-map-sound-note">Use Reality Check to sharpen your awareness of the present moment. Use Theta Realm to rehearse recognizing a dream sign as your body settles. Each recording now lives with the practice it supports, so you can read, listen, and continue without losing your place.</p>
            <nav className="night-map-step-nav" aria-label="Sound step navigation">
              <a href="#night-practices" onClick={() => setActiveDescentStep("night-practices")}><span aria-hidden="true">←</span> Previous</a>
              <a href="#night-reflection" onClick={() => setActiveDescentStep("night-reflection")}>Continue <span aria-hidden="true">→</span></a>
@@ -470,7 +470,7 @@ export default function MoonTracker() {
            >
              {descentStepComplete["night-reflection"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
            </button>
-          <div className="night-map-compact-heading"><div><p className="night-map-kicker">03 / Reflection</p><h2 id="night-map-reflection-title">Arrive as you are.</h2></div></div>
+           <div className="night-map-compact-heading"><div><p className="dream-journey-eyebrow night-map-kicker">03 / Reflection</p><h2 className="dream-journey-step-title" id="night-map-reflection-title">Arrive as you are.</h2></div></div>
            <div className="dream-journey-reflection night-map-journey-note">
              <label htmlFor="night-intention">
                <Feather aria-hidden="true" />
@@ -534,8 +534,8 @@ export default function MoonTracker() {
              {descentStepComplete["night-sleep"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
            </button>
           <div className="night-map-complete__heading">
-            <p className="night-map-kicker">04 / Sleep</p>
-            <h2>{ritualComplete ? "The night is yours." : "Let the day become a dream."}</h2>
+             <p className="dream-journey-eyebrow night-map-kicker">04 / Sleep</p>
+             <h2 className="dream-journey-step-title">{ritualComplete ? "The night is yours." : "Let the day become a dream."}</h2>
           </div>
           <button type="button" onClick={() => void completeTonightRitual()} disabled={ritualComplete || intentionMutation.isPending} className="night-map-complete__button home-capsule-button home-capsule-button--outline no-default-hover-elevate no-default-active-elevate" data-testid="button-complete-ritual">
             {ritualComplete ? "Ritual complete" : intentionMutation.isPending ? "Saving Tonight's Ritual" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span>
