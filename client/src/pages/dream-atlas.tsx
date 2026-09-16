@@ -110,6 +110,47 @@ const containsPhrase = (text: string, phrase: string) => {
   return new RegExp(`(^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`, "i").test(text);
 };
 
+const locationScenePrepositions =
+  "in|at|on|near|by|inside|within|through|across|along|around|toward|towards|from|to|into|outside|beside|under|over|behind|between";
+const locationSceneVerbs =
+  "was|were|is|are|felt|looked|seemed|stood|lay|stretched|surrounded|appeared|opened|led|continued|ended|began";
+const nonLocationReferenceWords =
+  "picture|photo|photograph|painting|drawing|image|map|symbol|metaphor|memory|story|video|movie|book|article";
+
+const isExplicitLocationMention = (text: string, term: string) => {
+  const escaped = term
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\s+/g, "\\s+");
+  const location = `(?:the|a|an|my|our)?\\s*${escaped}`;
+  const sentences = text.split(/[.!?;\n]+/);
+
+  return sentences.some((sentence) => {
+    const normalized = sentence.trim();
+    if (!normalized || !containsPhrase(normalized, term)) return false;
+
+    const referencedAsNonLocation = new RegExp(
+      `\\b(?:${nonLocationReferenceWords})\\b[^,;]{0,60}\\b${escaped}\\b|\\b${escaped}\\b[^,;]{0,60}\\b(?:${nonLocationReferenceWords})\\b`,
+      "i",
+    ).test(normalized);
+    if (referencedAsNonLocation) return false;
+
+    const enteredAsPlace = new RegExp(
+      `\\b(?:${locationScenePrepositions})\\s+${location}(?=$|[^a-z0-9])`,
+      "i",
+    ).test(normalized);
+    const placeAsScene = new RegExp(
+      `\\b${location}\\s+(?:${locationSceneVerbs})\\b`,
+      "i",
+    ).test(normalized);
+    const dreamPlace = new RegExp(
+      `\\b(?:dreamed|dreamt|dreaming|dream)\\s+(?:about|of|in|at|on)\\s+${location}(?=$|[^a-z0-9])`,
+      "i",
+    ).test(normalized);
+
+    return enteredAsPlace || placeAsScene || dreamPlace;
+  });
+};
+
 const formatDate = (date: Date | string) =>
   new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
@@ -135,9 +176,9 @@ export default function DreamAtlas() {
     const activeDreams = dreams.filter((dream) => !dream.isArchived);
     const grouped = locationFamilies.map((family) => {
       const matches = activeDreams.filter((dream) => {
-        const text = `${dream.title} ${dream.content}`.toLocaleLowerCase();
+        const text = `${dream.title}. ${dream.content}`.toLocaleLowerCase();
         const isExcluded = family.exclude?.some((term) => containsPhrase(text, term)) ?? false;
-        return !isExcluded && family.terms.some((term) => containsPhrase(text, term));
+        return !isExcluded && family.terms.some((term) => isExplicitLocationMention(text, term));
       });
       return { name: family.name, dreams: matches.sort((a, b) => +new Date(a.date) - +new Date(b.date)) };
     }).filter((record) => record.dreams.length > 0);
