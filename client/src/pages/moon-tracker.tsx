@@ -9,7 +9,7 @@ import type { SleepIntention } from "@shared/schema";
 import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.m4a";
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.m4a";
 import boxBreathingAudio from "@/assets/box-breathing-for-sleep.m4a";
-import meditationSymbolRelief from "@assets/meditation-symbol-relief.webp";
+import descentStatueImage from "@assets/descent-statue.webp";
 
 const lucidMeditations = [
   {
@@ -256,7 +256,7 @@ export default function MoonTracker() {
               </div>
               <img
                 className="meditation-header__object"
-                src={meditationSymbolRelief}
+                 src={descentStatueImage}
                 alt=""
                 aria-hidden="true"
               />
