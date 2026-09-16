@@ -75,7 +75,7 @@ const lucidPractices = [
     eyebrow: "Final sleep preparation",
     title: "Box Breathing for Sleep · 6 min",
     description: "",
-    steps: ["Get comfortable and let your jaw, shoulders, and hands soften.", "Follow the four-count rhythm without trying to force sleep.", "Let the final breath carry you toward the dream state."],
+    steps: [],
   },
   {
     id: "recall",
