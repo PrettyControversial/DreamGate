@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { BookOpen, Check, ChevronDown, Eye, Feather, Headphones, Pause, Play, Sparkles } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { DescentSymbolBackground } from "@/components/descent-symbol-background";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 import type { SleepIntention } from "@shared/schema";
@@ -244,6 +245,7 @@ export default function MoonTracker() {
       className="meditation-page dream-journey-page night-map-page min-h-screen px-4 py-8 md:px-8 md:py-10"
       data-testid="night-map-page"
     >
+      <DescentSymbolBackground />
       <div className="mx-auto max-w-3xl">
         <header className="meditation-header meditation-header--object dream-journey-header">
           <div className="meditation-header__copy space-y-3">

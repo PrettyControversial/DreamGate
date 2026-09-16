@@ -9150,6 +9150,117 @@
   padding-top: 1.5rem !important;
 }
 
+/* Descent-only symbol field using the supplied hand-drawn marks. */
+.dreamgate-app-shell:has(.night-map-page) > .dreamgate-symbol-field {
+  display: none;
+}
+
+.night-map-page > .descent-symbol-field {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.night-map-page .descent-symbol {
+  position: absolute;
+  display: block;
+  max-width: none;
+  height: auto;
+  opacity: 0.065;
+  filter: grayscale(1) contrast(0.88);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transform: rotate(var(--descent-symbol-rotation, 0deg));
+  transform-origin: center;
+}
+
+.night-map-page .descent-symbol--75 {
+  top: 4%;
+  left: -7rem;
+  width: clamp(11rem, 22vw, 18rem);
+  --descent-symbol-rotation: -8deg;
+}
+
+.night-map-page .descent-symbol--149 {
+  top: 18%;
+  right: -7rem;
+  width: clamp(12rem, 23vw, 19rem);
+  --descent-symbol-rotation: 9deg;
+}
+
+.night-map-page .descent-symbol--166 {
+  top: 38%;
+  left: -7rem;
+  width: clamp(10rem, 19vw, 16rem);
+  --descent-symbol-rotation: -14deg;
+}
+
+.night-map-page .descent-symbol--167 {
+  top: 51%;
+  right: -8rem;
+  width: clamp(12rem, 22vw, 18rem);
+  --descent-symbol-rotation: 12deg;
+}
+
+.night-map-page .descent-symbol--48 {
+  bottom: 9%;
+  left: 11%;
+  width: clamp(10rem, 19vw, 16rem);
+  --descent-symbol-rotation: -7deg;
+}
+
+.night-map-page .descent-symbol--73 {
+  top: 75%;
+  right: 23%;
+  width: clamp(10rem, 18vw, 15rem);
+  --descent-symbol-rotation: 8deg;
+}
+
+@media (max-width: 767px) {
+  .night-map-page .descent-symbol {
+    opacity: 0.052;
+  }
+
+  .night-map-page .descent-symbol--75 {
+    top: 5%;
+    left: -5rem;
+    width: 12rem;
+  }
+
+  .night-map-page .descent-symbol--149 {
+    top: 21%;
+    right: -5rem;
+    width: 12rem;
+  }
+
+  .night-map-page .descent-symbol--166 {
+    top: 42%;
+    left: -5rem;
+    width: 10rem;
+  }
+
+  .night-map-page .descent-symbol--167 {
+    top: 57%;
+    right: -5rem;
+    width: 12rem;
+  }
+
+  .night-map-page .descent-symbol--48 {
+    bottom: 10%;
+    left: 6%;
+    width: 10rem;
+  }
+
+  .night-map-page .descent-symbol--73 {
+    top: 78%;
+    right: 14%;
+    width: 10rem;
+  }
+}
+
 .writing-prompts-editor {
   border-top: 1px solid hsl(var(--border));
   border-bottom: 1px solid hsl(var(--border));
