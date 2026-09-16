@@ -109,6 +109,7 @@ export default function MoonTracker() {
   const [nightMeditationDuration, setNightMeditationDuration] = useState(0);
   const [ritualComplete, setRitualComplete] = useState(false);
   const [ritualSaveError, setRitualSaveError] = useState<string | null>(null);
+  const [activeDescentStep, setActiveDescentStep] = useState("night-practices");
   const nightMeditationRef = useRef<HTMLAudioElement | null>(null);
   const { data: recentMoods } = useQuery<MoodEntry[]>({ queryKey: ["/api/moods"] });
   const { data: recentIntentions } = useQuery<SleepIntention[]>({ queryKey: ["/api/intentions"] });
@@ -131,6 +132,35 @@ export default function MoonTracker() {
       nightMeditationRef.current?.pause();
     };
   }, []);
+
+  useEffect(() => {
+    const sections = ["night-practices", "night-meditation", "night-reflection", "night-sleep"]
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+
+        if (visibleEntry?.target instanceof HTMLElement) {
+          setActiveDescentStep(visibleEntry.target.id);
+        }
+      },
+      { rootMargin: "-18% 0px -62% 0px", threshold: 0 },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  const focusDescentStep = (stepId: string) => {
+    setActiveDescentStep(stepId);
+    document.getElementById(stepId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const toggleNightMeditation = (track: (typeof lucidMeditations)[number]) => {
     const activeAudio = nightMeditationRef.current;
@@ -216,6 +246,15 @@ export default function MoonTracker() {
     } catch {
       setRitualSaveError("We couldn't save tonight's ritual. Please try again.");
     }
+  };
+
+  const descentStepComplete = {
+    "night-practices": completedPractices.length === lucidPractices.length,
+    "night-meditation": completedPractices.some((id) =>
+      lucidMeditations.some((meditation) => meditation.practiceId === id),
+    ),
+    "night-reflection": selectedMood !== null && dailyIntention.trim().length > 0,
+    "night-sleep": ritualComplete,
   };
 
   return (
