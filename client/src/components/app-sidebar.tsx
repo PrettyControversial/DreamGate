@@ -67,6 +67,11 @@ const menuItems: SidebarItem[] = [
     symbol: "archive",
   },
   {
+    title: "The Descent",
+    url: "/night-map",
+    symbol: "night-map",
+  },
+  {
     title: "Dream Atlas",
     url: "/atlas",
     symbol: "archive",
@@ -74,11 +79,6 @@ const menuItems: SidebarItem[] = [
 ];
 
 const trackerItems: SidebarItem[] = [
-  {
-    title: "The Descent",
-    url: "/night-map",
-    symbol: "night-map",
-  },
   {
     title: "Moon Calendar",
     url: "/lunar-calendar",
