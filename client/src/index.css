@@ -9718,3 +9718,302 @@
   }
 }
 
+/* Descent-only Guided Journey template.
+   The shared symbol field remains untouched so this page inherits the same
+   assets, colors, placement, scale, and behind-content layering as Guided
+   Journey without changing that page. */
+.night-map-page {
+  --meditation-ink: #f6f3ec;
+  --meditation-muted: rgba(246, 243, 236, 0.78);
+  --journey-line: rgba(246, 243, 236, 0.34);
+  --journey-accent: #f6f3ec;
+  --descent-ink: #f6f3ec;
+  --descent-muted: rgba(246, 243, 236, 0.78);
+  --descent-faint: rgba(246, 243, 236, 0.56);
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(116, 119, 126, 0.96) 0%,
+      rgba(91, 94, 101, 0.95) 48%,
+      rgba(70, 73, 80, 0.97) 100%
+    ) !important;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(116, 119, 126, 0.96) 0%,
+      rgba(91, 94, 101, 0.95) 48%,
+      rgba(70, 73, 80, 0.97) 100%
+    ) !important;
+  color: var(--meditation-ink) !important;
+  color-scheme: dark;
+}
+
+.night-map-page::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(circle at 78% 10%, rgba(229, 232, 226, 0.16), transparent 28rem),
+    radial-gradient(circle at 12% 72%, rgba(28, 31, 37, 0.18), transparent 32rem);
+  content: "";
+  pointer-events: none;
+}
+
+.night-map-page::after {
+  position: fixed;
+  z-index: 0;
+  inset: -12%;
+  background:
+    radial-gradient(ellipse at 18% 30%, rgba(240, 241, 237, 0.1), transparent 22%),
+    radial-gradient(ellipse at 82% 58%, rgba(33, 36, 42, 0.12), transparent 24%);
+  filter: blur(2rem);
+  opacity: 0.85;
+  pointer-events: none;
+  content: "";
+}
+
+.night-map-page > .mx-auto {
+  position: relative;
+  z-index: 1;
+}
+
+.night-map-page .night-map-journey-header {
+  min-height: 0;
+  margin-bottom: 2.75rem;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.night-map-page .night-map-journey-header .meditation-header__copy {
+  position: relative;
+  z-index: 2;
+}
+
+.night-map-page .night-map-journey-header .meditation-header__object {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 0;
+  flex: 0 0 auto;
+  width: min(12rem, 24vw);
+  max-height: 10rem;
+  margin: -0.8rem 0 0;
+  object-fit: contain;
+  filter: drop-shadow(0 0.75rem 0.65rem rgba(22, 24, 29, 0.3));
+  transform: rotate(4deg);
+}
+
+.night-map-page .dream-journey-heading-row {
+  gap: 1rem;
+}
+
+.night-map-page .dream-journey-heading-copy,
+.night-map-page .dream-journey-heading-copy h1,
+.night-map-page .meditation-kicker,
+.night-map-page .dream-journey-headphones {
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .meditation-muted,
+.night-map-page .night-map-arrival--compact .night-map-deck {
+  color: var(--meditation-muted) !important;
+}
+
+.night-map-page .night-map-journey-path {
+  position: relative;
+  padding-left: 2.45rem;
+}
+
+.night-map-page .night-map-journey-path::before {
+  top: 0.6rem;
+  bottom: 0.85rem;
+  left: 0.58rem;
+  width: 2px;
+  background: var(--journey-line);
+}
+
+.night-map-page .night-map-journey-path .night-map-step {
+  min-height: 0;
+  margin-bottom: 2.9rem;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-step:last-child {
+  margin-bottom: 0;
+}
+
+.night-map-page .night-map-step__content {
+  position: relative;
+  z-index: 2;
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker {
+  top: 0.05rem;
+  left: -2.45rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid var(--meditation-ink);
+  border-radius: 999px;
+  background: rgba(116, 119, 126, 0.96);
+  color: var(--journey-accent);
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker span {
+  width: 0.28rem;
+  height: 0.28rem;
+  background: var(--descent-faint);
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker.is-active {
+  box-shadow: 0 0 0 0.3rem rgba(246, 243, 236, 0.14);
+}
+
+.night-map-page .night-map-journey-path .dream-journey-marker.is-complete {
+  border-color: var(--journey-accent);
+  background: var(--journey-accent);
+  color: #4b4e55;
+}
+
+.night-map-page .night-map-journey-path .night-map-kicker,
+.night-map-page .night-map-journey-path .night-map-checklist-eyebrow,
+.night-map-page .night-map-journey-path .night-map-checklist-number {
+  color: var(--descent-faint) !important;
+  font-family: var(--font-accent);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-journey-path .night-map-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.night-map-page .night-map-journey-path .night-map-compact-heading h2,
+.night-map-page .night-map-journey-path .night-map-meditation-compact__heading h2,
+.night-map-page .night-map-journey-path .night-map-complete h2 {
+  margin: 0 0 0.55rem;
+  color: var(--meditation-ink) !important;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.night-map-page .night-map-journey-path .night-map-sound-note,
+.night-map-page .night-map-journey-path .night-map-checklist-intro {
+  max-width: 42rem;
+  margin: 0 0 1rem !important;
+  color: var(--meditation-muted) !important;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.night-map-page .night-map-journey-path .night-map-meditation-compact,
+.night-map-page .night-map-journey-path .night-map-reflection,
+.night-map-page .night-map-journey-path .night-map-complete {
+  padding-top: 0 !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-step-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--journey-line);
+}
+
+.night-map-page .night-map-journey-path .night-map-step-nav a {
+  display: inline-flex;
+  gap: 0.8rem;
+  align-items: center;
+  color: var(--meditation-ink) !important;
+  font-family: var(--font-accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-journey-path .night-map-step-nav a:hover,
+.night-map-page .night-map-journey-path .night-map-step-nav a:focus-visible {
+  color: #ffffff !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-audio-player__play {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--meditation-ink) !important;
+  border-radius: 999px;
+  background: transparent !important;
+  color: var(--meditation-ink) !important;
+}
+
+.night-map-page .night-map-journey-path .night-map-audio-player__play:hover,
+.night-map-page .night-map-journey-path .night-map-audio-player__play:focus-visible {
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.night-map-page .night-map-complete__button {
+  min-height: 3.25rem;
+  width: auto;
+  max-width: 100%;
+  border: 2px solid var(--meditation-ink) !important;
+  border-radius: 9999px !important;
+  background: transparent !important;
+  padding: 0.8rem 1.6rem;
+  color: var(--meditation-ink) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.night-map-page .night-map-complete__button:hover,
+.night-map-page .night-map-complete__button:focus-visible {
+  background: rgba(246, 243, 236, 0.12) !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 767px) {
+  .night-map-page .night-map-journey-header .meditation-header__object {
+    width: min(7rem, 24vw);
+    max-height: 7rem;
+    margin-top: -0.5rem;
+  }
+
+  .night-map-page .dream-journey-heading-row {
+    gap: 0.45rem;
+  }
+
+  .night-map-page .night-map-complete__button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .night-map-page .night-map-journey-header {
+    margin-bottom: 2.25rem;
+  }
+
+  .night-map-page .night-map-journey-path {
+    padding-left: 2rem;
+  }
+
+  .night-map-page .night-map-journey-path .dream-journey-marker {
+    left: -2rem;
+  }
+}
+

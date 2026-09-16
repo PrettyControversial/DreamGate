@@ -280,7 +280,7 @@ export default function MoonTracker() {
 
   return (
     <main
-      className="night-map-page min-h-screen px-4 py-8 md:px-8 md:py-10"
+      className="meditation-page dream-journey-page night-map-page min-h-screen px-4 py-8 md:px-8 md:py-10"
       data-testid="night-map-page"
     >
       <div className="mx-auto max-w-3xl">
@@ -291,6 +291,12 @@ export default function MoonTracker() {
                 <p className="meditation-kicker text-xs uppercase tracking-[0.28em]">Nightly Ritual</p>
                 <h1 className="font-display text-4xl tracking-tight md:text-5xl">The Descent</h1>
               </div>
+              <img
+                className="meditation-header__object"
+                src={nightMapPortal}
+                alt=""
+                aria-hidden="true"
+              />
             </div>
             <p className="meditation-muted max-w-xl text-sm leading-relaxed">
               A nightly checklist for training awareness, preparing for lucid dreams, and crossing gently into sleep.
@@ -300,9 +306,6 @@ export default function MoonTracker() {
               Headphones are recommended.
             </p>
             <a href="#night-practices" className="night-map-text-link">Begin the descent <span aria-hidden="true">↓</span></a>
-          </div>
-          <div className="night-map-arrival__mirror" aria-hidden="true">
-            <img src={nightMapPortal} alt="" />
           </div>
         </header>
 
@@ -542,7 +545,7 @@ export default function MoonTracker() {
             <p className="night-map-kicker">04 / Sleep</p>
             <h2>{ritualComplete ? "The night is yours." : "Let the day become a dream."}</h2>
           </div>
-          <button type="button" onClick={() => void completeTonightRitual()} disabled={ritualComplete || intentionMutation.isPending} className="night-map-complete__button" data-testid="button-complete-ritual">
+          <button type="button" onClick={() => void completeTonightRitual()} disabled={ritualComplete || intentionMutation.isPending} className="night-map-complete__button home-capsule-button home-capsule-button--outline no-default-hover-elevate no-default-active-elevate" data-testid="button-complete-ritual">
             {ritualComplete ? "Ritual complete" : intentionMutation.isPending ? "Saving Tonight's Ritual" : "Complete Tonight's Ritual"} <span aria-hidden="true">→</span>
           </button>
           {ritualSaveError && <p className="night-map-save-error" role="alert">{ritualSaveError}</p>}
