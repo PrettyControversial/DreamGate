@@ -58,8 +58,8 @@ const lucidPractices = [
     icon: Sparkles,
     eyebrow: "Guided practice",
     title: "Theta Realm Rehearsal · 8 min",
-    description: "Practice recognizing a dream sign without adding pressure. You are teaching attention to stay steady when the scene changes.",
-    steps: ["Recall a recent dream or choose one familiar dream sign.", "Picture yourself noticing it, breathing once, and becoming lucid.", "Repeat, “When I dream tonight, I will remember that I am dreaming.”"],
+    description: "",
+    steps: [],
   },
   {
     id: "intention",
@@ -318,9 +318,11 @@ export default function MoonTracker() {
                          {practice.description && (
                            <p className="dream-journey-description night-map-checklist-description">{practice.description}</p>
                          )}
-                        <ol className={practice.id === "recall" ? "night-map-recall-steps" : undefined}>
-                         {practice.steps.map((step) => <li key={step}>{step}</li>)}
-                       </ol>
+                        {practice.steps.length > 0 && (
+                          <ol className={practice.id === "recall" ? "night-map-recall-steps" : undefined}>
+                            {practice.steps.map((step) => <li key={step}>{step}</li>)}
+                          </ol>
+                        )}
                       {(() => {
                      const meditation = lucidMeditations.find((track) => track.practiceId === practice.id);
                      if (!meditation) return null;
