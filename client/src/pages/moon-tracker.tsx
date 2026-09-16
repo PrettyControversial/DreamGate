@@ -299,16 +299,6 @@ export default function MoonTracker() {
                   }}
                   aria-label={`${isComplete ? "Completed" : "Complete"} ${practice.title}`}
                 >
-                  <button
-                    type="button"
-                    className="night-map-checklist-toggle"
-                    onClick={() => togglePractice(practice.id)}
-                    aria-pressed={isComplete}
-                    aria-label={`${isComplete ? "Uncheck" : "Complete"} ${practice.title}`}
-                    data-testid={`button-practice-${practice.id}`}
-                  >
-                    {isComplete && <Check aria-hidden="true" />}
-                  </button>
                   <p className="night-map-checklist-number">0{index + 1}</p>
                   <PracticeIcon className="night-map-checklist-icon" aria-hidden="true" />
                    <button
