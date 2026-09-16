@@ -342,7 +342,7 @@ export default function MoonTracker() {
                        </div>
                      );
                       })()}
-                      {practice.id === "recall" && (
+                       {practice.id === "intention" && (
                         <>
                           <div className="dream-journey-reflection night-map-journey-note night-map-inline-journey-note">
                             <label htmlFor="night-intention">
