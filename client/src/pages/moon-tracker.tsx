@@ -8,10 +8,7 @@ import type { MoodEntry, SleepIntention } from "@shared/schema";
 import sensesInitiatedAudio from "@assets/dreamgate_meditations/senses-initiated-lucid-dream.m4a";
 import thetaRealmAudio from "@assets/dreamgate_meditations/theta-realm-lucid-dreaming-rehearsal.m4a";
 import boxBreathingAudio from "@/assets/box-breathing-for-sleep.m4a";
-import nightMapHeaderRelief from "@assets/night-map-stone-cutout.png";
 import nightMapPortal from "@assets/night-map-portal.webp";
-import nightMapIvy from "@assets/night-map-ivy.webp";
-import nightMapStoneSteps from "@assets/night-map-stone-steps.webp";
 
 const moodOptions = [
   { value: 1, label: "Exhausted" },
@@ -431,12 +428,6 @@ export default function MoonTracker() {
              {descentStepComplete["night-meditation"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
            </button>
            <div className="night-map-step__content">
-          <div className="night-map-object-stage night-map-object-stage--relief" aria-hidden="true">
-            <img src={nightMapHeaderRelief} alt="" />
-          </div>
-          <div className="night-map-object-stage night-map-object-stage--ivy" aria-hidden="true">
-            <img src={nightMapIvy} alt="" />
-          </div>
           <div className="night-map-meditation-compact__heading"><p className="night-map-kicker">02 / Sound</p><h2 id="night-map-meditation-title">Choose one path into sleep.</h2><span>One meditation is enough for tonight.</span></div>
           <p className="night-map-sound-note">Use Reality Check to sharpen your awareness of the present moment. Use Theta Realm to rehearse recognizing a dream sign as your body settles. Each recording now lives with the practice it supports, so you can read, listen, and continue without losing your place.</p>
            <nav className="night-map-step-nav" aria-label="Sound step navigation">
@@ -490,9 +481,6 @@ export default function MoonTracker() {
              {descentStepComplete["night-sleep"] ? <Check aria-hidden="true" /> : <span aria-hidden="true" />}
            </button>
            <div className="night-map-step__content">
-          <div className="night-map-object-stage night-map-object-stage--steps" aria-hidden="true">
-            <img src={nightMapStoneSteps} alt="" />
-          </div>
           <div className="night-map-complete__heading">
             <p className="night-map-kicker">04 / Sleep</p>
             <h2>{ritualComplete ? "The night is yours." : "Let the day become a dream."}</h2>

@@ -8150,9 +8150,7 @@
   --descent-line: rgba(246, 243, 236, 0.24);
   position: relative;
   min-height: calc(100dvh - 4rem);
-  background:
-    radial-gradient(circle at 76% 8%, rgba(111, 102, 83, 0.18), transparent 27%),
-    linear-gradient(180deg, var(--descent-paper) 0%, var(--descent-paper-deep) 56%, var(--descent-paper) 100%) !important;
+  background: var(--descent-paper) !important;
   color: var(--descent-ink) !important;
   color-scheme: dark;
 }
@@ -8460,8 +8458,13 @@
 }
 
 .night-map-page .night-map-journey-path {
-  --journey-line: var(--descent-line);
-  --journey-accent: #d9b875;
+  --journey-line: rgba(246, 243, 236, 0.38);
+  --journey-accent: var(--descent-ink);
+}
+
+.night-map-page .night-map-journey-path::before {
+  width: 2px;
+  background: var(--journey-line);
 }
 
 .night-map-page::after {
@@ -8529,12 +8532,13 @@
 }
 
 .night-map-page .night-map-journey-path .dream-journey-marker.is-active {
-  box-shadow: 0 0 0 0.3rem rgba(217, 184, 117, 0.12);
+  box-shadow: 0 0 0 0.3rem rgba(246, 243, 236, 0.12);
 }
 
 .night-map-page .night-map-journey-path .dream-journey-marker.is-complete {
   border-color: var(--journey-accent);
-  background: color-mix(in srgb, var(--journey-accent) 18%, var(--descent-paper));
+  background: var(--descent-ink);
+  color: var(--descent-paper);
 }
 
 .night-map-page .night-map-journey-path .night-map-kicker,
@@ -8588,10 +8592,6 @@
 .night-map-page .night-map-journey-path .night-map-step-nav a:hover,
 .night-map-page .night-map-journey-path .night-map-step-nav a:focus-visible {
   color: var(--journey-accent) !important;
-}
-
-.night-map-page .night-map-journey-path .night-map-object-stage {
-  z-index: 0;
 }
 
 .night-map-page .night-map-journey-footer {
