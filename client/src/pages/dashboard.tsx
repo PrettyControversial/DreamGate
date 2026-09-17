@@ -254,7 +254,7 @@ function CategoryTabs() {
   const tabs: { id: CategoryTab; label: string; href: string }[] = [
     { id: "featured", label: "Featured", href: "/discover" },
     { id: "dreams", label: "Dreams", href: "/dream" },
-    { id: "rest", label: "Rest", href: "/meditation" },
+    { id: "rest", label: "Rest", href: "/night-map" },
     { id: "explore", label: "Explore", href: "/atlas" },
   ];
   
