@@ -252,7 +252,7 @@ type CategoryTab = "featured" | "dreams" | "rest" | "explore";
 
 function CategoryTabs() {
   const tabs: { id: CategoryTab; label: string; href: string }[] = [
-    { id: "featured", label: "Featured", href: "/discover" },
+    { id: "featured", label: "Featured", href: "/atlas" },
     { id: "dreams", label: "Dreams", href: "/dream" },
     { id: "rest", label: "Rest", href: "/night-map" },
     { id: "explore", label: "Explore", href: "/atlas" },
