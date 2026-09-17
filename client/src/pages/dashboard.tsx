@@ -675,7 +675,7 @@ export default function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground">Guided Journey</h3>
                     <p className="text-sm text-muted-foreground">
-                      Guided meditations for lucid dreaming, sleep, and emotional calm
+                      Guided meditations for dream discovery
                     </p>
                   </div>
                 </div>
