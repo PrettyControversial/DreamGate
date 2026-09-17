@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img">
+  <defs>
+    <linearGradient id="house-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9d5d2"/>
+      <stop offset=".58" stop-color="#e4c7a4"/>
+      <stop offset="1" stop-color="#9b7962"/>
+    </linearGradient>
+    <linearGradient id="house-wall" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f2e5cd"/>
+      <stop offset="1" stop-color="#bd9578"/>
+    </linearGradient>
+    <linearGradient id="house-roof" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#4b4b50"/>
+      <stop offset="1" stop-color="#252b35"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#house-sky)"/>
+  <circle cx="464" cy="124" r="55" fill="#f8e0ad" opacity=".76"/>
+  <path d="M0 420c102-36 202-38 300-12 108 29 199 26 300-12v204H0Z" fill="#3c5350"/>
+  <path d="M88 414 300 197l213 217Z" fill="url(#house-roof)"/>
+  <path d="M130 414h340v145H130Z" fill="url(#house-wall)"/>
+  <path d="M270 559V424h66v135Z" fill="#604a43"/>
+  <path d="M177 439h63v64h-63zM365 439h63v64h-63z" fill="#7ea3a1"/>
+  <path d="M177 470h63M208 439v64M365 470h63M396 439v64" stroke="#f2e5cd" stroke-width="8" opacity=".75"/>
+  <path d="M73 559c68-26 124-29 177-11 55 19 107 19 162 0 55-18 107-16 188 11v41H73Z" fill="#263a3a" opacity=".65"/>
+  <path d="M78 560c22-55 50-73 74-90M122 572c15-45 38-69 62-89M482 572c-16-45-38-69-61-89" fill="none" stroke="#a4b89d" stroke-width="10" opacity=".7"/>
+</svg>

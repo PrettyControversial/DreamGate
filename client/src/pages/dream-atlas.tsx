@@ -9,6 +9,7 @@ import atlasBackground from "@assets/dream-atlas-background.webp";
 import atlasPool from "@/assets/atlas-location-pool.svg";
 import atlasFair from "@/assets/atlas-location-fair.svg";
 import atlasMall from "@/assets/atlas-location-mall.svg";
+import atlasHouse from "@/assets/atlas-location-house.svg";
 import atlasPark from "@/assets/dream-atlas-park.webp";
 import atlasWater from "@/assets/atlas-detail-water.webp";
 import atlasForest from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
@@ -40,7 +41,8 @@ const locationFamilies = [
   { name: "The Fair", terms: ["fairground", "state fair", "county fair", "carnival", "amusement park"] },
   { name: "The Mall", terms: ["shopping mall", "mall", "food court"] },
   { name: "Childhood Home", terms: ["childhood home", "childhood house", "old house"] },
-  { name: "Home", terms: ["my home", "my house", "at home", "apartment", "bedroom", "living room", "kitchen", "hallway"] },
+  { name: "The House", terms: ["grandmother's house", "grandmother’s house", "grandmothers house", "grandma's house", "grandma’s house", "grandmas house", "grandparent's house", "grandparent’s house", "grandparents house", "house"] },
+  { name: "Home", terms: ["my home", "at home", "apartment", "bedroom", "living room", "kitchen", "hallway"] },
   { name: "School", terms: ["school", "classroom", "college", "university", "campus"] },
   { name: "The Hospital", terms: ["hospital", "clinic", "doctor's office", "doctor’s office", "nurse's station", "nurse’s station"] },
   { name: "The Ocean", terms: ["ocean", "at sea", "beach", "shore", "seashore", "coast", "coastline"] },
@@ -70,8 +72,9 @@ const locationImages: Record<string, LocationImage> = {
   "The Pool": { src: atlasPool, alt: "An indoor swimming pool beneath tall windows" },
   "The Fair": { src: atlasFair, alt: "A fairground with a ferris wheel and illuminated stalls at dusk" },
   "The Mall": { src: atlasMall, alt: "A glass-roofed shopping mall interior" },
-  "Childhood Home": { src: atlasMall, alt: "A warmly lit interior passage" },
-  Home: { src: atlasMall, alt: "A warmly lit interior passage" },
+  "Childhood Home": { src: atlasHouse, alt: "A warmly lit house at dusk" },
+  "The House": { src: atlasHouse, alt: "A warmly lit house at dusk" },
+  Home: { src: atlasHouse, alt: "A warmly lit house at dusk" },
   School: { src: atlasMall, alt: "A bright public interior with long architectural lines" },
   "The Hospital": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
   "The Ocean": { src: atlasWater, alt: "A quiet waterside landscape" },
@@ -117,38 +120,74 @@ const locationSceneVerbs =
 const nonLocationReferenceWords =
   "picture|photo|photograph|painting|drawing|image|map|symbol|metaphor|memory|story|video|movie|book|article";
 
-const isExplicitLocationMention = (text: string, term: string) => {
+const locationPhraseFor = (escapedTerm: string) =>
+  `(?:the|a|an|my|our|his|her|their|this|that)?(?:\\s+[a-z][a-z'’\\-]*){0,2}\\s*${escapedTerm}`;
+
+const locationCompletion = `(?=\\s*(?:$|[,.!?;:]|and\\b|while\\b|where\\b|when\\b|near\\b|beside\\b|under\\b|over\\b|along\\b|around\\b|with\\b))`;
+
+const locationEvidenceScore = (text: string, term: string) => {
   const escaped = term
     .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     .replace(/\s+/g, "\\s+");
-  const location = `(?:the|a|an|my|our)?\\s*${escaped}`;
+  const location = locationPhraseFor(escaped);
   const sentences = text.split(/[.!?;\n]+/);
+  let bestScore: number | null = null;
 
-  return sentences.some((sentence) => {
+  sentences.forEach((sentence, sentenceIndex) => {
     const normalized = sentence.trim();
-    if (!normalized || !containsPhrase(normalized, term)) return false;
+    if (!normalized || !containsPhrase(normalized, term)) return;
 
     const referencedAsNonLocation = new RegExp(
       `\\b(?:${nonLocationReferenceWords})\\b[^,;]{0,60}\\b${escaped}\\b|\\b${escaped}\\b[^,;]{0,60}\\b(?:${nonLocationReferenceWords})\\b`,
       "i",
     ).test(normalized);
-    if (referencedAsNonLocation) return false;
+    if (referencedAsNonLocation) return;
 
-    const enteredAsPlace = new RegExp(
-      `\\b(?:${locationScenePrepositions})\\s+${location}(?=$|[^a-z0-9])`,
-      "i",
-    ).test(normalized);
+    const enteredAsPlace = new RegExp(`\\b(${locationScenePrepositions})\\s+${location}${locationCompletion}`, "i").exec(normalized);
     const placeAsScene = new RegExp(
       `\\b${location}\\s+(?:${locationSceneVerbs})\\b`,
       "i",
     ).test(normalized);
     const dreamPlace = new RegExp(
-      `\\b(?:dreamed|dreamt|dreaming|dream)\\s+(?:about|of|in|at|on)\\s+${location}(?=$|[^a-z0-9])`,
+      `\\b(?:dreamed|dreamt|dreaming|dream)\\s+(?:about|of|in|at|on)\\s+${location}${locationCompletion}`,
       "i",
     ).test(normalized);
 
-    return enteredAsPlace || placeAsScene || dreamPlace;
+    if (!enteredAsPlace && !placeAsScene && !dreamPlace) return;
+
+    const preposition = enteredAsPlace?.[1].toLowerCase();
+    const baseScore = enteredAsPlace
+      ? ["at", "in", "inside", "within"].includes(preposition ?? "")
+        ? 110
+        : preposition === "on"
+          ? 86
+          : 98
+      : placeAsScene
+        ? 94
+        : 90;
+    const specificityBonus = Math.min(term.length, 36) * 0.35;
+    const sentencePriority = Math.max(0, 12 - sentenceIndex);
+    const score = baseScore + specificityBonus + sentencePriority;
+    bestScore = bestScore === null ? score : Math.max(bestScore, score);
   });
+
+  return bestScore;
+};
+
+const primaryLocationFor = (dream: Dream) => {
+  const text = `${dream.title}. ${dream.content}`.toLocaleLowerCase();
+  const candidates = locationFamilies.flatMap((family, familyIndex) => {
+    if (family.exclude?.some((term) => containsPhrase(text, term))) return [];
+
+    const score = family.terms.reduce<number | null>((best, term) => {
+      const evidence = locationEvidenceScore(text, term);
+      return evidence === null ? best : best === null ? evidence : Math.max(best, evidence);
+    }, null);
+
+    return score === null ? [] : [{ name: family.name, score, familyIndex }];
+  });
+
+  return candidates.sort((a, b) => b.score - a.score || a.familyIndex - b.familyIndex)[0]?.name ?? null;
 };
 
 const formatDate = (date: Date | string) =>
@@ -175,11 +214,7 @@ export default function DreamAtlas() {
   const records = useMemo<AtlasRecord[]>(() => {
     const activeDreams = dreams.filter((dream) => !dream.isArchived);
     const grouped = locationFamilies.map((family) => {
-      const matches = activeDreams.filter((dream) => {
-        const text = `${dream.title}. ${dream.content}`.toLocaleLowerCase();
-        const isExcluded = family.exclude?.some((term) => containsPhrase(text, term)) ?? false;
-        return !isExcluded && family.terms.some((term) => isExplicitLocationMention(text, term));
-      });
+      const matches = activeDreams.filter((dream) => primaryLocationFor(dream) === family.name);
       return { name: family.name, dreams: matches.sort((a, b) => +new Date(a.date) - +new Date(b.date)) };
     }).filter((record) => record.dreams.length > 0);
 
