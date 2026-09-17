@@ -1403,8 +1403,8 @@ function AccountControls({
 function RouteLoading() {
   return (
     <div className="route-loading flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center gap-3 bg-background px-6">
-      <PsyraLoadingKey label="Opening Psyra" />
-      <p className="text-sm text-muted-foreground">Opening your private Psyra space…</p>
+      <PsyraLoadingKey label="Opening Dream Space" />
+      <p className="text-sm text-muted-foreground">Opening your private dream space…</p>
     </div>
   );
 }
@@ -1843,8 +1843,8 @@ function AuthenticatedQueryContent({
         </>
       ) : (
         <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
-          <PsyraLoadingKey label="Opening Psyra" />
-          <p className="text-sm text-muted-foreground">Opening your private Psyra space…</p>
+          <PsyraLoadingKey label="Opening Dream Space" />
+          <p className="text-sm text-muted-foreground">Opening your private dream space…</p>
         </div>
       )}
       <PsyraLoadingKey
@@ -1874,8 +1874,8 @@ function App() {
   if (!nativeTokenReady) {
     return (
       <div className="route-loading min-h-screen bg-background flex flex-col gap-3 items-center justify-center">
-        <PsyraLoadingKey label="Opening Psyra" />
-        <p className="text-sm text-muted-foreground">Opening your private Psyra space…</p>
+        <PsyraLoadingKey label="Opening Dream Space" />
+        <p className="text-sm text-muted-foreground">Opening your private dream space…</p>
       </div>
     );
   }
