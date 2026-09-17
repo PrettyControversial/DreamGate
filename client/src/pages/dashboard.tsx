@@ -605,7 +605,7 @@ export default function Dashboard() {
     { title: "Ask Psyra", subtitle: "Jungian dream analysis", image: dreamDecoderImage, href: "/decoder", testId: "card-decoder" },
     { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar" },
     { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot" },
-    { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
+    { title: "Guided Journey", subtitle: "Guided meditations for dream discovery", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
     { title: "The Descent", subtitle: "Lucid dream preparation", image: descentCardImage, href: "/night-map", testId: "card-night-map" },
   ];
 
