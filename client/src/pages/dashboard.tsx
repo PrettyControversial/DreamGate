@@ -17,7 +17,7 @@ import restRestoreImage from "@assets/dreamgate_cards/rest-restore.webp";
 import tarotReadingImage from "@assets/dreamgate_cards/tarot-reading-hand.webp";
 import moonCalendarImage from "@assets/dreamgate_cards/moon-calendar.webp";
 import dreamDecoderImage from "@assets/dreamgate_cards/dream-decoder.webp";
-import nightMapImage from "@assets/dreamgate_cards/night-map.webp";
+import descentCardImage from "@/assets/descent-card-spiral.webp";
 import dreamJournalAwaitsIcon from "@assets/dreamgate_icons/dream-journal-icon.webp";
 import mirrorPortalImage from "@assets/night-map-portal.webp";
 import greetingVideo from "@assets/dreamgate_backgrounds/good-evening-video.mp4";
@@ -606,7 +606,7 @@ export default function Dashboard() {
     { title: "Moon Calendar", subtitle: "Lunar rhythms", image: moonCalendarImage, href: "/lunar-calendar", testId: "card-calendar" },
     { title: "Tarot Reading", subtitle: "Divine guidance", image: tarotReadingImage, href: "/tarot", badge: "New", testId: "card-tarot" },
     { title: "Guided Journey", subtitle: "Guided meditations for lucid dreaming, sleep, and emotional calm", image: restRestoreImage, href: "/meditation", testId: "card-meditation" },
-    { title: "The Descent", subtitle: "Lucid dream preparation", image: nightMapImage, href: "/night-map", testId: "card-night-map" },
+    { title: "The Descent", subtitle: "Lucid dream preparation", image: descentCardImage, href: "/night-map", testId: "card-night-map" },
   ];
 
   return (

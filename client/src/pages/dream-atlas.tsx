@@ -5,7 +5,7 @@ import { ArrowRight, ChevronDown, LockKeyhole, MapPin, Search } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/lib/subscription";
 import type { Dream } from "@shared/schema";
-import atlasBackground from "@assets/dream-atlas-background.webp";
+import atlasBackground from "@/assets/dream-atlas-maze.webp";
 import atlasPool from "@/assets/atlas-location-pool.svg";
 import atlasFair from "@/assets/atlas-location-fair.svg";
 import atlasMall from "@/assets/atlas-location-mall.svg";
