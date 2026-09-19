@@ -11,6 +11,7 @@ import { type Dream, type DreamStats, type CelestialData, type WritingPrompt } f
 import { BookOpen, Calendar, Moon, Sparkles, Search, Archive, Layers, Heart, Flame, Trophy, Star, Target, Zap } from "lucide-react";
 import { achievementSymbols } from "@/data/achievement-symbols";
 import { markTarotEntrySource } from "@/lib/analytics";
+import { getJournalMonthCount } from "@/lib/achievements";
 
 
 import restRestoreImage from "@assets/dreamgate_cards/rest-restore.webp";
@@ -123,7 +124,7 @@ function saveStreakData(currentStreak: number, longestStreak: number, dreamCount
 // Achievement definitions
 const achievements = [
   { id: 'first_dream', name: 'Dream Seeker', description: 'Log your first dream', icon: Star, symbol: achievementSymbols.ring, threshold: 1, type: 'dreams' },
-  { id: 'week_warrior', name: 'Week Warrior', description: 'Log 7 dreams', icon: Target, symbol: achievementSymbols.blackTag, threshold: 7, type: 'dreams' },
+  { id: 'warrior', name: 'Warrior', description: 'Journal dreams across 4 months', icon: Target, symbol: achievementSymbols.blackTag, threshold: 4, type: 'months' },
   { id: 'dream_weaver', name: 'Dream Weaver', description: 'Log 30 dreams', icon: Zap, symbol: achievementSymbols.leaf, threshold: 30, type: 'dreams' },
   { id: 'dream_master', name: 'Dream Master', description: 'Log 100 dreams', icon: Trophy, symbol: achievementSymbols.leafSprig, threshold: 100, type: 'dreams' },
   { id: 'streak_3', name: 'On Fire', description: '3 day streak', icon: Flame, symbol: achievementSymbols.stone, threshold: 3, type: 'streak' },
@@ -131,25 +132,49 @@ const achievements = [
   { id: 'streak_30', name: 'Moon Cycle', description: '30 day streak', icon: Moon, symbol: achievementSymbols.flower, threshold: 30, type: 'streak' },
 ];
 
-function getUnlockedAchievements(totalDreams: number, longestStreak: number) {
+function getUnlockedAchievements(
+  totalDreams: number,
+  longestStreak: number,
+  journalMonths: number,
+) {
   return achievements.filter(a => {
     if (a.type === 'dreams') return totalDreams >= a.threshold;
     if (a.type === 'streak') return longestStreak >= a.threshold;
+    if (a.type === 'months') return journalMonths >= a.threshold;
     return false;
   });
 }
 
-function getNextAchievement(totalDreams: number, longestStreak: number) {
+function getNextAchievement(
+  totalDreams: number,
+  longestStreak: number,
+  journalMonths: number,
+) {
   const dreamAchievement = achievements.find(a => a.type === 'dreams' && totalDreams < a.threshold);
   const streakAchievement = achievements.find(a => a.type === 'streak' && longestStreak < a.threshold);
-  
-  if (!dreamAchievement) return streakAchievement;
-  if (!streakAchievement) return dreamAchievement;
-  
-  const dreamProgress = totalDreams / dreamAchievement.threshold;
-  const streakProgress = longestStreak / streakAchievement.threshold;
-  
-  return dreamProgress > streakProgress ? dreamAchievement : streakAchievement;
+  const monthAchievement = achievements.find(a => a.type === 'months' && journalMonths < a.threshold);
+
+  const candidates = [
+    dreamAchievement && {
+      achievement: dreamAchievement,
+      progress: totalDreams / dreamAchievement.threshold,
+    },
+    streakAchievement && {
+      achievement: streakAchievement,
+      progress: longestStreak / streakAchievement.threshold,
+    },
+    monthAchievement && {
+      achievement: monthAchievement,
+      progress: journalMonths / monthAchievement.threshold,
+    },
+  ].filter(
+    (candidate): candidate is {
+      achievement: (typeof achievements)[number];
+      progress: number;
+    } => Boolean(candidate),
+  );
+
+  return candidates.sort((a, b) => b.progress - a.progress)[0]?.achievement;
 }
 
 // Motivational messages based on activity
@@ -321,9 +346,17 @@ function StreakWidget({ currentStreak, longestStreak }: { currentStreak: number;
 }
 
 // Achievement Progress Component
-function AchievementProgress({ totalDreams, longestStreak }: { totalDreams: number; longestStreak: number }) {
-  const unlocked = getUnlockedAchievements(totalDreams, longestStreak);
-  const next = getNextAchievement(totalDreams, longestStreak);
+function AchievementProgress({
+  totalDreams,
+  longestStreak,
+  journalMonths,
+}: {
+  totalDreams: number;
+  longestStreak: number;
+  journalMonths: number;
+}) {
+  const unlocked = getUnlockedAchievements(totalDreams, longestStreak, journalMonths);
+  const next = getNextAchievement(totalDreams, longestStreak, journalMonths);
   
   if (!next && unlocked.length === 0) return null;
   
@@ -333,7 +366,12 @@ function AchievementProgress({ totalDreams, longestStreak }: { totalDreams: numb
       : Math.min((longestStreak / next.threshold) * 100, 100)
     : 100;
   
-  const current = next?.type === 'dreams' ? totalDreams : longestStreak;
+  const current =
+    next?.type === 'dreams'
+      ? totalDreams
+      : next?.type === 'months'
+        ? journalMonths
+        : longestStreak;
   
   return (
     <div className="space-y-3" data-testid="widget-achievements">
@@ -389,9 +427,17 @@ interface HeroSectionProps {
   stats?: DreamStats;
   currentStreak: number;
   longestStreak: number;
+  journalMonths: number;
 }
 
-function HeroSection({ celestial, isLoading, stats, currentStreak, longestStreak }: HeroSectionProps) {
+function HeroSection({
+  celestial,
+  isLoading,
+  stats,
+  currentStreak,
+  longestStreak,
+  journalMonths,
+}: HeroSectionProps) {
   const { greeting, subtitle } = getTimeBasedGreeting();
   const moonPhase = capitalizeWords(celestial?.moonPhase?.replace(/_/g, ' ') || 'New Moon');
   const totalDreams = stats?.totalDreams || 0;
@@ -454,7 +500,11 @@ function HeroSection({ celestial, isLoading, stats, currentStreak, longestStreak
           </p>
           
           <div className="mt-3">
-            <AchievementProgress totalDreams={totalDreams} longestStreak={longestStreak} />
+            <AchievementProgress
+              totalDreams={totalDreams}
+              longestStreak={longestStreak}
+              journalMonths={journalMonths}
+            />
           </div>
         </div>
       </div>
@@ -560,6 +610,7 @@ export default function Dashboard() {
   });
 
   const recentDreams = dreams?.filter(d => !d.isArchived).slice(0, 4) || [];
+  const journalMonths = getJournalMonthCount(dreams ?? []);
   const introSeenKey = "dreamgate-intro-seen-v3";
   const [showIntro, setShowIntro] = useState(() => {
     try {
@@ -626,6 +677,7 @@ export default function Dashboard() {
           stats={stats}
           currentStreak={streakData.currentStreak}
           longestStreak={streakData.longestStreak}
+          journalMonths={journalMonths}
         />
 
         <section className="space-y-4">

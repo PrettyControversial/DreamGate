@@ -24,7 +24,10 @@ import { achievementSymbols } from "@/data/achievement-symbols";
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import { PsyraArchetypeCard } from "@/components/psyra-archetype-card";
 import { getArchetype } from "@shared/psyra";
-import { getJournalMonthCount } from "@/lib/achievements";
+import {
+  getJournalMonthCount,
+  hasCompletedTarotYear,
+} from "@/lib/achievements";
 
 function readInterpretation(value?: string | null): EnhancedDreamInterpretation | undefined {
   if (!value) return undefined;
@@ -70,7 +73,7 @@ const achievements = [
   { id: "dreams_10", name: "Dream Explorer", symbol: achievementSymbols.leafSprig, requirement: { type: "dreams", value: 10 } },
   { id: "dreams_50", name: "Dream Master", symbol: achievementSymbols.stone, requirement: { type: "dreams", value: 50 } },
   { id: "tarot_50", name: "Card Reader", symbol: achievementSymbols.seatedStone, requirement: { type: "tarot", value: 50 } },
-  { id: "tarot_25", name: "Tarot Master", symbol: achievementSymbols.flower, requirement: { type: "tarot", value: 25 } },
+  { id: "tarot_master", name: "Tarot Master", symbol: achievementSymbols.flower, requirement: { type: "tarot_year", value: 1 } },
 ];
 
 export default function Stats() {
@@ -137,6 +140,7 @@ export default function Stats() {
 
     const tarotReadings = parseInt(localStorage.getItem("tarotReadings") || "0");
     const totalMinutes = dreams.length * 5;
+    const tarotMasterUnlocked = hasCompletedTarotYear();
 
     return {
       currentStreak,
@@ -147,6 +151,7 @@ export default function Stats() {
       tarotReadings,
       activeDates: uniqueDates,
       journalMonths: getJournalMonthCount(dreams),
+      tarotMasterUnlocked,
     };
   }, [dreams]);
 
@@ -157,6 +162,7 @@ export default function Stats() {
       if (type === "dreams") return stats.dreamsDecoded >= value;
       if (type === "tarot") return stats.tarotReadings >= value;
       if (type === "months") return stats.journalMonths >= value;
+      if (type === "tarot_year") return stats.tarotMasterUnlocked;
       return false;
     });
   }, [stats]);

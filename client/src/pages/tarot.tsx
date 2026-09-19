@@ -10,6 +10,7 @@ import {
   trackDiscoverToolCompleted,
   trackEvent,
 } from "@/lib/analytics";
+import { recordTarotJourneyStart } from "@/lib/achievements";
 
 interface TarotCard {
   id: number;
@@ -346,6 +347,7 @@ function saveReading(reading: TarotReading) {
   history.unshift(reading);
   const trimmed = history.slice(0, 10);
   localStorage.setItem('tarot_history', JSON.stringify(trimmed));
+  recordTarotJourneyStart(reading.date);
   
   const count = parseInt(localStorage.getItem('tarotReadings') || '0');
   localStorage.setItem('tarotReadings', String(count + 1));
