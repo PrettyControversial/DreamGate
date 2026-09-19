@@ -24,6 +24,7 @@ import { achievementSymbols } from "@/data/achievement-symbols";
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import { PsyraArchetypeCard } from "@/components/psyra-archetype-card";
 import { getArchetype } from "@shared/psyra";
+import { getJournalMonthCount } from "@/lib/achievements";
 
 function readInterpretation(value?: string | null): EnhancedDreamInterpretation | undefined {
   if (!value) return undefined;
@@ -63,6 +64,7 @@ function StatCard({ icon, value, label, testId }: StatCardProps) {
 
 const achievements = [
   { id: "first_dream", name: "Dream Seeker", symbol: achievementSymbols.ring, requirement: { type: "dreams", value: 1 } },
+  { id: "warrior", name: "Warrior", symbol: achievementSymbols.blackTag, requirement: { type: "months", value: 4 } },
   { id: "streak_7", name: "7-Day Streak", symbol: achievementSymbols.blackTag, requirement: { type: "streak", value: 7 } },
   { id: "streak_30", name: "30-Day Streak", symbol: achievementSymbols.leaf, requirement: { type: "streak", value: 30 } },
   { id: "dreams_10", name: "Dream Explorer", symbol: achievementSymbols.leafSprig, requirement: { type: "dreams", value: 10 } },
@@ -144,6 +146,7 @@ export default function Stats() {
       dreamsDecoded: dreams.length,
       tarotReadings,
       activeDates: uniqueDates,
+      journalMonths: getJournalMonthCount(dreams),
     };
   }, [dreams]);
 
@@ -153,6 +156,7 @@ export default function Stats() {
       if (type === "streak") return stats.longestStreak >= value;
       if (type === "dreams") return stats.dreamsDecoded >= value;
       if (type === "tarot") return stats.tarotReadings >= value;
+      if (type === "months") return stats.journalMonths >= value;
       return false;
     });
   }, [stats]);
