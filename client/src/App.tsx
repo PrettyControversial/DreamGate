@@ -87,7 +87,8 @@ import drawerSymbol from "@assets/dreamgate_symbols/background/62.webp";
 
 const Landing = lazy(() => import("@/pages/landing"));
 const NotFound = lazy(() => import("@/pages/not-found"));
-const Dashboard = lazy(() => import("@/pages/dashboard"));
+const importDashboard = () => import("@/pages/dashboard");
+const Dashboard = lazy(importDashboard);
 const DreamPage = lazy(() => import("@/pages/dream"));
 const DreamDetail = lazy(() => import("@/pages/dream-detail"));
 const DreamDecoder = lazy(() => import("@/pages/dream-decoder"));
@@ -316,6 +317,36 @@ function ClerkQueryClientCacheInvalidator() {
 
     return unsubscribe;
   }, [activeQueryClient, addListener]);
+
+  return null;
+}
+
+// The home dashboard is the landing screen after sign-in and the tab users
+// return to most often. Warm its route chunk and its queries as soon as the
+// session is ready so the first mount renders from cache instead of showing
+// the Suspense fallback and loading skeletons.
+const HOME_PREFETCH_QUERY_KEYS = [
+  ["/api/dreams"],
+  ["/api/dreams/stats"],
+  ["/api/celestial"],
+  ["/api/prompts/daily"],
+];
+
+function HomeDataPrefetch() {
+  const { isSignedIn } = useAuth();
+  const activeQueryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+
+    void importDashboard().catch(() => {
+      // The route's own Suspense boundary still loads the chunk on demand.
+    });
+
+    for (const queryKey of HOME_PREFETCH_QUERY_KEYS) {
+      void activeQueryClient.prefetchQuery({ queryKey });
+    }
+  }, [activeQueryClient, isSignedIn]);
 
   return null;
 }
@@ -1683,6 +1714,7 @@ function AuthenticatedQueryProvider() {
       {authTransportReady && isLoaded ? (
         <>
           <ClerkQueryClientCacheInvalidator />
+          <HomeDataPrefetch />
           <ThemeProvider defaultTheme="light" storageKey="dreamgate-clean-day-mode">
             <TooltipProvider>
               <SubscriptionProvider>

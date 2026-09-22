@@ -4191,7 +4191,7 @@
 @keyframes fade-in-up {
   0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(10px);
   }
   100% {
     opacity: 1;
@@ -4239,7 +4239,9 @@
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 1s ease-out 2.5s both;
+  /* Runs on every mount of the home dashboard, including each return to the
+     Home tab, so it stays short and never delays the first paint. */
+  animation: fade-in-up 0.28s ease-out both;
 }
 
 .animate-logo-pulse {
@@ -4422,6 +4424,7 @@
   .animate-celebration,
   .animate-badge-unlock,
   .animate-progress-fill,
+  .animate-fade-in-up,
   .card-hover-lift {
     animation: none !important;
     transition: none !important;
