@@ -43,6 +43,7 @@ import {
   setAuthTokenProvider,
 } from "./lib/queryClient";
 import { trackEvent } from "@/lib/analytics";
+import { tarotJourneyStartedAtStorageKey } from "@/lib/achievements";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -1622,6 +1623,7 @@ function AuthenticatedApp() {
           localStorage.removeItem("dreamstate_streak");
           localStorage.removeItem("tarot_history");
           localStorage.removeItem("tarotReadings");
+          localStorage.removeItem(tarotJourneyStartedAtStorageKey);
           sessionStorage.removeItem("dreamgate-intro-seen-v3");
         } catch {
           // Account deletion should still complete if browser storage is unavailable.

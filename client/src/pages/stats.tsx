@@ -86,6 +86,7 @@ export default function Stats() {
   const { data: dreamStats, isLoading: dreamStatsLoading } = useQuery<DreamStats>({
     queryKey: ["/api/dreams/stats"],
   });
+  const tarotMasterUnlocked = hasCompletedTarotYear();
 
   const stats = useMemo(() => {
     const dreamDates = dreams.map(d => new Date(d.date).toDateString());
@@ -140,7 +141,6 @@ export default function Stats() {
 
     const tarotReadings = parseInt(localStorage.getItem("tarotReadings") || "0");
     const totalMinutes = dreams.length * 5;
-    const tarotMasterUnlocked = hasCompletedTarotYear();
 
     return {
       currentStreak,
@@ -153,7 +153,7 @@ export default function Stats() {
       journalMonths: getJournalMonthCount(dreams),
       tarotMasterUnlocked,
     };
-  }, [dreams]);
+  }, [dreams, tarotMasterUnlocked]);
 
   const unlockedAchievements = useMemo(() => {
     return achievements.filter(a => {
