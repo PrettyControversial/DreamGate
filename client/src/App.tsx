@@ -1403,9 +1403,8 @@ function AccountControls({
 
 function RouteLoading() {
   return (
-    <div className="route-loading flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center gap-3 bg-background px-6">
+    <div className="route-loading flex min-h-[calc(100dvh-8rem)] items-center justify-center bg-background px-6">
       <PsyraLoadingKey label="Opening Dream Space" />
-      <p className="text-sm text-muted-foreground">Opening your private dream space…</p>
     </div>
   );
 }
