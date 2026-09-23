@@ -163,7 +163,7 @@ export function PsyraPaywall({
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#100e12]/40 via-[#100e12]/75 to-[#100e12]" />
           <div className="relative">
-            <div className="mb-5 flex items-center gap-2 text-[0.65rem] uppercase tracking-[0.28em] text-[#d8c7e8]">
+            <div className="mb-5 flex items-center gap-2 text-[0.65rem] uppercase tracking-[0.28em] text-[#fffaf0]">
               <Sparkles className="h-3.5 w-3.5" />
               <span>{request?.eyebrow || "Psyra+"}</span>
             </div>
@@ -171,7 +171,7 @@ export function PsyraPaywall({
               <DialogTitle className="max-w-md font-display text-3xl leading-tight text-[#f6f1e9] sm:text-4xl">
                 {title}
               </DialogTitle>
-              <DialogDescription className="max-w-lg text-sm leading-relaxed text-[#d2ccd4]">
+              <DialogDescription className="max-w-lg text-sm font-medium leading-relaxed text-[#fffaf0]">
                 {description}
               </DialogDescription>
             </DialogHeader>
