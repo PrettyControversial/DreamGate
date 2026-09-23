@@ -111,6 +111,12 @@ export function PsyraPaywall({
     paywallWasOpen.current = open;
   }, [open, request?.feature]);
 
+  useEffect(() => {
+    if (open && isPremium) {
+      onClose();
+    }
+  }, [isPremium, onClose, open]);
+
   const isAnnualTrial = selectedPlan === "annual" && trialEligible;
   const plan = SUBSCRIPTION_CONFIG.plans[selectedPlan];
   const title = request?.title || "Go Deeper With Psyra";
@@ -308,14 +314,14 @@ export function PsyraPaywall({
           </div>
 
           {isDevelopmentBuild && (
-            <div className="space-y-3 rounded-xl border border-dashed border-[#82758d] bg-[#d8c7e8]/5 p-4">
+            <div className="space-y-3 rounded-xl border border-dashed border-[#a998b5] bg-[#d8c7e8]/10 p-4 text-[#fffaf0]">
               <div className="flex items-start gap-2">
                 <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-[#d8c7e8]" />
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#e9e3e9]">
+                  <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#fffaf0]">
                     Development subscription controls
                   </p>
-                  <p className="mt-1 text-xs leading-relaxed text-[#aaa1ad]">
+                  <p className="mt-1 text-sm font-medium leading-relaxed text-[#f6f1e9]">
                     Mock state only. StoreKit is not connected and this control
                     is excluded from production behavior.
                   </p>
@@ -328,10 +334,11 @@ export function PsyraPaywall({
                       key={option}
                       type="button"
                       onClick={() => setDevelopmentEntitlement(option)}
-                      className={`rounded-lg border px-2 py-2 text-[0.65rem] ${
+                      aria-pressed={entitlement === option}
+                      className={`rounded-lg border px-2 py-2 text-xs font-bold ${
                         entitlement === option
-                          ? "border-[#d8c7e8] bg-[#d8c7e8]/15 text-[#f6f1e9]"
-                          : "border-white/15 text-[#aaa1ad]"
+                          ? "border-[#fffaf0] bg-[#d8c7e8]/25 text-[#fffaf0]"
+                          : "border-white/30 text-[#f6f1e9] hover:border-white/60"
                       }`}
                       data-testid={`dev-entitlement-${option.toLowerCase()}`}
                     >
@@ -348,10 +355,10 @@ export function PsyraPaywall({
                 <button
                   type="button"
                   onClick={() => setDevelopmentTrialEligibility(true)}
-                  className={`rounded-lg border px-2.5 py-1.5 text-[0.65rem] ${
+                    className={`rounded-lg border px-2.5 py-1.5 text-xs font-bold ${
                     trialEligible
-                      ? "border-[#e9d8b3] text-[#e9d8b3]"
-                      : "border-white/15 text-[#aaa1ad]"
+                        ? "border-[#e9d8b3] text-[#fffaf0]"
+                        : "border-white/30 text-[#f6f1e9] hover:border-white/60"
                   }`}
                   data-testid="dev-trial-eligible"
                 >
@@ -360,10 +367,10 @@ export function PsyraPaywall({
                 <button
                   type="button"
                   onClick={() => setDevelopmentTrialEligibility(false)}
-                  className={`rounded-lg border px-2.5 py-1.5 text-[0.65rem] ${
+                    className={`rounded-lg border px-2.5 py-1.5 text-xs font-bold ${
                     !trialEligible
-                      ? "border-[#e9d8b3] text-[#e9d8b3]"
-                      : "border-white/15 text-[#aaa1ad]"
+                        ? "border-[#e9d8b3] text-[#fffaf0]"
+                        : "border-white/30 text-[#f6f1e9] hover:border-white/60"
                   }`}
                   data-testid="dev-trial-ineligible"
                 >
