@@ -547,29 +547,27 @@ export default function Tarot() {
                     </p>
                   </div>
                 </div>
-                {isPremium ? (
-                  <span className="shrink-0 text-sm font-semibold text-primary">
-                    Ready to draw
-                  </span>
-                ) : (
-                  <Button
-                    variant="outline"
-                    className="shrink-0"
-                    onClick={() =>
-                      openPaywall({
-                        feature: "premiumTarot",
-                        eyebrow: "Psyra+ Tarot",
-                        title: "Unlock Tarot Readings",
-                        description:
-                          "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
-                      })
+                <Button
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={() => {
+                    if (isPremium) {
+                      shuffleAndDraw("single");
+                      return;
                     }
-                    data-testid="button-unlock-tarot"
-                  >
-                    Unlock Tarot
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                )}
+                    openPaywall({
+                      feature: "premiumTarot",
+                      eyebrow: "Psyra+ Tarot",
+                      title: "Unlock Tarot Readings",
+                      description:
+                        "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
+                    });
+                  }}
+                  data-testid={isPremium ? "button-start-tarot" : "button-unlock-tarot"}
+                >
+                  {isPremium ? "Draw a Card" : "Unlock Tarot"}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </CardContent>
             </Card>
 
