@@ -354,8 +354,13 @@ function saveReading(reading: TarotReading) {
 }
 
 export default function Tarot() {
-  const { canAccess, freeTarotPullsRemaining, openPaywall, recordTarotPull } =
-    useSubscription();
+  const {
+    canAccess,
+    freeTarotPullsRemaining,
+    isPremium,
+    openPaywall,
+    recordTarotPull,
+  } = useSubscription();
   const [selectedSpread, setSelectedSpread] = useState<string | null>(null);
   const [drawnCards, setDrawnCards] = useState<{ card: TarotCard; reversed: boolean; position: string }[]>([]);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -370,7 +375,7 @@ export default function Tarot() {
   }, []);
 
   const shuffleAndDraw = (spreadId: string) => {
-    if (!canAccess("premiumTarot")) {
+    if (!isPremium && !canAccess("premiumTarot")) {
       openPaywall({
         feature: "premiumTarot",
         eyebrow: "Psyra+ Tarot",
@@ -526,9 +531,15 @@ export default function Tarot() {
                 <div className="flex items-start gap-3">
                   <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
-                    <p className="font-medium">Tarot readings are part of Psyra+</p>
+                    <p className="font-medium">
+                      {isPremium
+                        ? "Psyra+ Tarot is unlocked"
+                        : "Tarot readings are part of Psyra+"}
+                    </p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {freeTarotPullsRemaining > 0
+                      {isPremium
+                        ? "Mock Psyra+ is active. You can pull from the Major Arcana."
+                        : freeTarotPullsRemaining > 0
                         ? `${freeTarotPullsRemaining} free ${
                             freeTarotPullsRemaining === 1 ? "pull" : "pulls"
                           } remain.`
@@ -536,23 +547,29 @@ export default function Tarot() {
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  className="shrink-0"
-                  onClick={() =>
-                    openPaywall({
-                      feature: "premiumTarot",
-                      eyebrow: "Psyra+ Tarot",
-                      title: "Unlock Tarot Readings",
-                      description:
-                        "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
-                    })
-                  }
-                  data-testid="button-unlock-tarot"
-                >
-                  Unlock Tarot
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                {isPremium ? (
+                  <span className="shrink-0 text-sm font-semibold text-primary">
+                    Ready to draw
+                  </span>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="shrink-0"
+                    onClick={() =>
+                      openPaywall({
+                        feature: "premiumTarot",
+                        eyebrow: "Psyra+ Tarot",
+                        title: "Unlock Tarot Readings",
+                        description:
+                          "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
+                      })
+                    }
+                    data-testid="button-unlock-tarot"
+                  >
+                    Unlock Tarot
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
