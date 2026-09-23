@@ -509,9 +509,21 @@ export default function Tarot() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-foreground/90">
-                  The 22 cards of the Major Arcana represent the great archetypal forces that shape human experience—
-                  from the innocent Fool to the integrated World. Each card speaks in the symbolic language of 
-                  your dreams, offering not fortune-telling but a mirror for self-reflection.
+                  The 22 cards of the Major Arcana reflect timeless archetypal patterns found throughout human
+                  experience. From the Fool’s first step into the unknown to the World’s image of wholeness, each
+                  card represents a stage, challenge, or transformation within the psyche.
+                </p>
+                <p className="text-foreground/90">
+                  Carl Jung believed that archetypal symbols could reveal aspects of the unconscious and help us
+                  understand the deeper patterns shaping our inner lives. Viewed through this lens, tarot becomes
+                  less about predicting the future and more about reflection. Its imagery can act as a mirror for
+                  the psyche, much like the symbols that emerge in dreams.
+                </p>
+                <p className="text-foreground/90">
+                  As you move through the Major Arcana, consider each card an invitation to notice what is becoming
+                  conscious within you. The journey through these archetypes echoes individuation, Jung’s term for
+                  the lifelong process of integrating the many parts of the self and moving toward greater
+                  psychological wholeness.
                 </p>
               </CardContent>
             </Card>
