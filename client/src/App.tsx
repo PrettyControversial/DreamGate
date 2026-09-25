@@ -29,6 +29,7 @@ import {
 import {
   AlertCircle,
   CheckCircle2,
+  ChevronLeft,
   CircleHelp,
   Eye,
   EyeOff,
@@ -1536,8 +1537,11 @@ function AppRoutes({
   );
 }
 
+// Tab roots never show a header back button.
+const TAB_ROOTS = new Set(["/user-portal", "/dream", "/tarot", "/stats", "/discover"]);
+
 function AuthenticatedApp() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const { signOut } = useClerk();
   const { user } = useUser();
   const { toast } = useToast();
@@ -1548,6 +1552,23 @@ function AuthenticatedApp() {
   const { paywallRequest, closePaywall } = useSubscription();
   const isDiscover = location === "/discover";
   const isAtlas = location === "/atlas";
+
+  // Show the header back button on deep/tool screens. Suppress it on tab roots
+  // and on screens that already carry a prominent page-level back control.
+  const showBack =
+    !TAB_ROOTS.has(location) &&
+    !location.startsWith("/sign-") &&
+    !location.startsWith("/dream/") && // dream detail has a hero-overlay back button
+    !location.startsWith("/decoder/") && // decoder detail has its own content back
+    location !== "/help"; // help page has its own content back
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      navigate("/user-portal");
+    }
+  };
 
   const isDreamDecoder =
     location === "/dream" ||
@@ -1647,12 +1668,25 @@ function AuthenticatedApp() {
           className={`dreamgate-app-shell day-mode-shell flex min-h-[100dvh] w-full flex-col bg-background${isDiscover ? " discover-shell" : ""}${isDreamDecoder ? " dream-decoder-shell" : ""}`}
         >
           <header className={`glam-app-header relative z-20 flex items-center justify-between border-b border-border/70 bg-background px-4 py-3${isDreamDecoder ? " dream-decoder-header" : ""}${isHome ? " home-page-header" : ""}${isDiscover ? " discover-night-header" : ""}`}>
-            <Link href="/user-portal" className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1">
+              {showBack && (
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  aria-label="Go back"
+                  data-testid="button-header-back"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-foreground transition-opacity hover:opacity-70 active:opacity-50"
+                >
+                  <ChevronLeft className="h-5 w-5 stroke-[1.75]" />
+                </button>
+              )}
+              <Link href="/user-portal" className="flex items-center gap-2.5">
                 <DreamGateLogo />
                 <h1 className="dreamgate-wordmark text-base text-foreground">
                   Psyra
                 </h1>
               </Link>
+            </div>
             <AccountControls
               onSignOut={handleSignOut}
             />
