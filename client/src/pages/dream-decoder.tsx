@@ -96,7 +96,7 @@ function storeInsights(
 
 function HeroSection() {
   return (
-    <div className="relative w-full h-48 md:h-64 overflow-hidden">
+    <div className="relative z-10 w-full h-48 md:h-64 overflow-hidden">
       <img
         src={dreamDecoderBackground}
         alt=""
@@ -538,10 +538,14 @@ export default function DreamDecoder() {
   return (
     <div
       className="decoder-light-surface dream-decoder-light-surface relative min-h-screen pb-24 bg-background"
-      style={{ backgroundImage: `url(${dreamgatePageTexture})` }}
     >
+      <div
+        className="dream-decoder-texture"
+        style={{ backgroundImage: `url(${dreamgatePageTexture})` }}
+        aria-hidden="true"
+      />
       <HeroSection />
-      <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+      <div className="relative z-10 p-6 md:p-8 max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Link href="/decoder">
             <Button variant="ghost" size="icon" data-testid="button-back-decoder">

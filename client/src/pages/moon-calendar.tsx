@@ -103,7 +103,9 @@ export default function MoonCalendar() {
             </div>
           ) : liveSky ? (
             <div className="mt-5 grid min-w-0 gap-5 sm:grid-cols-[5rem_minmax(0,1fr)] sm:items-center">
-              <MoonPhaseVisual phase={liveSky.moonPhase} size="lg" className="h-20 w-20" />
+              <div className="current-sky-moon">
+                <MoonPhaseVisual phase={liveSky.moonPhase} size="lg" className="current-sky-moon__disc h-20 w-20" />
+              </div>
               <div className="min-w-0">
                 <p className="font-display text-[clamp(1.6rem,7vw,2.1rem)] leading-none">{getMoonPhaseName(liveSky.moonPhase)}</p>
                 <p className="mt-2 text-sm leading-relaxed opacity-75">

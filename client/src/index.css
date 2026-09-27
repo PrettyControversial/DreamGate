@@ -4035,13 +4035,69 @@
   box-shadow: none;
 }
 
-.dark .dream-decoder-shell,
-.dark .dream-decoder-shell > main {
+.dark .dream-decoder-shell {
   background-color: #0e0c06 !important;
+}
+
+.dream-decoder-shell > main,
+.dream-decoder-shell .decoder-light-surface {
+  background-color: transparent !important;
 }
 
 .dark .dream-decoder-shell > main {
   color: #f6f3ec;
+}
+
+.dream-decoder-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  background-position: top center;
+  background-repeat: repeat-y;
+  background-size: max(100%, 42rem) auto;
+}
+
+.current-sky-moon {
+  position: relative;
+  isolation: isolate;
+  width: 5rem;
+  height: 5rem;
+  flex-shrink: 0;
+}
+
+.current-sky-moon::before {
+  content: "";
+  position: absolute;
+  inset: -0.75rem;
+  border: 1px solid rgba(180, 157, 112, 0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(180, 157, 112, 0.3);
+  pointer-events: none;
+  animation: current-sky-moon-glow 5s ease-in-out infinite;
+}
+
+.current-sky-moon__disc {
+  animation: current-sky-moon-float 5s ease-in-out infinite;
+  box-shadow: 0 0 15px rgba(180, 157, 112, 0.35);
+}
+
+@keyframes current-sky-moon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes current-sky-moon-glow {
+  0%, 100% { opacity: 0.32; transform: scale(0.92); }
+  50% { opacity: 0.85; transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .current-sky-moon::before,
+  .current-sky-moon__disc {
+    animation: none;
+  }
 }
 
 .dark .dream-decoder-bottom-nav button.text-foreground {
