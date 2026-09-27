@@ -8,3 +8,17 @@ type = "audio"
 title = "dreamgate celestial intro ambient"
 description = "Generated music: A very subtle 5-second instrumental ambient sound bed for a mystical dream journal app intro. Ethereal celestial atmosphere, soft warm analog pad, airy resonance, delicate crystallin…"
 logical_id = "37e8f18a-b7cb-4da3-bfef-e90a3ebb8714"
+
+[[outputs]]
+id = "n-ip0H4IAR9DR_sOnyEbW"
+uri = "file://screenshots/atlas-sketch-preview.png"
+type = "image"
+title = "Dream Atlas pencil sketches"
+description = "A sample of six circular memory-token sketches used for recurring locations in the Atlas."
+logical_id = "e46c5b7b-dea1-45e6-bc76-490eb1ca7f91"
+content_hash = "sha256:e021b056b94e67faefd2e1ddb4ab1ccb234b74758c368899ea89276f62a72595"
+size = 357203
+mtime_ms = 1790519846872
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:59f22cae-b6b4-4ede-9285-b518b77c5cb7/e46c5b7b-dea1-45e6-bc76-490eb1ca7f91/edd87c31-2f8b-4f68-8477-51cf446382c4"
+storage_version_token = "1790519869763479"
+content_type = "image/png"

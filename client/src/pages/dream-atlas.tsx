@@ -3,18 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { ArrowRight, ChevronDown, LockKeyhole, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { RecurringLocationSketch } from "@/components/recurring-location-sketch";
 import { useSubscription } from "@/lib/subscription";
 import type { Dream } from "@shared/schema";
 import atlasBackground from "@assets/dream-atlas-background.webp";
-import atlasPool from "@/assets/atlas-location-pool.svg";
-import atlasFair from "@/assets/atlas-location-fair.svg";
-import atlasMall from "@/assets/atlas-location-mall.svg";
-import atlasHouse from "@/assets/atlas-location-house.svg";
-import atlasPark from "@/assets/dream-atlas-park.webp";
-import atlasWater from "@/assets/atlas-detail-water.webp";
-import atlasForest from "@assets/stock_images/dark_misty_forest_ni_2b87884a.jpg";
-import atlasDesert from "@assets/stock_images/desert_sand_dunes_go_b71b71c5.jpg";
-import atlasLake from "@assets/stock_images/misty_mountain_lake__396c4e5f.jpg";
 
 type AtlasRecord = {
   name: string;
@@ -25,11 +17,6 @@ type LocationFamily = {
   name: string;
   terms: string[];
   exclude?: string[];
-};
-
-type LocationImage = {
-  src: string;
-  alt: string;
 };
 
 // These are physical places only. Do not add objects, characters, emotions,
@@ -67,41 +54,6 @@ const locationFamilies = [
   { name: "The Mountain", terms: ["mountain", "mountainside", "summit"] },
   { name: "The Threshold", terms: ["doorway", "threshold", "entrance", "stairwell", "elevator"] },
 ] satisfies LocationFamily[];
-
-const locationImages: Record<string, LocationImage> = {
-  "The Pool": { src: atlasPool, alt: "An indoor swimming pool beneath tall windows" },
-  "The Fair": { src: atlasFair, alt: "A fairground with a ferris wheel and illuminated stalls at dusk" },
-  "The Mall": { src: atlasMall, alt: "A glass-roofed shopping mall interior" },
-  "Childhood Home": { src: atlasHouse, alt: "A warmly lit house at dusk" },
-  "The House": { src: atlasHouse, alt: "A warmly lit house at dusk" },
-  Home: { src: atlasHouse, alt: "A warmly lit house at dusk" },
-  School: { src: atlasMall, alt: "A bright public interior with long architectural lines" },
-  "The Hospital": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
-  "The Ocean": { src: atlasWater, alt: "A quiet waterside landscape" },
-  "The Park": { src: atlasPark, alt: "A stone path through a leafy hillside park" },
-  "The Forest": { src: atlasForest, alt: "A dark, misty forest" },
-  "The City": { src: atlasMall, alt: "A glass-roofed urban interior" },
-  "The Hotel": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
-  "The Airport": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
-  "The Store": { src: atlasMall, alt: "A glass-roofed shopping mall interior" },
-  "The Restaurant": { src: atlasMall, alt: "A warmly lit public interior" },
-  "The Road": { src: atlasPark, alt: "A stone path leading through a broad landscape" },
-  "The Train Station": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
-  "The Library": { src: atlasMall, alt: "A quiet public interior with tall architectural lines" },
-  "The Church": { src: atlasMall, alt: "A tall, quiet public interior" },
-  "The Theater": { src: atlasFair, alt: "A warmly lit public venue at dusk" },
-  "The Office": { src: atlasMall, alt: "A bright public interior with long architectural lines" },
-  "The Rooftop": { src: atlasMall, alt: "A broad view across an urban interior" },
-  "The Bridge": { src: atlasLake, alt: "A mountain landscape beside still water" },
-  "The Lake": { src: atlasLake, alt: "A still mountain lake" },
-  "The Cave": { src: atlasForest, alt: "A dark, textured natural landscape" },
-  "The Desert": { src: atlasDesert, alt: "Dunes stretching across a desert" },
-  "The Mountain": { src: atlasLake, alt: "A mountain landscape beside still water" },
-  "The Threshold": { src: atlasMall, alt: "A bright architectural passage" },
-};
-
-const locationImageFor = (name: string): LocationImage =>
-  locationImages[name] ?? { src: atlasMall, alt: `${name} recurring location` };
 
 const locationId = (name: string) =>
   `atlas-record-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
@@ -294,7 +246,6 @@ export default function DreamAtlas() {
           <div className="atlas-world-path__line" aria-hidden="true" />
           <div className="atlas-world-path__locations">
             {records.map((record) => {
-              const image = locationImageFor(record.name);
               return (
                 <button
                   className="atlas-world-path__location"
@@ -302,7 +253,7 @@ export default function DreamAtlas() {
                   type="button"
                   onClick={() => document.getElementById(locationId(record.name))?.scrollIntoView({ behavior: "smooth", block: "center" })}
                 >
-                  <img src={image.src} alt="" aria-hidden="true" />
+                  <RecurringLocationSketch location={record.name} className="atlas-world-path__sketch" />
                   <span>{record.name.replace(/^The /, "")}</span>
                 </button>
               );
@@ -327,7 +278,6 @@ export default function DreamAtlas() {
             const isOpen = openLocation === record.name;
             const isLocked = !canAccessAtlasLocation(record.name);
             const dates = record.dreams.slice(-3).map((dream) => formatDate(dream.date));
-            const image = locationImageFor(record.name);
             return (
               <article className={`atlas-record${isOpen ? " is-open" : ""}`} id={locationId(record.name)} key={record.name}>
                 <button
@@ -336,7 +286,7 @@ export default function DreamAtlas() {
                   aria-expanded={isOpen}
                   aria-label={`${isOpen ? "Close" : "Open"} ${record.name}${isLocked ? " (Psyra+)" : ""}`}
                 >
-                  <img className="atlas-record__image" src={image.src} alt={image.alt} />
+                  <RecurringLocationSketch location={record.name} className="atlas-record__image" />
                   <span className="atlas-record__summary-copy"><strong>{record.name} {isLocked && <LockKeyhole aria-hidden="true" className="inline-block h-3.5 w-3.5 align-[-0.1em]" />}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
                   <ChevronDown aria-hidden="true" />
                 </button>

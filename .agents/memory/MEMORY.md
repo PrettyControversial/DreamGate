@@ -2,6 +2,7 @@
 - [DreamGate visual source of truth](dreamgate-visual-system.md) — Discover defines authenticated-app styling; keep Welcome and the post-login intro visually isolated.
 - [Dream Atlas parchment](dreamgate-visual-system.md) — the Atlas uses the supplied parchment artwork as its only decorative image; keep location content layered in the open area.
 - [Dream Atlas location grouping](dream-atlas-location-grouping.md) — group dreams only from explicit scene-level place evidence, never from symbolic location words.
+- [Dream Atlas sketch identity](dream-atlas-sketch-identity.md) — keep a stable, local pencil sketch per recognized place; avoid per-visit generation from private dreams.
 - [DreamGate intro playback](dreamgate-intro-playback.md) — play the pre-home animation once per auth session and again during logout, not on every Home mount.
 - [Psyra interpretation metadata](psyra-interpretation-metadata.md) — keep archetype analysis inside the saved interpretation envelope so old dreams remain readable and profiles aggregate without rereading dream text.
 - [Psyra+ access boundaries](psyra-plus-access-boundaries.md) — keep paywall UI, entitlements, and purchase providers separate; development premium state must never unlock production.
@@ -18,3 +19,4 @@
 - [Development schema sync](db-schema-sync.md) — inspect additive Drizzle changes before approving a non-TTY push that reports a named-schema conflict.
 - [Drizzle PostgreSQL type compatibility](drizzle-pg-type-compatibility.md) — use validated connection config instead of unsafe Pool casts when pg declaration versions disagree.
 - [Descent Journey Note](descent-journey-note.md) — Tonight’s Intention is the editable saved note; reopen the latest record and update it instead of creating duplicates.
+- [ImageMagick contact sheets](image-magick-contact-sheets.md) — montage may fail without a usable font here; compose unlabeled previews with append instead.
