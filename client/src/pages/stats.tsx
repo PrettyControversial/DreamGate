@@ -24,6 +24,7 @@ import { achievementSymbols } from "@/data/achievement-symbols";
 import { DreamGateFunctionSymbol } from "@/components/dreamgate-function-symbol";
 import { PsyraArchetypeCard } from "@/components/psyra-archetype-card";
 import { getArchetype } from "@shared/psyra";
+import { buildPsycheProfile } from "@shared/psyche-profile";
 import {
   getJournalMonthCount,
   hasCompletedTarotYear,
@@ -167,32 +168,7 @@ export default function Stats() {
     });
   }, [stats]);
 
-  const psycheProfile = useMemo(() => {
-    const analyses = dreams
-      .map((dream) => readInterpretation(dream.decodedInsights)?.archetypeAnalysis)
-      .filter((analysis): analysis is NonNullable<typeof analysis> => Boolean(analysis));
-    const counts = new Map<string, number>();
-    const dimensions = { shadow: 0, ego: 0, self: 0, persona: 0 };
-    for (const analysis of analyses) {
-      counts.set(
-        analysis.primaryArchetype,
-        (counts.get(analysis.primaryArchetype) ?? 0) + 1,
-      );
-      for (const key of Object.keys(dimensions) as Array<keyof typeof dimensions>) {
-        dimensions[key] += analysis.jungianDimensions[key];
-      }
-    }
-    const dominantId = Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0];
-    const divisor = analyses.length || 1;
-    return {
-      total: analyses.length,
-      dominantId,
-      counts,
-      dimensions: Object.fromEntries(
-        Object.entries(dimensions).map(([key, value]) => [key, value / divisor]),
-      ) as typeof dimensions,
-    };
-  }, [dreams]);
+  const psycheProfile = useMemo(() => buildPsycheProfile(dreams), [dreams]);
 
   const calendarDays = useMemo(() => {
     const year = currentMonth.getFullYear();

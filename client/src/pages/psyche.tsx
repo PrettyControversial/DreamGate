@@ -2,9 +2,10 @@ import { ArrowRight, LockKeyhole, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSubscription } from "@/lib/subscription";
+import { DemoPsycheProfile } from "@/components/demo-psyche-profile";
 
 export default function Psyche() {
-  const { isPremium, openPaywall } = useSubscription();
+  const { isPremium, isDemo, openPaywall } = useSubscription();
 
   return (
     <div className="min-h-screen bg-background px-5 pb-28 pt-10 md:px-8 md:pt-16">
@@ -20,6 +21,7 @@ export default function Psyche() {
           recurring tensions, archetypes, and movements within your inner world.
         </p>
 
+        {isDemo ? <DemoPsycheProfile /> : (
         <Card className="mt-10 overflow-hidden border-primary/25 bg-card">
           <CardContent className="p-0">
             <div className="grid md:grid-cols-[0.85fr_1.15fr]">
@@ -81,6 +83,7 @@ export default function Psyche() {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </div>
   );

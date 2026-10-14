@@ -19,6 +19,8 @@ import {
 import { z } from "zod";
 import { getLunarEventsForYear } from "./lunar-astronomy";
 import { tarotService } from "./tarot";
+import { hasDemoPremium } from "@shared/demo";
+import { seedDemo, validDemoSeedAuthorization } from "./demo-seed";
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   const auth = getAuth(req);
@@ -40,7 +42,33 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Administrator-only maintenance operation, not an authentication bypass.
+  // The body cannot choose a user or email; it can only seed the fixed demo.
+  app.post("/internal/demo/seed", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    if (!process.env.DEMO_SEED_TOKEN) return res.sendStatus(404);
+    if (!validDemoSeedAuthorization(req.get("authorization"), process.env.DEMO_SEED_TOKEN)) {
+      return res.sendStatus(401);
+    }
+    try {
+      res.json(await seedDemo());
+    } catch {
+      console.error("Demo seed failed; credentials and journal contents were not logged.");
+      res.status(500).json({ error: "Demo seed failed. Check demo Secrets and retry; a failed AI batch does not replace the journal." });
+    }
+  });
+
   app.use("/api", requireAuth);
+
+  app.get("/api/account/demo-access", async (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      const user = await clerkClient.users.getUser(currentUserId(res));
+      res.json({ isDemo: hasDemoPremium(user) });
+    } catch {
+      res.status(503).json({ error: "Unable to verify demo access" });
+    }
+  });
 
   app.get("/api/tarot/latest", async (_req, res) => {
     res.setHeader("Cache-Control", "no-store");

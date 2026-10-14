@@ -20,3 +20,9 @@ Premium feature surfaces must use the same entitlement state for access checks a
 **Why:** Showing free-tier messaging after access is granted makes a valid entitlement look blocked and can lead users back into the paywall.
 
 **How to apply:** When a premium state changes, update the gate, explanatory copy, and CTA together. Prefer an explicit active state over leaving the free-tier UI visible.
+
+The App Review demo is an explicit production-only business exception: the verified, fixed demo identity may receive permanent premium access from a server-controlled private account flag. This must never become an email-only check, a public/client-editable flag, or a production development-mock override.
+
+**Why:** The user requires complete screenshots and review access while keeping every real user's paywall and pricing unchanged.
+
+**How to apply:** Grant access through the central entitlement manager, using only an authenticated server decision. Use the real interpretation and profile aggregation pipeline for the demo's ten sample dreams; never hardcode its dominant archetype or dimension percentages. Review login credentials are shared with Apple, so they must never authorize administrative reseeding—keep that authority separate.

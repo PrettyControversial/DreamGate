@@ -8,6 +8,8 @@ import {
   type ReactNode,
 } from "react";
 import { useUser } from "@clerk/react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import {
   isPremiumEntitlement,
   SUBSCRIPTION_CONFIG,
@@ -51,7 +53,8 @@ interface DevelopmentSubscriptionState {
 
 interface SubscriptionContextValue extends DevelopmentSubscriptionState {
   isDevelopmentBuild: boolean;
-  provider: "development-mock" | "storekit";
+  provider: "development-mock" | "storekit" | "demo-account";
+  isDemo: boolean;
   isPremium: boolean;
   freeAskPsyraRemaining: number;
   freeAtlasLocationsRemaining: number;
@@ -185,6 +188,19 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [freeUsage, setFreeUsage] = useState(() => loadFreeUsage(userScope));
   const [paywallRequest, setPaywallRequest] =
     useState<PaywallRequest | null>(null);
+  const { data: demoAccess } = useQuery<{ isDemo: boolean }>({
+    queryKey: ["/api/account/demo-access", userScope],
+    queryFn: async () => (await apiRequest("GET", "/api/account/demo-access")).json(),
+    enabled: Boolean(user),
+    staleTime: 30000,
+    retry: false,
+  });
+  const isDemo = Boolean(user && demoAccess?.isDemo);
+  const entitlement: SubscriptionEntitlement = isDemo ? "PSYRA_PLUS" : developmentState.entitlement;
+
+  useEffect(() => {
+    if (isDemo) setPaywallRequest(null);
+  }, [isDemo]);
 
   useEffect(() => {
     setFreeUsage(loadFreeUsage(userScope));
@@ -214,28 +230,28 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   );
 
   const recordAskPsyraInterpretation = useCallback(() => {
-    if (isPremiumEntitlement(developmentState.entitlement)) {
+    if (isPremiumEntitlement(entitlement)) {
       return;
     }
     updateFreeUsage((current) => ({
       ...current,
       askPsyraCount: current.askPsyraCount + 1,
     }));
-  }, [developmentState.entitlement, updateFreeUsage]);
+  }, [entitlement, updateFreeUsage]);
 
   const recordTarotPull = useCallback(() => {
-    if (isPremiumEntitlement(developmentState.entitlement)) {
+    if (isPremiumEntitlement(entitlement)) {
       return;
     }
     updateFreeUsage((current) => ({
       ...current,
       tarotPullCount: current.tarotPullCount + 1,
     }));
-  }, [developmentState.entitlement, updateFreeUsage]);
+  }, [entitlement, updateFreeUsage]);
 
   const recordAtlasLocation = useCallback(
     (locationName: string) => {
-      if (isPremiumEntitlement(developmentState.entitlement)) {
+      if (isPremiumEntitlement(entitlement)) {
         return;
       }
       updateFreeUsage((current) =>
@@ -248,12 +264,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
             },
       );
     },
-    [developmentState.entitlement, updateFreeUsage],
+    [entitlement, updateFreeUsage],
   );
 
   const recordMeditationSession = useCallback(
     (sessionId: string) => {
-      if (isPremiumEntitlement(developmentState.entitlement)) {
+      if (isPremiumEntitlement(entitlement)) {
         return;
       }
       updateFreeUsage((current) =>
@@ -267,12 +283,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
             },
       );
     },
-    [developmentState.entitlement, updateFreeUsage],
+    [entitlement, updateFreeUsage],
   );
 
   const canAccess = useCallback(
     (feature: SubscriptionFeature) => {
-      if (isPremiumEntitlement(developmentState.entitlement)) return true;
+      if (isPremiumEntitlement(entitlement)) return true;
       if (feature === "askPsyraInterpretation") {
         return freeUsage.askPsyraCount < SUBSCRIPTION_CONFIG.freeAskPsyraLimit;
       }
@@ -293,25 +309,25 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       }
       return false;
     },
-    [developmentState.entitlement, freeUsage],
+    [entitlement, freeUsage],
   );
 
   const canAccessAtlasLocation = useCallback(
     (locationName: string) =>
-      isPremiumEntitlement(developmentState.entitlement) ||
+      isPremiumEntitlement(entitlement) ||
       freeUsage.atlasLocations.includes(locationName) ||
       freeUsage.atlasLocations.length <
         SUBSCRIPTION_CONFIG.freeAtlasLocationLimit,
-    [developmentState.entitlement, freeUsage],
+    [entitlement, freeUsage],
   );
 
   const canAccessMeditationSession = useCallback(
     (sessionId: string) =>
-      isPremiumEntitlement(developmentState.entitlement) ||
+      isPremiumEntitlement(entitlement) ||
       freeUsage.meditationSessions.includes(sessionId) ||
       freeUsage.meditationSessions.length <
         SUBSCRIPTION_CONFIG.freeMeditationSessionLimit,
-    [developmentState.entitlement, freeUsage],
+    [entitlement, freeUsage],
   );
 
   const purchaseSelectedPlan = useCallback(async () => {
@@ -345,9 +361,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const value = useMemo<SubscriptionContextValue>(
     () => ({
       ...developmentState,
+      entitlement,
+      isDemo,
       isDevelopmentBuild,
-      provider: isDevelopmentBuild ? "development-mock" : "storekit",
-      isPremium: isPremiumEntitlement(developmentState.entitlement),
+      provider: isDemo ? "demo-account" : isDevelopmentBuild ? "development-mock" : "storekit",
+      isPremium: isPremiumEntitlement(entitlement),
       freeAskPsyraRemaining: Math.max(
         0,
          SUBSCRIPTION_CONFIG.freeAskPsyraLimit - freeUsage.askPsyraCount,
@@ -380,8 +398,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         updateDevelopmentState({ trialEligible: eligible }),
       purchaseSelectedPlan,
       restorePurchases,
-      paywallRequest,
-      openPaywall: (request = {}) => setPaywallRequest(request),
+      paywallRequest: isDemo ? null : paywallRequest,
+      openPaywall: (request = {}) => { if (!isDemo) setPaywallRequest(request); },
       closePaywall: () => setPaywallRequest(null),
     }),
     [
@@ -389,6 +407,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
        canAccessAtlasLocation,
        canAccessMeditationSession,
       developmentState,
+      entitlement,
+      isDemo,
        freeUsage,
       paywallRequest,
       purchaseSelectedPlan,
