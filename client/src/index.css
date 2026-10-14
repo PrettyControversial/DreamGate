@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep iOS edge-to-edge scrolling behind an opaque system status-bar area.
+   The body offset leaves the initial page content below the native status bar. */
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 2147483647;
+  background: #F6F3EC;
+  pointer-events: none;
+}
+
+/* The welcome page already included this safe-area space in its own layout. */
+.glam-welcome-page,
+.glam-welcome-page .glam-welcome-main {
+  min-height: calc(100dvh - env(safe-area-inset-top, 0px));
+}
+
 /* LIGHT MODE - Warm cream aesthetic inspired by wellness design */
 :root {
   --button-outline: rgba(0,0,0, .08);

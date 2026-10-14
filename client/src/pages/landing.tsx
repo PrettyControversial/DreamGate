@@ -26,7 +26,7 @@ export default function Landing() {
       </video>
       <div className="glam-welcome-overlay" aria-hidden="true" />
 
-      <main className="glam-welcome-main relative z-10 flex min-h-[100dvh] flex-col items-center px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-[env(safe-area-inset-top)] text-center">
+      <main className="glam-welcome-main relative z-10 flex min-h-[100dvh] flex-col items-center px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-center">
         <section className="glam-welcome-copy flex flex-1 flex-col items-center justify-center">
           <img
             src={welcomeSymbol}
