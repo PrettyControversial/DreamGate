@@ -5,6 +5,7 @@
 - [Dream Atlas sketch identity](dream-atlas-sketch-identity.md) — keep a stable, local pencil sketch per recognized place; avoid per-visit generation from private dreams.
 - [DreamGate intro playback](dreamgate-intro-playback.md) — play the pre-home animation once per auth session and again during logout, not on every Home mount.
 - [Psyra interpretation metadata](psyra-interpretation-metadata.md) — keep archetype analysis inside the saved interpretation envelope so old dreams remain readable and profiles aggregate without rereading dream text.
+- [Dream-based Tarot](dream-based-tarot.md) — use the newest dated interpreted dream; retain each spread until a newer dream and never send raw dream text for card selection.
 - [Psyra+ access boundaries](psyra-plus-access-boundaries.md) — keep paywall UI, entitlements, and purchase providers separate; development premium state must never unlock production.
 - [Clerk transport by platform](clerk-platform-auth-transport.md) — browsers use Clerk session cookies; native Capacitor webviews use bearer tokens for API requests.
 - [Managed Clerk environment sync](clerk-managed-env-sync.md) — resync managed Clerk keys for session redirect loops; never hand-edit the coordinated secrets.

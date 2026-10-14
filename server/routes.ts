@@ -18,6 +18,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { getLunarEventsForYear } from "./lunar-astronomy";
+import { tarotService } from "./tarot";
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   const auth = getAuth(req);
@@ -40,6 +41,26 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   app.use("/api", requireAuth);
+
+  app.get("/api/tarot/latest", async (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      res.json(await tarotService.context(currentUserId(res)));
+    } catch {
+      res.status(503).json({ error: "Dream-based Tarot is temporarily unavailable" });
+    }
+  });
+
+  app.post("/api/tarot/pull", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    const input = z.object({ spreadId: z.enum(["single", "past-present-future", "dream"]) }).safeParse(req.body);
+    if (!input.success) return res.status(400).json({ error: "Unknown Tarot spread" });
+    try {
+      res.json(await tarotService.draw(currentUserId(res), input.data.spreadId));
+    } catch {
+      res.status(503).json({ error: "Dream-based Tarot is temporarily unavailable" });
+    }
+  });
 
   app.delete("/api/account", async (_req, res) => {
     const userId = currentUserId(res);

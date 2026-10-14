@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useUser } from "@clerk/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { TAROT_POSITIONS, type TarotSpreadId, type DreamTarotPull, type TarotContext } from "@shared/tarot";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -332,28 +337,53 @@ interface TarotReading {
   date: string;
   spreadType: string;
   cards: { cardId: number; cardName: string; reversed: boolean; position: string }[];
+  dreamId?: string;
 }
 
-function getReadingHistory(): TarotReading[] {
+function getReadingHistory(userId: string): TarotReading[] {
   try {
-    const data = localStorage.getItem('tarot_history');
-    if (data) return JSON.parse(data);
+    const data = localStorage.getItem(`tarot_history:${userId}`);
+    if (data && Array.isArray(JSON.parse(data))) return JSON.parse(data);
   } catch {}
   return [];
 }
 
-function saveReading(reading: TarotReading) {
-  const history = getReadingHistory();
-  history.unshift(reading);
-  const trimmed = history.slice(0, 10);
-  localStorage.setItem('tarot_history', JSON.stringify(trimmed));
-  recordTarotJourneyStart(reading.date);
-  
-  const count = parseInt(localStorage.getItem('tarotReadings') || '0');
-  localStorage.setItem('tarotReadings', String(count + 1));
+function saveReading(userId: string, reading: TarotReading) {
+  try {
+    const history = getReadingHistory(userId);
+    history.unshift(reading);
+    const trimmed = history.slice(0, 10);
+    localStorage.setItem(`tarot_history:${userId}`, JSON.stringify(trimmed));
+    recordTarotJourneyStart(reading.date);
+
+    const count = parseInt(localStorage.getItem('tarotReadings') || '0');
+    localStorage.setItem('tarotReadings', String(count + 1));
+  } catch {
+    // The server's saved spread remains available if local history is blocked.
+    console.warn("Local Tarot history is unavailable.");
+  }
 }
 
 export default function Tarot() {
+  const { user, isLoaded } = useUser();
+  if (!isLoaded) return <p role="status">Opening Tarot…</p>;
+  if (!user) return <p>Please sign in to open Tarot.</p>;
+  // Account changes remount every piece of private reading state.
+  return <UserTarot key={user.id} userId={user.id} />;
+}
+
+type DrawnCard = { card: TarotCard; reversed: boolean; position: string; reason?: string };
+
+function cardsForPull(pull: DreamTarotPull): DrawnCard[] {
+  return pull.cards.map(selection => {
+    const card = majorArcana.find(item => item.id === selection.card_id);
+    if (!card) throw new Error("Unavailable Tarot card");
+    return { card, reversed: selection.reversed, position: selection.position, reason: selection.reason };
+  });
+}
+
+function UserTarot({ userId }: { userId: string }) {
+  const queryClient = useQueryClient();
   const {
     canAccess,
     freeTarotPullsRemaining,
@@ -362,20 +392,68 @@ export default function Tarot() {
     recordTarotPull,
   } = useSubscription();
   const [selectedSpread, setSelectedSpread] = useState<string | null>(null);
-  const [drawnCards, setDrawnCards] = useState<{ card: TarotCard; reversed: boolean; position: string }[]>([]);
+  const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([]);
+  const [currentPull, setCurrentPull] = useState<DreamTarotPull | null>(null);
+  const [isChoosing, setIsChoosing] = useState(false);
+  const pending = useRef(false);
+  const interacted = useRef(false);
+  const mounted = useRef(true);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const latestId = useRef<string | null | undefined>(undefined);
+  const { data: context, isLoading: isLoadingContext } = useQuery<TarotContext>({
+    queryKey: ["/api/tarot/latest", userId],
+    queryFn: async () => (await apiRequest("GET", "/api/tarot/latest")).json(),
+    staleTime: 0,
+    retry: false,
+    refetchOnWindowFocus: true,
+  });
   const [isRevealing, setIsRevealing] = useState(false);
   const [revealedCount, setRevealedCount] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   const [readingHistory, setReadingHistory] = useState<TarotReading[]>([]);
 
   useEffect(() => {
+    mounted.current = true;
     const entry = consumeTarotEntrySource();
     trackEvent("tarot_opened", entry);
-    setReadingHistory(getReadingHistory());
-  }, []);
+    setReadingHistory(getReadingHistory(userId));
+    return () => {
+      mounted.current = false;
+      timers.current.forEach(clearTimeout);
+    };
+  }, [userId]);
 
-  const shuffleAndDraw = (spreadId: string) => {
-    if (!isPremium && !canAccess("premiumTarot")) {
+  useEffect(() => {
+    if (!context || pending.current) return;
+    const nextId = context.dream?.id ?? null;
+    if (latestId.current !== undefined && latestId.current !== nextId) {
+      timers.current.forEach(clearTimeout);
+      setSelectedSpread(null);
+      setDrawnCards([]);
+      setCurrentPull(null);
+      setRevealedCount(0);
+      setIsRevealing(false);
+      interacted.current = false;
+    }
+    latestId.current = nextId;
+    if (!interacted.current && context.savedPull) {
+      try {
+        const cards = cardsForPull(context.savedPull);
+        setSelectedSpread(context.savedPull.spreadId);
+        setCurrentPull(context.savedPull);
+        setDrawnCards(cards);
+        setRevealedCount(cards.length);
+        setIsRevealing(false);
+      } catch {
+        setCurrentPull(null);
+      }
+    }
+  }, [context]);
+
+  const shuffleAndDraw = async (spreadId: string) => {
+    if (pending.current || isRevealing || isLoadingContext) return;
+    const savedPull = context?.pulls[spreadId as TarotSpreadId];
+    if (!savedPull && !isPremium && !canAccess("premiumTarot")) {
       openPaywall({
         feature: "premiumTarot",
         eyebrow: "Psyra+ Tarot",
@@ -388,30 +466,56 @@ export default function Tarot() {
 
     const spread = spreadTypes.find(s => s.id === spreadId);
     if (!spread) return;
-
+    pending.current = true;
+    interacted.current = true;
+    setIsChoosing(true);
+    let pull: DreamTarotPull;
+    let drawn: DrawnCard[];
+    try {
+      pull = await (await apiRequest("POST", "/api/tarot/pull", { spreadId })).json();
+      drawn = cardsForPull(pull);
+      if (pull.dream) {
+        const cached = { ...pull, cached: true };
+        queryClient.setQueryData<TarotContext>(["/api/tarot/latest", userId], previous => ({
+          dream: pull.dream, savedPull: cached,
+          pulls: {
+            ...(previous && previous.dream?.id === pull.dream?.id ? previous.pulls : {}),
+            [spreadId]: cached,
+          },
+        }));
+      }
+    } catch {
+      if (savedPull) {
+        pull = savedPull;
+        drawn = cardsForPull(pull);
+      } else {
+      const shuffled = [...majorArcana].sort(() => Math.random() - 0.5);
+      const cards = TAROT_POSITIONS[spreadId as TarotSpreadId].map((position, index) => ({
+        position, card_id: shuffled[index].id, reversed: Math.random() > 0.7, reason: "",
+      }));
+      pull = {
+        spreadId: spreadId as TarotSpreadId, cards, source: "random",
+        dream: null, cached: false, createdAt: new Date().toISOString(),
+      };
+      drawn = cardsForPull(pull);
+      }
+    } finally {
+      pending.current = false;
+      if (mounted.current) setIsChoosing(false);
+    }
+    if (!mounted.current) return;
+    timers.current.forEach(clearTimeout);
+    setCurrentPull(pull);
     setSelectedSpread(spreadId);
-    setIsRevealing(true);
-    setRevealedCount(0);
-    
-    const shuffled = [...majorArcana].sort(() => Math.random() - 0.5);
-    const positions = spreadId === "single" 
-      ? ["Your Message"]
-      : spreadId === "past-present-future"
-      ? ["Past", "Present", "Future"]
-      : ["The Symbol", "The Shadow", "The Guidance"];
-    
-    const drawn = shuffled.slice(0, spread.cards).map((card, index) => ({
-      card,
-      reversed: Math.random() > 0.7,
-      position: positions[index]
-    }));
-
+    setIsRevealing(!pull.cached);
+    setRevealedCount(pull.cached ? drawn.length : 0);
     setDrawnCards(drawn);
 
     const reading: TarotReading = {
       id: Date.now().toString(),
       date: new Date().toISOString(),
       spreadType: spreadId,
+      dreamId: pull.dream?.id,
       cards: drawn.map(d => ({
         cardId: d.card.id,
         cardName: d.card.name,
@@ -419,30 +523,36 @@ export default function Tarot() {
         position: d.position
       }))
     };
-    saveReading(reading);
-    recordTarotPull();
-    trackEvent("tarot_card_drawn", {
-      spread: spreadId,
-      card_count: drawn.length,
-      reversed_count: drawn.filter((card) => card.reversed).length,
-      tool_id: "tarot",
-    });
-    trackDiscoverToolCompleted(["tarot", "tarot-101"], "card_drawn");
-    setReadingHistory(getReadingHistory());
+    if (!pull.cached) {
+      saveReading(userId, reading);
+      recordTarotPull();
+      trackEvent("tarot_card_drawn", {
+        spread: spreadId,
+        card_count: drawn.length,
+        reversed_count: drawn.filter((card) => card.reversed).length,
+        tool_id: "tarot",
+      });
+      trackDiscoverToolCompleted(["tarot", "tarot-101"], "card_drawn");
+      setReadingHistory(getReadingHistory(userId));
+    }
 
+    if (pull.cached) return;
     drawn.forEach((_, index) => {
-      setTimeout(() => {
-        setRevealedCount(prev => prev + 1);
+      timers.current.push(setTimeout(() => {
+        setRevealedCount(index + 1);
         if (index === drawn.length - 1) {
-          setTimeout(() => setIsRevealing(false), 500);
+          timers.current.push(setTimeout(() => setIsRevealing(false), 500));
         }
-      }, (index + 1) * 800);
+      }, (index + 1) * 800));
     });
   };
 
   const resetReading = () => {
+    interacted.current = true;
+    timers.current.forEach(clearTimeout);
     setSelectedSpread(null);
     setDrawnCards([]);
+    setCurrentPull(null);
     setRevealedCount(0);
     setIsRevealing(false);
   };
@@ -500,6 +610,33 @@ export default function Tarot() {
       </div>
 
       <div className="px-6 md:px-8 max-w-4xl mx-auto space-y-8">
+        {(currentPull?.dream ?? context?.dream) && (
+          <Link
+            href={`/decoder/${(currentPull?.dream ?? context?.dream)!.id}`}
+            className="block text-sm text-muted-foreground underline underline-offset-4"
+            data-testid="link-tarot-source-dream"
+          >
+            {currentPull?.source === "dream" ? "Drawn from your dream: " : "Your latest interpreted dream: "}
+            {(currentPull?.dream ?? context?.dream)!.title}
+          </Link>
+        )}
+        {(isChoosing || isLoadingContext) && (
+          <p role="status" className="text-sm text-muted-foreground">
+            {isChoosing ? "Choosing cards from your dream…" : "Opening your saved dream pull…"}
+          </p>
+        )}
+        {!isLoadingContext && !context?.dream && !currentPull && (
+          <p className="text-sm text-muted-foreground">
+            Interpret a dream to draw cards connected to it. Until then, your pulls are random.
+          </p>
+        )}
+        {currentPull?.source === "random" && (
+          <p role="status" className="text-sm text-muted-foreground" data-testid="text-tarot-fallback">
+            {currentPull.dream
+              ? "Dream-based selection was unavailable. This random pull has been saved for this dream."
+              : "This is a random pull. Dream-based selection needs a saved interpretation and a connection."}
+          </p>
+        )}
         {!selectedSpread ? (
           <div className="space-y-6">
             <Card className="bg-card border-border">
@@ -550,8 +687,9 @@ export default function Tarot() {
                 <Button
                   variant="outline"
                   className="shrink-0"
+                  disabled={isChoosing || isLoadingContext}
                   onClick={() => {
-                    if (isPremium) {
+                    if (isPremium || context?.pulls.single) {
                       shuffleAndDraw("single");
                       return;
                     }
@@ -565,7 +703,7 @@ export default function Tarot() {
                   }}
                   data-testid={isPremium ? "button-start-tarot" : "button-unlock-tarot"}
                 >
-                  {isPremium ? "Draw a Card" : "Unlock Tarot"}
+                  {context?.pulls.single ? "Open Saved Card" : isPremium ? "Draw a Card" : "Unlock Tarot"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
@@ -577,6 +715,15 @@ export default function Tarot() {
                   key={spread.id}
                   className="cursor-pointer hover-elevate overflow-visible transition-all border-border hover:border-primary/50"
                   onClick={() => shuffleAndDraw(spread.id)}
+                  role="button"
+                  tabIndex={isChoosing || isLoadingContext ? -1 : 0}
+                  aria-disabled={isChoosing || isLoadingContext}
+                  onKeyDown={event => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      void shuffleAndDraw(spread.id);
+                    }
+                  }}
                   data-testid={`card-spread-${spread.id}`}
                 >
                   <CardContent className="p-6">
@@ -675,7 +822,7 @@ export default function Tarot() {
               <h2 className="font-display text-xl font-semibold text-foreground">
                 {spreadTypes.find(s => s.id === selectedSpread)?.name}
               </h2>
-              <Button variant="outline" size="sm" onClick={resetReading} data-testid="button-new-reading">
+              <Button variant="outline" size="sm" onClick={resetReading} disabled={isChoosing || isRevealing} data-testid="button-new-reading">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 New Reading
               </Button>
@@ -782,7 +929,7 @@ export default function Tarot() {
                         Dream Connection
                       </h4>
                       <p className="text-foreground/90 leading-relaxed">
-                        {drawn.card.dreamConnection}
+                        {drawn.reason || drawn.card.dreamConnection}
                       </p>
                     </div>
 
@@ -902,7 +1049,7 @@ export default function Tarot() {
                               Dream Connection
                             </p>
                             <p className="text-sm text-foreground/90 leading-relaxed">
-                              {drawn.card.dreamConnection}
+                        {drawn.reason || drawn.card.dreamConnection}
                             </p>
                           </div>
 
