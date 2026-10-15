@@ -22,6 +22,24 @@ export const DEMO_DREAMS = [
   ["The Owl at the Window", "A white owl tapped on my bedroom window at midnight. When I opened it, the owl dropped a folded letter in my hand."],
 ] as const;
 
+export type DemoSeedPhase =
+  | "validate_secrets"
+  | "lookup_demo_account"
+  | "create_demo_account"
+  | "verify_demo_email"
+  | "verify_demo_identity"
+  | "interpret_demo_dreams"
+  | "replace_demo_journal"
+  | "build_archetype_profile"
+  | "grant_demo_access";
+
+export class DemoSeedFailure extends Error {
+  constructor(readonly phase: DemoSeedPhase) {
+    super("Demo seed failed");
+    this.name = "DemoSeedFailure";
+  }
+}
+
 export function validDemoSeedAuthorization(header: string | undefined, secret: string | undefined): boolean {
   if (!secret || secret.length < 32 || !header?.startsWith("Bearer ")) return false;
   const hash = (value: string) => createHash("sha256").update(value).digest();
@@ -78,56 +96,74 @@ export async function seedDemoContentForIdentity(
     interpret: (content: string) => Promise<EnhancedDreamInterpretation>;
     replaceJournal: (userId: string, samples: InsertDream[]) => Promise<Dream[]>;
     grantPremium: (userId: string) => Promise<void>;
+    onPhase?: (phase: DemoSeedPhase) => void;
   },
   now = new Date(),
 ) {
+  operations.onPhase?.("verify_demo_identity");
   if (!hasVerifiedDemoEmail(user)) throw new Error("Refusing to seed a non-demo identity");
+  operations.onPhase?.("interpret_demo_dreams");
   const samples = await generateDemoDreams(operations.interpret, now);
+  operations.onPhase?.("replace_demo_journal");
   const seeded = await operations.replaceJournal(user.id, samples);
   if (seeded.some(dream => dream.userId !== user.id)) throw new Error("Seed ownership mismatch");
+  operations.onPhase?.("build_archetype_profile");
   const report = describeDemoProfile(seeded);
+  operations.onPhase?.("grant_demo_access");
   await operations.grantPremium(user.id);
   return report;
 }
 
 async function runSeed() {
-  const password = process.env.DEMO_PASSWORD;
-  if (!password || password.length < 16) throw new Error("Set a strong DEMO_PASSWORD in Secrets before seeding");
-  if (password === process.env.DEMO_SEED_TOKEN) throw new Error("Demo login and administrator seed secrets must be different");
-  const candidates = await clerkClient.users.getUserList({ emailAddress: [DEMO_EMAIL] });
-  if (candidates.data.length > 1) throw new Error("Ambiguous demo identity; refusing to seed");
-  let user = candidates.data[0];
-  if (user) {
-    const primary = user.emailAddresses.find(email => email.id === user.primaryEmailAddressId);
-    if (primary?.emailAddress.toLowerCase() !== DEMO_EMAIL) {
-      throw new Error("Demo email is not the primary email; refusing to touch this account");
-    }
-  } else {
-    user = await clerkClient.users.createUser({
-      emailAddress: [DEMO_EMAIL], password, firstName: "Luna",
-    });
-  }
-  const primary = user.emailAddresses.find(email => email.id === user.primaryEmailAddressId);
-  if (!primary || primary.emailAddress.toLowerCase() !== DEMO_EMAIL) throw new Error("Unexpected demo identity");
-  if (primary.verification?.status !== "verified") {
-    await clerkClient.emailAddresses.updateEmailAddress(primary.id, { verified: true });
-  }
-  user = await clerkClient.users.getUser(user.id);
-  if (!hasVerifiedDemoEmail(user)) throw new Error("Demo email verification failed");
+  let phase: DemoSeedPhase = "validate_secrets";
+  try {
+    const password = process.env.DEMO_PASSWORD;
+    if (!password || password.length < 16) throw new Error("Demo password secret is invalid");
+    if (password === process.env.DEMO_SEED_TOKEN) throw new Error("Demo secrets must be different");
 
-  return seedDemoContentForIdentity(user, {
-    interpret: content => storage.enhancedDecodeDream(content),
-    replaceJournal: (userId, samples) => db.transaction(async tx => {
-      // This fixed, verified identity is the ONLY account this operation resets.
-      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
-      await tx.delete(dreams).where(eq(dreams.userId, userId));
-      return tx.insert(dreams).values(samples.map(sample => ({ ...sample, userId }))).returning();
-    }),
-    grantPremium: async userId => {
-      await clerkClient.users.updateUser(userId, { firstName: "Luna", password });
-      await clerkClient.users.updateUserMetadata(userId, { privateMetadata: { is_demo: true } });
-    },
-  });
+    phase = "lookup_demo_account";
+    const candidates = await clerkClient.users.getUserList({ emailAddress: [DEMO_EMAIL] });
+    if (candidates.data.length > 1) throw new Error("Ambiguous demo identity");
+    let user = candidates.data[0];
+    if (!user) {
+      phase = "create_demo_account";
+      user = await clerkClient.users.createUser({
+        emailAddress: [DEMO_EMAIL], password, firstName: "Luna",
+      });
+    }
+
+    phase = "verify_demo_email";
+    const primary = user.emailAddresses.find(email => email.id === user.primaryEmailAddressId);
+    if (!primary || primary.emailAddress.toLowerCase() !== DEMO_EMAIL) {
+      throw new Error("Unexpected demo identity");
+    }
+    if (primary.verification?.status !== "verified") {
+      await clerkClient.emailAddresses.updateEmailAddress(primary.id, { verified: true });
+    }
+    user = await clerkClient.users.getUser(user.id);
+    phase = "verify_demo_identity";
+    if (!hasVerifiedDemoEmail(user)) throw new Error("Demo email verification failed");
+
+    return await seedDemoContentForIdentity(user, {
+      interpret: content => storage.enhancedDecodeDream(content),
+      replaceJournal: (userId, samples) => db.transaction(async tx => {
+        // This fixed, verified identity is the ONLY account this operation resets.
+        await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
+        await tx.delete(dreams).where(eq(dreams.userId, userId));
+        return tx.insert(dreams).values(samples.map(sample => ({ ...sample, userId }))).returning();
+      }),
+      grantPremium: async userId => {
+        await clerkClient.users.updateUser(userId, { firstName: "Luna", password });
+        await clerkClient.users.updateUserMetadata(userId, { privateMetadata: { is_demo: true } });
+      },
+      onPhase: nextPhase => {
+        phase = nextPhase;
+      },
+    });
+  } catch {
+    console.error(`Demo seed failed at phase=${phase}; credentials and journal contents were not logged.`);
+    throw new DemoSeedFailure(phase);
+  }
 }
 
 export function seedDemo() {

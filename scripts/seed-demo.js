@@ -15,6 +15,21 @@ const response = await fetch(new URL("/internal/demo/seed", url), {
   redirect: "error",
 });
 if (!response.ok) {
-  throw new Error(`Demo seed failed (${response.status}). Confirm the new code and demo secrets are published. No account password is returned.`);
+  const body = await response.json().catch(() => null);
+  const allowedPhases = new Set([
+    "validate_secrets",
+    "lookup_demo_account",
+    "create_demo_account",
+    "verify_demo_email",
+    "verify_demo_identity",
+    "interpret_demo_dreams",
+    "replace_demo_journal",
+    "build_archetype_profile",
+    "grant_demo_access",
+    "unknown",
+  ]);
+  const phase =
+    body && allowedPhases.has(body.phase) ? body.phase : "unknown";
+  throw new Error(`Demo seed failed (${response.status}, phase: ${phase}). No credentials or journal contents were returned.`);
 }
 console.log(JSON.stringify(await response.json(), null, 2));

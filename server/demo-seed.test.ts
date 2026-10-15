@@ -118,9 +118,12 @@ test("non-demo identities and incomplete AI output cannot seed a journal or gran
   await assert.rejects(seedDemoContentForIdentity({
     ...identity, primaryEmailAddressId: null,
   }, operations));
+  const failedPhases: string[] = [];
   await assert.rejects(seedDemoContentForIdentity(identity, {
     ...operations, interpret: async () => { throw new Error("AI unavailable"); },
+    onPhase: phase => { failedPhases.push(phase); },
   }));
+  assert.deepEqual(failedPhases, ["verify_demo_identity", "interpret_demo_dreams"]);
   assert.equal(writes, 0);
   assert.equal(grants, 0);
 });

@@ -20,7 +20,11 @@ import { z } from "zod";
 import { getLunarEventsForYear } from "./lunar-astronomy";
 import { tarotService } from "./tarot";
 import { hasDemoPremium } from "@shared/demo";
-import { seedDemo, validDemoSeedAuthorization } from "./demo-seed";
+import {
+  DemoSeedFailure,
+  seedDemo,
+  validDemoSeedAuthorization,
+} from "./demo-seed";
 import {
   hasAcceptedDreamAiConsent,
   withDreamAiConsent,
@@ -67,9 +71,11 @@ export async function registerRoutes(
     }
     try {
       res.json(await seedDemo());
-    } catch {
-      console.error("Demo seed failed; credentials and journal contents were not logged.");
-      res.status(500).json({ error: "Demo seed failed. Check demo Secrets and retry; a failed AI batch does not replace the journal." });
+    } catch (error) {
+      const phase =
+        error instanceof DemoSeedFailure ? error.phase : "unknown";
+      console.error(`Demo seed failed at phase=${phase}; sensitive data was not logged.`);
+      res.status(500).json({ error: "Demo seed failed", phase });
     }
   });
 
