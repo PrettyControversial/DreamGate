@@ -5,6 +5,7 @@ import { trackDiscoverToolCompleted, trackEvent } from "@/lib/analytics";
 import { setMeditationMediaSession } from "@/lib/meditation-media-session";
 import { useSubscription } from "@/lib/subscription";
 import { Button } from "@/components/ui/button";
+import { PAYWALL_ENABLED } from "@shared/subscription";
 
 import dreamSymbolAudio from "@assets/dreamgate_meditations/meeting-the-dream-symbol.m4a";
 import shadowSelfAudio from "@assets/dreamgate_meditations/meeting-the-shadow-self.m4a";
@@ -260,7 +261,7 @@ export default function Meditation() {
           </div>
         </header>
 
-        {!isPremium && (
+        {PAYWALL_ENABLED && !isPremium && (
           <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" />

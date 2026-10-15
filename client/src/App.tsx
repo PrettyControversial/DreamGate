@@ -66,6 +66,7 @@ import {
   readSecureClerkClientToken,
 } from "@/lib/clerk-secure-storage";
 import { Button } from "@/components/ui/button";
+import { PAYWALL_ENABLED } from "@shared/subscription";
 import {
   Sheet,
   SheetClose,
@@ -93,6 +94,7 @@ import discoverSymbol from "@assets/dreamgate_symbols/footer/discover.webp";
 import drawerSymbol from "@assets/dreamgate_symbols/background/62.webp";
 
 const Landing = lazy(() => import("@/pages/landing"));
+const PrivacyPolicy = lazy(() => import("@/pages/privacy-policy"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const importDashboard = () => import("@/pages/dashboard");
 const Dashboard = lazy(importDashboard);
@@ -1732,7 +1734,7 @@ function AuthenticatedApp() {
           </main>
           <div className="dreamgate-bottom-nav-spacer shrink-0" aria-hidden="true" />
           <BottomNav />
-          {paywallRequest !== null && (
+          {PAYWALL_ENABLED && paywallRequest !== null && (
             <Suspense fallback={null}>
               <PsyraPaywall
                 open
@@ -1807,6 +1809,7 @@ function Router() {
       {import.meta.env.DEV && (
         <Route path="/dev/descent-preview" component={DevDescentPreview} />
       )}
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/" component={HomeRedirect} />
       <Route path="/sign-in/forgot-password/*?" component={ForgotPasswordPage} />
       <Route path="/sign-in/*?" component={SignInPage} />

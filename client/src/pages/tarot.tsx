@@ -16,6 +16,7 @@ import {
   trackEvent,
 } from "@/lib/analytics";
 import { recordTarotJourneyStart } from "@/lib/achievements";
+import { PAYWALL_ENABLED } from "@shared/subscription";
 
 interface TarotCard {
   id: number;
@@ -666,29 +667,52 @@ function UserTarot({ userId }: { userId: string }) {
             <Card className="border-primary/25 bg-primary/5">
               <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
-                  <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  {PAYWALL_ENABLED && (
+                    <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  )}
                   <div>
                     <p className="font-medium">
-                      {isPremium
-                        ? "Psyra+ Tarot is unlocked"
-                        : "Tarot readings are part of Psyra+"}
+                      {!PAYWALL_ENABLED
+                        ? "Tarot readings are available"
+                        : isPremium
+                          ? "Psyra+ Tarot is unlocked"
+                          : "Tarot readings are part of Psyra+"}
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {isPremium
-                        ? "Mock Psyra+ is active. You can pull from the Major Arcana."
-                        : freeTarotPullsRemaining > 0
-                        ? `${freeTarotPullsRemaining} free ${
-                            freeTarotPullsRemaining === 1 ? "pull" : "pulls"
-                          } remain.`
-                        : "Your free pulls are complete. Unlock the full Tarot practice."}
+                      {!PAYWALL_ENABLED
+                        ? isPremium
+                          ? "Choose a spread to begin a reflection."
+                          : freeTarotPullsRemaining > 0
+                            ? `${freeTarotPullsRemaining} free ${
+                                freeTarotPullsRemaining === 1 ? "pull" : "pulls"
+                              } remain.`
+                            : "Your free Tarot pulls are complete."
+                        : isPremium
+                          ? "Mock Psyra+ is active. You can pull from the Major Arcana."
+                          : freeTarotPullsRemaining > 0
+                            ? `${freeTarotPullsRemaining} free ${
+                                freeTarotPullsRemaining === 1 ? "pull" : "pulls"
+                              } remain.`
+                            : "Your free pulls are complete. Unlock the full Tarot practice."}
                     </p>
                   </div>
                 </div>
                 <Button
                   variant="outline"
                   className="shrink-0"
-                  disabled={isChoosing || isLoadingContext}
+                  disabled={
+                    isChoosing ||
+                    isLoadingContext ||
+                    (!PAYWALL_ENABLED &&
+                      !isPremium &&
+                      freeTarotPullsRemaining === 0 &&
+                      !context?.pulls.single)
+                  }
                   onClick={() => {
+                    if (!PAYWALL_ENABLED && !isPremium) {
+                      shuffleAndDraw("single");
+                      return;
+                    }
                     if (isPremium || context?.pulls.single) {
                       shuffleAndDraw("single");
                       return;
@@ -701,9 +725,17 @@ function UserTarot({ userId }: { userId: string }) {
                         "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
                     });
                   }}
-                  data-testid={isPremium ? "button-start-tarot" : "button-unlock-tarot"}
+                  data-testid={
+                    isPremium || !PAYWALL_ENABLED
+                      ? "button-start-tarot"
+                      : "button-unlock-tarot"
+                  }
                 >
-                  {context?.pulls.single ? "Open Saved Card" : isPremium ? "Draw a Card" : "Unlock Tarot"}
+                  {context?.pulls.single
+                    ? "Open Saved Card"
+                    : isPremium || !PAYWALL_ENABLED
+                      ? "Draw a Card"
+                      : "Unlock Tarot"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>

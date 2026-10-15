@@ -21,6 +21,10 @@ import { getLunarEventsForYear } from "./lunar-astronomy";
 import { tarotService } from "./tarot";
 import { hasDemoPremium } from "@shared/demo";
 import { seedDemo, validDemoSeedAuthorization } from "./demo-seed";
+import {
+  hasAcceptedDreamAiConsent,
+  withDreamAiConsent,
+} from "@shared/ai-dream-consent";
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   const auth = getAuth(req);
@@ -36,6 +40,17 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
 
 function currentUserId(res: Response): string {
   return res.locals.userId as string;
+}
+
+async function requireDreamAiConsent(userId: string, res: Response): Promise<boolean> {
+  try {
+    const user = await clerkClient.users.getUser(userId);
+    if (hasAcceptedDreamAiConsent(user.privateMetadata)) return true;
+    res.status(428).json({ error: "AI_CONSENT_REQUIRED" });
+  } catch {
+    res.status(503).json({ error: "Unable to verify AI consent" });
+  }
+  return false;
 }
 
 export async function registerRoutes(
@@ -67,6 +82,41 @@ export async function registerRoutes(
       res.json({ isDemo: hasDemoPremium(user) });
     } catch {
       res.status(503).json({ error: "Unable to verify demo access" });
+    }
+  });
+
+  app.get("/api/account/ai-dream-consent", async (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      const user = await clerkClient.users.getUser(currentUserId(res));
+      res.json({
+        consented: hasAcceptedDreamAiConsent(user.privateMetadata),
+      });
+    } catch {
+      res.status(503).json({ error: "Unable to check AI consent" });
+    }
+  });
+
+  app.post("/api/account/ai-dream-consent", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    const acceptance = z.object({ accepted: z.literal(true) }).safeParse(req.body);
+    if (!acceptance.success) {
+      return res.status(400).json({ error: "Consent must be explicitly accepted" });
+    }
+
+    try {
+      const userId = currentUserId(res);
+      const user = await clerkClient.users.getUser(userId);
+      if (!hasAcceptedDreamAiConsent(user.privateMetadata)) {
+        const privateMetadata = withDreamAiConsent(
+          user.privateMetadata,
+          new Date().toISOString(),
+        );
+        await clerkClient.users.updateUserMetadata(userId, { privateMetadata });
+      }
+      res.json({ consented: true });
+    } catch {
+      res.status(503).json({ error: "Unable to save AI consent" });
     }
   });
 
@@ -305,6 +355,7 @@ export async function registerRoutes(
 
   app.post("/api/dreams/decode", async (req, res) => {
     try {
+      if (!(await requireDreamAiConsent(currentUserId(res), res))) return;
       const { content, moonPhase } = req.body;
       if (!content) {
         return res.status(400).json({ error: "Dream content is required" });
@@ -320,6 +371,7 @@ export async function registerRoutes(
 
   app.post("/api/dreams/enhanced-decode", async (req, res) => {
     try {
+      if (!(await requireDreamAiConsent(currentUserId(res), res))) return;
       const { content } = req.body;
       if (!content) {
         return res.status(400).json({ error: "Dream content is required" });
@@ -335,6 +387,7 @@ export async function registerRoutes(
   app.post("/api/dreams/:id/enhanced-decode", async (req, res) => {
     try {
       const userId = currentUserId(res);
+      if (!(await requireDreamAiConsent(userId, res))) return;
       const dream = await storage.getDream(userId, req.params.id);
       if (!dream) {
         return res.status(404).json({ error: "Dream not found" });

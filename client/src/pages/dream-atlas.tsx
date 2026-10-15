@@ -5,6 +5,7 @@ import { ArrowRight, ChevronDown, LockKeyhole, MapPin, Search } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { RecurringLocationSketch } from "@/components/recurring-location-sketch";
 import { useSubscription } from "@/lib/subscription";
+import { PAYWALL_ENABLED } from "@shared/subscription";
 import type { Dream } from "@shared/schema";
 import atlasBackground from "@assets/dream-atlas-background.webp";
 
@@ -208,7 +209,7 @@ export default function DreamAtlas() {
         </div>
       </header>
 
-      {!isPremium && (
+      {PAYWALL_ENABLED && !isPremium && (
         <section className="mx-auto mb-7 flex max-w-4xl flex-col gap-4 rounded-2xl border border-[#85765f]/35 bg-[#f6f3ec]/75 p-5 text-[#2d2924] shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0" />
@@ -284,10 +285,10 @@ export default function DreamAtlas() {
                   className="atlas-record__summary"
                   onClick={() => openLocationRecord(record.name)}
                   aria-expanded={isOpen}
-                  aria-label={`${isOpen ? "Close" : "Open"} ${record.name}${isLocked ? " (Psyra+)" : ""}`}
+                  aria-label={`${isOpen ? "Close" : "Open"} ${record.name}${PAYWALL_ENABLED && isLocked ? " (Psyra+)" : ""}`}
                 >
                   <RecurringLocationSketch location={record.name} className="atlas-record__image" />
-                  <span className="atlas-record__summary-copy"><strong>{record.name} {isLocked && <LockKeyhole aria-hidden="true" className="inline-block h-3.5 w-3.5 align-[-0.1em]" />}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
+                  <span className="atlas-record__summary-copy"><strong>{record.name} {PAYWALL_ENABLED && isLocked && <LockKeyhole aria-hidden="true" className="inline-block h-3.5 w-3.5 align-[-0.1em]" />}</strong><b>{record.dreams.length} {record.dreams.length === 1 ? "dream" : "dreams"}</b><small>{dates.join(" · ")}</small></span>
                   <ChevronDown aria-hidden="true" />
                 </button>
                 <p className="atlas-record__story">An evolving storyline from the dreams that took place here, in the order they were remembered.</p>

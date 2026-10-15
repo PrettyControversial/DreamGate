@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useUser } from "@clerk/react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link, useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -12,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/lib/subscription";
+import { AiDreamConsentDialog } from "@/components/ai-dream-consent-dialog";
+import { FREE_AI_LIMIT_MESSAGE, PAYWALL_ENABLED } from "@shared/subscription";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import {
   trackDiscoverToolCompleted,
@@ -117,6 +120,7 @@ function HeroSection() {
 
 export default function DreamDecoder() {
   const params = useParams<{ id: string }>();
+  const { user } = useUser();
   const { toast } = useToast();
   const [insights, setInsights] = useState("");
   const [interpretation, setInterpretation] = useState<EnhancedDreamInterpretation | null>(null);
@@ -124,25 +128,92 @@ export default function DreamDecoder() {
   const [archetypeRevealed, setArchetypeRevealed] = useState(false);
   const [newDreamTitle, setNewDreamTitle] = useState("");
   const [newDreamContent, setNewDreamContent] = useState("");
+  const [isAiConsentOpen, setIsAiConsentOpen] = useState(false);
+  const [isSavingAiConsent, setIsSavingAiConsent] = useState(false);
+  const pendingInterpretationRef = useRef<(() => void) | null>(null);
   const [, navigate] = useLocation();
   const {
     canAccess,
     freeAskPsyraRemaining,
-    isPremium,
+    hasPremiumEntitlement,
     openPaywall,
     recordAskPsyraInterpretation,
   } = useSubscription();
+  const aiConsentQueryKey = ["/api/account/ai-dream-consent", user?.id] as const;
+  const aiConsentQuery = useQuery<{ consented: boolean }>({
+    queryKey: aiConsentQueryKey,
+    queryFn: async () =>
+      (await apiRequest("GET", "/api/account/ai-dream-consent")).json(),
+    enabled: Boolean(user),
+    staleTime: Infinity,
+    retry: false,
+  });
 
   const requestInterpretationAccess = () => {
     if (canAccess("askPsyraInterpretation")) return true;
-    openPaywall({
-      feature: "askPsyraInterpretation",
-      eyebrow: "Your free readings are complete",
-      title: "Keep Exploring With Psyra",
-      description:
-        "Unlock unlimited Jungian dream interpretations and continue following the patterns unfolding across your dreams.",
-    });
+    if (PAYWALL_ENABLED) {
+      openPaywall({
+        feature: "askPsyraInterpretation",
+        eyebrow: "Your free readings are complete",
+        title: "Keep Exploring With Psyra",
+        description:
+          "Unlock unlimited Jungian dream interpretations and continue following the patterns unfolding across your dreams.",
+      });
+    } else {
+      toast({
+        title: "Free readings complete",
+        description: FREE_AI_LIMIT_MESSAGE,
+      });
+    }
     return false;
+  };
+
+  const requestDreamAiConsent = (action: () => void) => {
+    if (aiConsentQuery.isPending) return;
+    if (aiConsentQuery.data?.consented) {
+      action();
+      return;
+    }
+    pendingInterpretationRef.current = action;
+    setIsAiConsentOpen(true);
+  };
+
+  const handleAiConsentOpenChange = (open: boolean) => {
+    setIsAiConsentOpen(open);
+    if (!open) pendingInterpretationRef.current = null;
+  };
+
+  const acceptAiDreamConsent = async () => {
+    setIsSavingAiConsent(true);
+    try {
+      const response = await apiRequest(
+        "POST",
+        "/api/account/ai-dream-consent",
+        { accepted: true },
+      );
+      const result: unknown = await response.json();
+      if (
+        !result ||
+        typeof result !== "object" ||
+        (result as { consented?: unknown }).consented !== true
+      ) {
+        throw new Error("Psyra could not confirm your consent.");
+      }
+      queryClient.setQueryData(aiConsentQueryKey, { consented: true });
+      setIsAiConsentOpen(false);
+      const action = pendingInterpretationRef.current;
+      pendingInterpretationRef.current = null;
+      action?.();
+    } catch (error) {
+      console.error("Dream AI consent could not be saved:", error);
+      toast({
+        title: "Consent could not be saved",
+        description: "Please try again. Your dream has not been sent to OpenAI.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingAiConsent(false);
+    }
   };
 
   const { data: dream, isLoading } = useQuery<Dream>({
@@ -192,9 +263,8 @@ export default function DreamDecoder() {
     sessionStorage.removeItem(WRITING_PROMPT_SESSION_KEY);
   }, [params.id]);
 
-  const decodeDream = async () => {
+  const performSavedDreamDecode = async () => {
     if (!dream) return;
-    if (!requestInterpretationAccess()) return;
     setIsDecoding(true);
     trackEvent("psyra_interpretation_started", {
       source: "saved_dream",
@@ -242,6 +312,13 @@ export default function DreamDecoder() {
     } finally {
       setIsDecoding(false);
     }
+  };
+
+  const decodeDream = () => {
+    if (!dream || !requestInterpretationAccess()) return;
+    requestDreamAiConsent(() => {
+      void performSavedDreamDecode();
+    });
   };
 
   const createAndDecodeMutation = useMutation({
@@ -375,14 +452,28 @@ export default function DreamDecoder() {
       return;
     }
     if (!requestInterpretationAccess()) return;
-    createAndDecodeMutation.mutate({ title: newDreamTitle, content: newDreamContent });
+    requestDreamAiConsent(() => {
+      createAndDecodeMutation.mutate({
+        title: newDreamTitle,
+        content: newDreamContent,
+      });
+    });
   };
 
   const recentDreams = dreams?.filter(d => d.id !== params.id).slice(0, 5) || [];
+  const aiConsentDialog = (
+    <AiDreamConsentDialog
+      open={isAiConsentOpen}
+      saving={isSavingAiConsent}
+      onOpenChange={handleAiConsentOpenChange}
+      onAgree={acceptAiDreamConsent}
+    />
+  );
 
   if (!params.id) {
     return (
       <div className="decoder-light-surface bg-background min-h-screen">
+        {aiConsentDialog}
         <HeroSection />
         <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-8">
           <Card className="border-primary/30 bg-card">
@@ -403,7 +494,7 @@ export default function DreamDecoder() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!isPremium && (
+              {!hasPremiumEntitlement && (
                 <p
                   className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground"
                   data-testid="text-free-psyra-remaining"
@@ -414,7 +505,7 @@ export default function DreamDecoder() {
                           ? "interpretation"
                           : "interpretations"
                       } remaining this month`
-                    : "Your free interpretations for this month are complete."}
+                    : FREE_AI_LIMIT_MESSAGE}
                 </p>
               )}
               <div>
@@ -450,7 +541,13 @@ export default function DreamDecoder() {
               </div>
               <Button 
                 onClick={handleCreateAndDecode}
-                disabled={createAndDecodeMutation.isPending || !newDreamTitle.trim() || !newDreamContent.trim()}
+                disabled={
+                  createAndDecodeMutation.isPending ||
+                  aiConsentQuery.isPending ||
+                  (!hasPremiumEntitlement && freeAskPsyraRemaining === 0) ||
+                  !newDreamTitle.trim() ||
+                  !newDreamContent.trim()
+                }
                 className="w-full dark:text-white"
                 size="lg"
                 data-testid="button-decode-new-dream"
@@ -539,6 +636,7 @@ export default function DreamDecoder() {
     <div
       className="decoder-light-surface dream-decoder-light-surface relative min-h-screen pb-24 bg-background"
     >
+      {aiConsentDialog}
       <div
         className="dream-decoder-texture"
         style={{ backgroundImage: `url(${dreamgatePageTexture})` }}
@@ -864,7 +962,7 @@ export default function DreamDecoder() {
       {!interpretation && (
         <button
           onClick={decodeDream}
-          disabled={isDecoding}
+          disabled={isDecoding || aiConsentQuery.isPending}
           className="fixed right-6 md:right-8 z-[80] flex items-center gap-2 px-6 py-3 rounded-full text-primary-foreground font-medium shadow-lg transition-all hover:scale-105 active:scale-95 bg-primary"
           style={{ 
             bottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))',

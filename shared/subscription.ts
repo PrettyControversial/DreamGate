@@ -5,6 +5,21 @@ export type SubscriptionEntitlement =
 
 export type SubscriptionPlanId = "annual" | "monthly";
 
+// Keep the subscription experience wired up, but disabled until paid plans ship.
+export const PAYWALL_ENABLED = false;
+export const FREE_AI_LIMIT_MESSAGE =
+  "You've used this month's free readings. More readings unlock next month.";
+
+export function freeInterpretationCountForMonth(
+  count: number,
+  recordedMonth: string | undefined,
+  currentMonth: string,
+): number {
+  return recordedMonth && recordedMonth !== currentMonth
+    ? 0
+    : Math.max(0, count);
+}
+
 export type SubscriptionFeature =
   | "askPsyraInterpretation"
   | "fullJungianAnalysis"

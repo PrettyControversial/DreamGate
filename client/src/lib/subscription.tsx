@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import {
   isPremiumEntitlement,
+  freeInterpretationCountForMonth,
+  PAYWALL_ENABLED,
   SUBSCRIPTION_CONFIG,
   type SubscriptionEntitlement,
   type SubscriptionFeature,
@@ -23,20 +25,38 @@ export const isDevelopmentBuild = import.meta.env.DEV;
 const DEV_SUBSCRIPTION_STORAGE_KEY = "dreamgate-development-subscription";
 const LEGACY_ASK_PSYRA_USAGE_STORAGE_KEY = "dreamgate-ask-psyra-usage";
 const FREE_USAGE_STORAGE_KEY = "dreamgate-free-usage";
+const PAYWALL_DISABLED_FEATURES: SubscriptionFeature[] = [
+  "fullJungianAnalysis",
+  "archetypeReveals",
+  "yourPsyche",
+  "longitudinalPatterns",
+  "archetypeHistory",
+  "monthlyPsycheInsights",
+  "fullMeditationLibrary",
+];
 
 interface FreeUsageState {
   askPsyraCount: number;
+  askPsyraMonth: string;
   atlasLocations: string[];
   tarotPullCount: number;
   meditationSessions: string[];
 }
 
-const emptyFreeUsage: FreeUsageState = {
-  askPsyraCount: 0,
-  atlasLocations: [],
-  tarotPullCount: 0,
-  meditationSessions: [],
-};
+function currentUsageMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function emptyFreeUsage(): FreeUsageState {
+  return {
+    askPsyraCount: 0,
+    askPsyraMonth: currentUsageMonth(),
+    atlasLocations: [],
+    tarotPullCount: 0,
+    meditationSessions: [],
+  };
+}
 
 export interface PaywallRequest {
   feature?: SubscriptionFeature;
@@ -56,6 +76,7 @@ interface SubscriptionContextValue extends DevelopmentSubscriptionState {
   provider: "development-mock" | "storekit" | "demo-account";
   isDemo: boolean;
   isPremium: boolean;
+  hasPremiumEntitlement: boolean;
   freeAskPsyraRemaining: number;
   freeAtlasLocationsRemaining: number;
   freeTarotPullsRemaining: number;
@@ -122,11 +143,14 @@ function loadFreeUsage(userScope: string): FreeUsageState {
     const stored = localStorage.getItem(usageStorageKey(userScope));
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<FreeUsageState>;
+      const month = currentUsageMonth();
       return {
-        askPsyraCount:
-          typeof parsed.askPsyraCount === "number"
-            ? Math.max(0, parsed.askPsyraCount)
-            : 0,
+        askPsyraCount: freeInterpretationCountForMonth(
+          typeof parsed.askPsyraCount === "number" ? parsed.askPsyraCount : 0,
+          typeof parsed.askPsyraMonth === "string" ? parsed.askPsyraMonth : undefined,
+          month,
+        ),
+        askPsyraMonth: month,
         atlasLocations: Array.isArray(parsed.atlasLocations)
           ? parsed.atlasLocations.filter(
               (location): location is string => typeof location === "string",
@@ -150,15 +174,15 @@ function loadFreeUsage(userScope: string): FreeUsageState {
     if (legacy) {
       const parsed = JSON.parse(legacy) as { count?: number };
       return {
-        ...emptyFreeUsage,
+        ...emptyFreeUsage(),
         askPsyraCount:
           typeof parsed.count === "number" ? Math.max(0, parsed.count) : 0,
       };
     }
   } catch {
-    return emptyFreeUsage;
+    return emptyFreeUsage();
   }
-  return emptyFreeUsage;
+  return emptyFreeUsage();
 }
 
 function saveDevelopmentState(state: DevelopmentSubscriptionState) {
@@ -197,6 +221,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   });
   const isDemo = Boolean(user && demoAccess?.isDemo);
   const entitlement: SubscriptionEntitlement = isDemo ? "PSYRA_PLUS" : developmentState.entitlement;
+  const hasPremiumEntitlement = isPremiumEntitlement(entitlement);
 
   useEffect(() => {
     if (isDemo) setPaywallRequest(null);
@@ -206,10 +231,28 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     setFreeUsage(loadFreeUsage(userScope));
   }, [userScope]);
 
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      const month = currentUsageMonth();
+      setFreeUsage((current) => {
+        if (current.askPsyraMonth === month) return current;
+        const next = { ...current, askPsyraCount: 0, askPsyraMonth: month };
+        saveFreeUsage(userScope, next);
+        return next;
+      });
+    }, 60_000);
+    return () => window.clearInterval(interval);
+  }, [userScope]);
+
   const updateFreeUsage = useCallback(
     (update: (current: FreeUsageState) => FreeUsageState) => {
       setFreeUsage((current) => {
-        const next = update(current);
+        const month = currentUsageMonth();
+        const monthAdjusted =
+          current.askPsyraMonth === month
+            ? current
+            : { ...current, askPsyraMonth: month, askPsyraCount: 0 };
+        const next = update(monthAdjusted);
         saveFreeUsage(userScope, next);
         return next;
       });
@@ -288,9 +331,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   const canAccess = useCallback(
     (feature: SubscriptionFeature) => {
-      if (isPremiumEntitlement(entitlement)) return true;
       if (feature === "askPsyraInterpretation") {
-        return freeUsage.askPsyraCount < SUBSCRIPTION_CONFIG.freeAskPsyraLimit;
+        return (
+          hasPremiumEntitlement ||
+          freeUsage.askPsyraCount < SUBSCRIPTION_CONFIG.freeAskPsyraLimit
+        );
+      }
+      if (hasPremiumEntitlement) return true;
+      if (!PAYWALL_ENABLED && PAYWALL_DISABLED_FEATURES.includes(feature)) {
+        return true;
       }
       if (feature === "premiumTarot") {
         return freeUsage.tarotPullCount < SUBSCRIPTION_CONFIG.freeTarotPullLimit;
@@ -309,25 +358,26 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       }
       return false;
     },
-    [entitlement, freeUsage],
+    [hasPremiumEntitlement, freeUsage],
   );
 
   const canAccessAtlasLocation = useCallback(
     (locationName: string) =>
-      isPremiumEntitlement(entitlement) ||
+      hasPremiumEntitlement ||
       freeUsage.atlasLocations.includes(locationName) ||
       freeUsage.atlasLocations.length <
         SUBSCRIPTION_CONFIG.freeAtlasLocationLimit,
-    [entitlement, freeUsage],
+    [hasPremiumEntitlement, freeUsage],
   );
 
   const canAccessMeditationSession = useCallback(
     (sessionId: string) =>
-      isPremiumEntitlement(entitlement) ||
+      !PAYWALL_ENABLED ||
+      hasPremiumEntitlement ||
       freeUsage.meditationSessions.includes(sessionId) ||
       freeUsage.meditationSessions.length <
         SUBSCRIPTION_CONFIG.freeMeditationSessionLimit,
-    [entitlement, freeUsage],
+    [hasPremiumEntitlement, freeUsage],
   );
 
   const purchaseSelectedPlan = useCallback(async () => {
@@ -365,7 +415,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       isDemo,
       isDevelopmentBuild,
       provider: isDemo ? "demo-account" : isDevelopmentBuild ? "development-mock" : "storekit",
-      isPremium: isPremiumEntitlement(entitlement),
+      isPremium: hasPremiumEntitlement,
+      hasPremiumEntitlement,
       freeAskPsyraRemaining: Math.max(
         0,
          SUBSCRIPTION_CONFIG.freeAskPsyraLimit - freeUsage.askPsyraCount,
@@ -398,8 +449,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         updateDevelopmentState({ trialEligible: eligible }),
       purchaseSelectedPlan,
       restorePurchases,
-      paywallRequest: isDemo ? null : paywallRequest,
-      openPaywall: (request = {}) => { if (!isDemo) setPaywallRequest(request); },
+      paywallRequest: isDemo || !PAYWALL_ENABLED ? null : paywallRequest,
+      openPaywall: (request = {}) => {
+        if (PAYWALL_ENABLED && !isDemo) setPaywallRequest(request);
+      },
       closePaywall: () => setPaywallRequest(null),
     }),
     [
@@ -408,6 +461,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
        canAccessMeditationSession,
       developmentState,
       entitlement,
+      hasPremiumEntitlement,
       isDemo,
        freeUsage,
       paywallRequest,
