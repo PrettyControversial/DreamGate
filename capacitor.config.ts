@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.dreamstate.app',
+  appId: 'com.ninebynine.psyra',
   appName: 'Dream State',
   webDir: 'dist/public',
   server: {
