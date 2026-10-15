@@ -17,6 +17,36 @@ export default function PrivacyPolicy() {
           <h1 className="font-display text-4xl">Privacy Policy</h1>
         </header>
 
+        <section className="space-y-4" aria-labelledby="collected-data-heading">
+          <h2 id="collected-data-heading" className="font-display text-2xl">
+            Data collected
+          </h2>
+          <p className="leading-relaxed text-muted-foreground">
+            Psyra collects the following data to provide account and journal
+            features. Each data type is linked to your account and is not used
+            to track you across other companies’ apps or websites.
+          </p>
+          <ul className="space-y-3 text-muted-foreground">
+            <li className="leading-relaxed">
+              <strong className="text-foreground">Email address:</strong>{" "}
+              Used for sign-in, email verification, account recovery, and
+              account support. Linked to you: yes. Used for tracking: no.
+            </li>
+            <li className="leading-relaxed">
+              <strong className="text-foreground">
+                User Content (dreams):
+              </strong>{" "}
+              Saved in your journal and used to provide interpretations and
+              related Psyra features. Linked to you: yes. Used for tracking: no.
+            </li>
+            <li className="leading-relaxed">
+              <strong className="text-foreground">User ID:</strong> Used to
+              identify your account and associate your saved Psyra data with
+              you. Linked to you: yes. Used for tracking: no.
+            </li>
+          </ul>
+        </section>
+
         <section className="space-y-3">
           <h2 className="font-display text-2xl">Dreams and AI</h2>
           <p className="leading-relaxed text-muted-foreground">
