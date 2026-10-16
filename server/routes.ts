@@ -2,6 +2,7 @@ import type { Express, NextFunction, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { clerkClient, getAuth } from "@clerk/express";
 import { storage } from "./storage";
+import { appleSubjects, AppleDeletionError, deleteAccountForUser } from "./account-deletion";
 import { 
   insertDreamSchema, 
   updateDreamSchema, 
@@ -146,15 +147,42 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/account", async (_req, res) => {
+  app.get("/api/account/deletion-requirements", async (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      const user = await clerkClient.users.getUser(currentUserId(res));
+      res.json({ appleReauthorizationRequired: appleSubjects(user).length > 0 });
+    } catch {
+      res.status(503).json({ error: "Unable to check account deletion requirements" });
+    }
+  });
+
+  app.delete("/api/account", async (req, res) => {
     const userId = currentUserId(res);
+    res.setHeader("Cache-Control", "no-store");
+    const input = z.object({
+      appleAuthorizationCode: z.string().min(1).max(4096).optional(),
+      manualAppleRevocation: z.boolean().optional(),
+    }).strict().safeParse(req.body ?? {});
+    if (!input.success) return res.status(400).json({ error: "Invalid account deletion request" });
 
     try {
-      await storage.deleteUserData(userId);
-      await clerkClient.users.deleteUser(userId);
-      res.status(204).send();
+      const appleRevocation = await deleteAccountForUser(userId, input.data, {
+        getUser: (id) => clerkClient.users.getUser(id),
+        deleteUserData: (id) => storage.deleteUserData(id),
+        deleteUser: (id) => clerkClient.users.deleteUser(id),
+      });
+      if (appleRevocation === "manual_required") {
+        return res.json({ appleRevocation });
+      }
+      return res.status(204).send();
     } catch (error) {
-      console.error(`Account deletion failed for ${userId}:`, error);
+      if (error instanceof AppleDeletionError) {
+        return res.status(error.code === "APPLE_REAUTH_REQUIRED" ? 428 : 503).json({
+          error: error.code,
+        });
+      }
+      console.error("Account deletion failed; sensitive details were not logged.");
       res.status(500).json({ error: "Failed to delete account" });
     }
   });

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 import { Capacitor } from "@capacitor/core";
+import { deleteCurrentAccount, manualAppleRevocationInstructions } from "./lib/delete-account";
 import {
   ClerkProvider,
   Show,
@@ -1683,11 +1684,19 @@ function AuthenticatedApp() {
 
     setIsDeletingAccount(true);
     void (async () => {
+      let accountDeleted = false;
       try {
-        if (supportsLunarNotifications()) {
-          await deactivateLunarNotificationUser(user.id);
+        const deletion = await deleteCurrentAccount();
+        if (deletion === "cancelled") {
+          setIsDeletingAccount(false);
+          return;
         }
-        await apiRequest("DELETE", "/api/account");
+        accountDeleted = true;
+        if (supportsLunarNotifications()) {
+          await deactivateLunarNotificationUser(user.id).catch(() => {
+            // Notification cleanup must not hide a completed server deletion.
+          });
+        }
         try {
           localStorage.removeItem("dreamstate_streak");
           localStorage.removeItem("tarot_history");
@@ -1698,12 +1707,23 @@ function AuthenticatedApp() {
           // Account deletion should still complete if browser storage is unavailable.
         }
         await signOut({ redirectUrl: basePath || "/" });
+        if (deletion === "manual_required") {
+          toast({
+            title: "Account deleted — remove Apple authorization",
+            description: manualAppleRevocationInstructions,
+            duration: 30000,
+          });
+        }
       } catch (error) {
-        console.error("Unable to delete account:", error);
+        console.error("Unable to complete account deletion.");
         setIsDeletingAccount(false);
         toast({
-          title: "Account could not be deleted",
-          description: "Please try again. Your account is still active.",
+          title: accountDeleted ? "Account deleted" : "Account could not be deleted",
+          description: accountDeleted
+            ? "Your account was deleted. Please close and reopen the app to finish signing out."
+            : error instanceof Error && error.message.includes("APPLE_REVOCATION_FAILED")
+            ? "Apple authorization could not be revoked. Your account has not been deleted. Please try again."
+            : "Please try again. Your account is still active.",
           variant: "destructive",
         });
       }
