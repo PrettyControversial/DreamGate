@@ -9,7 +9,7 @@
 - [Psyra+ access boundaries](psyra-plus-access-boundaries.md) — keep paywall UI, entitlements, and purchase providers separate; development premium state must never unlock production.
 - [Clerk transport by platform](clerk-platform-auth-transport.md) — browsers use Clerk session cookies; native Capacitor webviews use bearer tokens for API requests.
 - [Managed Clerk environment sync](clerk-managed-env-sync.md) — resync managed Clerk keys for session redirect loops; never hand-edit the coordinated secrets.
-- [DreamGate sign-in methods](clerk-sign-in-methods.md) — keep the embedded Clerk sign-in email/password only; social controls stay hidden.
+- [DreamGate sign-in methods](clerk-sign-in-methods.md) — preserve email/password; Apple is the only native iOS social-login exception.
 - [Mobile asset budget](mobile-asset-budget.md) — keep bundled images near 500 KB and long meditation audio near 2–3 MB; preserve import paths during optimization.
 - [Product analytics boundaries](product-analytics-boundaries.md) — track only confirmed actions with controlled metadata; keep content/identity out and expire cross-route attribution.
 - [Native dream reminders](native-dream-reminders.md) — fixed morning/evening prompts use per-user Capacitor local schedules; web must not claim closed-browser delivery.
@@ -21,3 +21,4 @@
 - [Drizzle PostgreSQL type compatibility](drizzle-pg-type-compatibility.md) — use validated connection config instead of unsafe Pool casts when pg declaration versions disagree.
 - [Descent Journey Note](descent-journey-note.md) — Tonight’s Intention is the editable saved note; reopen the latest record and update it instead of creating duplicates.
 - [ImageMagick contact sheets](image-magick-contact-sheets.md) — montage may fail without a usable font here; compose unlabeled previews with append instead.
+- [Native release boundaries](native-release-boundaries.md) — pull the active branch first; leave ios/ and the bundle identity under the user's Xcode control.

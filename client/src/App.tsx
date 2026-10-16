@@ -66,6 +66,7 @@ import {
   readSecureClerkClientToken,
 } from "@/lib/clerk-secure-storage";
 import { Button } from "@/components/ui/button";
+import { AppleSignInButton } from "@/components/apple-sign-in-button";
 import { PAYWALL_ENABLED } from "@shared/subscription";
 import {
   Sheet,
@@ -474,6 +475,7 @@ function SignInPage() {
   >("device");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [isAppleSubmitting, setIsAppleSubmitting] = useState(false);
   const isSubmitting = fetchStatus === "fetching";
 
   const clerkErrorMessage = (caughtError: unknown) => {
@@ -555,6 +557,7 @@ function SignInPage() {
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isAppleSubmitting) return;
     setError("");
     setMessage("");
 
@@ -695,12 +698,16 @@ function SignInPage() {
               {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isAppleSubmitting}
                 className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:opacity-60"
               >
                 {isSubmitting ? "Signing in…" : "Sign in"}
               </button>
             </form>
+            <AppleSignInButton
+              disabled={isSubmitting}
+              onBusyChange={setIsAppleSubmitting}
+            />
             <div className="mt-5 flex items-center justify-between text-sm">
               <Link href="/sign-in/forgot-password" className="text-[#d9d7e6]">
                 Forgot password?
@@ -1022,6 +1029,7 @@ function SignUpPage() {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [isAppleSubmitting, setIsAppleSubmitting] = useState(false);
   const sawSignedOut = useRef(false);
   const trackedCompletion = useRef(false);
   const isSubmitting = fetchStatus === "fetching";
@@ -1064,6 +1072,7 @@ function SignUpPage() {
 
   const createAccount = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isAppleSubmitting) return;
     setError("");
     setMessage("");
 
@@ -1217,7 +1226,7 @@ function SignUpPage() {
             {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
             <button
               type="submit"
-              disabled={isSubmitting || !canCreateAccount}
+              disabled={isSubmitting || isAppleSubmitting || !canCreateAccount}
               className="w-full rounded-xl bg-[#d9d7e6] px-4 py-3 font-semibold text-[#171517] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isSubmitting ? "Creating account…" : "Create account"}
@@ -1255,6 +1264,13 @@ function SignUpPage() {
               Use a different email
             </button>
           </form>
+        )}
+
+        {step === "details" && (
+          <AppleSignInButton
+            disabled={isSubmitting}
+            onBusyChange={setIsAppleSubmitting}
+          />
         )}
 
         <div className="mt-6 text-center text-sm text-[#aca8b4]">
