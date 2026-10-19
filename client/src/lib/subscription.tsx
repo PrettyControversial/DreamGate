@@ -8,22 +8,21 @@ import {
   type ReactNode,
 } from "react";
 import { useUser } from "@clerk/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import {
   isPremiumEntitlement,
-  freeInterpretationCountForMonth,
   PAYWALL_ENABLED,
   SUBSCRIPTION_CONFIG,
   type SubscriptionEntitlement,
   type SubscriptionFeature,
   type SubscriptionPlanId,
 } from "@shared/subscription";
+import { DAILY_LIMITS, type InterpretationAllowance } from "@shared/daily-limits";
 
 export const isDevelopmentBuild = import.meta.env.DEV;
 
 const DEV_SUBSCRIPTION_STORAGE_KEY = "dreamgate-development-subscription";
-const LEGACY_ASK_PSYRA_USAGE_STORAGE_KEY = "dreamgate-ask-psyra-usage";
 const FREE_USAGE_STORAGE_KEY = "dreamgate-free-usage";
 const PAYWALL_DISABLED_FEATURES: SubscriptionFeature[] = [
   "fullJungianAnalysis",
@@ -36,22 +35,13 @@ const PAYWALL_DISABLED_FEATURES: SubscriptionFeature[] = [
 ];
 
 interface FreeUsageState {
-  askPsyraCount: number;
-  askPsyraMonth: string;
   atlasLocations: string[];
   tarotPullCount: number;
   meditationSessions: string[];
 }
 
-function currentUsageMonth() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
-
 function emptyFreeUsage(): FreeUsageState {
   return {
-    askPsyraCount: 0,
-    askPsyraMonth: currentUsageMonth(),
     atlasLocations: [],
     tarotPullCount: 0,
     meditationSessions: [],
@@ -77,7 +67,8 @@ interface SubscriptionContextValue extends DevelopmentSubscriptionState {
   isDemo: boolean;
   isPremium: boolean;
   hasPremiumEntitlement: boolean;
-  freeAskPsyraRemaining: number;
+  interpretationsRemaining: number;
+  interpretationAllowanceExempt: boolean;
   freeAtlasLocationsRemaining: number;
   freeTarotPullsRemaining: number;
   freeMeditationSessionsRemaining: number;
@@ -86,7 +77,7 @@ interface SubscriptionContextValue extends DevelopmentSubscriptionState {
   canAccessMeditationSession: (sessionId: string) => boolean;
   recordAtlasLocation: (locationName: string) => void;
   recordMeditationSession: (sessionId: string) => void;
-  recordAskPsyraInterpretation: () => void;
+  refreshInterpretationAllowance: () => void;
   recordTarotPull: () => void;
   setSelectedPlan: (plan: SubscriptionPlanId) => void;
   setDevelopmentEntitlement: (entitlement: SubscriptionEntitlement) => void;
@@ -143,14 +134,7 @@ function loadFreeUsage(userScope: string): FreeUsageState {
     const stored = localStorage.getItem(usageStorageKey(userScope));
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<FreeUsageState>;
-      const month = currentUsageMonth();
       return {
-        askPsyraCount: freeInterpretationCountForMonth(
-          typeof parsed.askPsyraCount === "number" ? parsed.askPsyraCount : 0,
-          typeof parsed.askPsyraMonth === "string" ? parsed.askPsyraMonth : undefined,
-          month,
-        ),
-        askPsyraMonth: month,
         atlasLocations: Array.isArray(parsed.atlasLocations)
           ? parsed.atlasLocations.filter(
               (location): location is string => typeof location === "string",
@@ -168,17 +152,6 @@ function loadFreeUsage(userScope: string): FreeUsageState {
       };
     }
 
-    // Preserve the earlier Ask Psyra counter when an existing browser first
-    // moves to the per-user usage record.
-    const legacy = localStorage.getItem(LEGACY_ASK_PSYRA_USAGE_STORAGE_KEY);
-    if (legacy) {
-      const parsed = JSON.parse(legacy) as { count?: number };
-      return {
-        ...emptyFreeUsage(),
-        askPsyraCount:
-          typeof parsed.count === "number" ? Math.max(0, parsed.count) : 0,
-      };
-    }
   } catch {
     return emptyFreeUsage();
   }
@@ -208,6 +181,27 @@ function saveFreeUsage(userScope: string, usage: FreeUsageState) {
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const userScope = user?.id ?? "guest";
+  const queryClient = useQueryClient();
+  const { data: interpretationStatus } = useQuery<InterpretationAllowance>({
+    queryKey: ["/api/account/interpretation-allowance", userScope],
+    queryFn: async () =>
+      (await apiRequest("GET", "/api/account/interpretation-allowance")).json(),
+    enabled: Boolean(user),
+    staleTime: 0,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+  const refreshInterpretationAllowance = useCallback(() => {
+    void queryClient.invalidateQueries({
+      queryKey: ["/api/account/interpretation-allowance", userScope],
+    });
+  }, [queryClient, userScope]);
+  useEffect(() => {
+    if (!interpretationStatus) return;
+    const delay = Math.max(0, Date.parse(interpretationStatus.resetsAt) - Date.now()) + 100;
+    const timer = window.setTimeout(refreshInterpretationAllowance, Math.min(delay, 2_147_483_647));
+    return () => window.clearTimeout(timer);
+  }, [interpretationStatus?.resetsAt, refreshInterpretationAllowance]);
   const [developmentState, setDevelopmentState] = useState(loadDevelopmentState);
   const [freeUsage, setFreeUsage] = useState(() => loadFreeUsage(userScope));
   const [paywallRequest, setPaywallRequest] =
@@ -222,6 +216,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const isDemo = Boolean(user && demoAccess?.isDemo);
   const entitlement: SubscriptionEntitlement = isDemo ? "PSYRA_PLUS" : developmentState.entitlement;
   const hasPremiumEntitlement = isPremiumEntitlement(entitlement);
+  useEffect(refreshInterpretationAllowance, [developmentState.entitlement, refreshInterpretationAllowance]);
 
   useEffect(() => {
     if (isDemo) setPaywallRequest(null);
@@ -231,28 +226,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     setFreeUsage(loadFreeUsage(userScope));
   }, [userScope]);
 
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      const month = currentUsageMonth();
-      setFreeUsage((current) => {
-        if (current.askPsyraMonth === month) return current;
-        const next = { ...current, askPsyraCount: 0, askPsyraMonth: month };
-        saveFreeUsage(userScope, next);
-        return next;
-      });
-    }, 60_000);
-    return () => window.clearInterval(interval);
-  }, [userScope]);
 
   const updateFreeUsage = useCallback(
     (update: (current: FreeUsageState) => FreeUsageState) => {
       setFreeUsage((current) => {
-        const month = currentUsageMonth();
-        const monthAdjusted =
-          current.askPsyraMonth === month
-            ? current
-            : { ...current, askPsyraMonth: month, askPsyraCount: 0 };
-        const next = update(monthAdjusted);
+        const next = update(current);
         saveFreeUsage(userScope, next);
         return next;
       });
@@ -271,16 +249,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     },
     [],
   );
-
-  const recordAskPsyraInterpretation = useCallback(() => {
-    if (isPremiumEntitlement(entitlement)) {
-      return;
-    }
-    updateFreeUsage((current) => ({
-      ...current,
-      askPsyraCount: current.askPsyraCount + 1,
-    }));
-  }, [entitlement, updateFreeUsage]);
 
   const recordTarotPull = useCallback(() => {
     if (isPremiumEntitlement(entitlement)) {
@@ -333,8 +301,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     (feature: SubscriptionFeature) => {
       if (feature === "askPsyraInterpretation") {
         return (
-          hasPremiumEntitlement ||
-          freeUsage.askPsyraCount < SUBSCRIPTION_CONFIG.freeAskPsyraLimit
+          !interpretationStatus ||
+          interpretationStatus.exempt ||
+          (interpretationStatus.remaining ?? 0) > 0 ||
+          Date.now() >= Date.parse(interpretationStatus.resetsAt)
         );
       }
       if (hasPremiumEntitlement) return true;
@@ -358,7 +328,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       }
       return false;
     },
-    [hasPremiumEntitlement, freeUsage],
+    [hasPremiumEntitlement, freeUsage, interpretationStatus],
   );
 
   const canAccessAtlasLocation = useCallback(
@@ -417,10 +387,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       provider: isDemo ? "demo-account" : isDevelopmentBuild ? "development-mock" : "storekit",
       isPremium: hasPremiumEntitlement,
       hasPremiumEntitlement,
-      freeAskPsyraRemaining: Math.max(
-        0,
-         SUBSCRIPTION_CONFIG.freeAskPsyraLimit - freeUsage.askPsyraCount,
-       ),
+       interpretationsRemaining: interpretationStatus?.remaining ?? DAILY_LIMITS.interpretations,
+       interpretationAllowanceExempt: interpretationStatus?.exempt ?? false,
        freeAtlasLocationsRemaining: Math.max(
          0,
          SUBSCRIPTION_CONFIG.freeAtlasLocationLimit -
@@ -440,7 +408,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
        canAccessMeditationSession,
        recordAtlasLocation,
        recordMeditationSession,
-      recordAskPsyraInterpretation,
+      refreshInterpretationAllowance,
        recordTarotPull,
       setSelectedPlan: (plan) => updateDevelopmentState({ selectedPlan: plan }),
       setDevelopmentEntitlement: (entitlement) =>
@@ -468,7 +436,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       purchaseSelectedPlan,
        recordAtlasLocation,
        recordMeditationSession,
-      recordAskPsyraInterpretation,
+      refreshInterpretationAllowance,
+      interpretationStatus,
        recordTarotPull,
       restorePurchases,
       updateDevelopmentState,

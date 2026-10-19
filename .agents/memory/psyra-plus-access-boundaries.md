@@ -9,17 +9,26 @@ Keep the paywall presentation, entitlement decisions, and platform purchase prov
 
 **How to apply:** Route every premium feature through the centralized entitlement manager. Keep mock purchase and entitlement mutation guarded by the development build, and replace the provider behind that interface when native StoreKit support is added.
 
-The free tier is intentionally a bounded product sample: three Ask Psyra interpretations, one Dream Atlas location, three Tarot pulls, and one Guided Journey audio session. Core journaling stays available; repeat use and deeper pattern exploration belong to Psyra+.
+During the first App Store release, usage limits are cost controls, not an
+opportunity to advertise a purchase. Meditation and archetype access stay
+available while the paywall is disabled.
 
-**Why:** The product should demonstrate its value before asking for payment, while reserving the recurring discovery loop that makes a subscription valuable.
+**Why:** The user postponed subscriptions for the first submission and
+explicitly requires non-commercial exhaustion messages.
 
-**How to apply:** New premium surfaces should offer one meaningful preview where possible, then route the next repeat or deeper view through the paywall. Keep exhaustion states explicit and user-scoped.
+**How to apply:** Do not reintroduce upgrade or unlock prompts when a usage cap
+is reached. Preserve the dormant purchase code for later activation.
 
-Premium feature surfaces must use the same entitlement state for access checks and status copy. Do not show a free quota or unlock action while a premium entitlement is active.
+Production AI allowance exemptions must come from the authenticated server
+identity, never from development mock state or a client-supplied entitlement.
 
-**Why:** Showing free-tier messaging after access is granted makes a valid entitlement look blocked and can lead users back into the paywall.
+**Why:** Client-only simulation is useful for previewing paid surfaces but
+cannot authorize real AI spending. No production subscription provider is
+connected yet; the explicit review-demo exception remains separate.
 
-**How to apply:** When a premium state changes, update the gate, explanatory copy, and CTA together. Prefer an explicit active state over leaving the free-tier UI visible.
+**How to apply:** Keep the demo exception server-verified. Preserve mock controls
+for other development-only feature previews, without treating them as a
+production account exemption.
 
 The App Review demo is an explicit production-only business exception: the verified, fixed demo identity may receive permanent premium access from a server-controlled private account flag. This must never become an email-only check, a public/client-editable flag, or a production development-mock override.
 

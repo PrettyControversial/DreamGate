@@ -14,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/lib/subscription";
 import { AiDreamConsentDialog } from "@/components/ai-dream-consent-dialog";
-import { FREE_AI_LIMIT_MESSAGE, PAYWALL_ENABLED } from "@shared/subscription";
-import { dailyLimitMessage } from "@shared/daily-limits";
+import { PAYWALL_ENABLED } from "@shared/subscription";
+import { dailyLimitMessage, DAILY_LIMIT_MESSAGES, INTERPRETATION_LIMIT_HEADING } from "@shared/daily-limits";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import {
   trackDiscoverToolCompleted,
@@ -135,10 +135,11 @@ export default function DreamDecoder() {
   const [, navigate] = useLocation();
   const {
     canAccess,
-    freeAskPsyraRemaining,
-    hasPremiumEntitlement,
     openPaywall,
-    recordAskPsyraInterpretation,
+    interpretationsRemaining,
+    interpretationAllowanceExempt,
+    hasPremiumEntitlement,
+    refreshInterpretationAllowance,
   } = useSubscription();
   const aiConsentQueryKey = ["/api/account/ai-dream-consent", user?.id] as const;
   const aiConsentQuery = useQuery<{ consented: boolean }>({
@@ -149,25 +150,6 @@ export default function DreamDecoder() {
     staleTime: Infinity,
     retry: false,
   });
-
-  const requestInterpretationAccess = () => {
-    if (canAccess("askPsyraInterpretation")) return true;
-    if (PAYWALL_ENABLED) {
-      openPaywall({
-        feature: "askPsyraInterpretation",
-        eyebrow: "Your free readings are complete",
-        title: "Keep Exploring With Psyra",
-        description:
-          "Unlock unlimited Jungian dream interpretations and continue following the patterns unfolding across your dreams.",
-      });
-    } else {
-      toast({
-        title: "Free readings complete",
-        description: FREE_AI_LIMIT_MESSAGE,
-      });
-    }
-    return false;
-  };
 
   const requestDreamAiConsent = (action: () => void) => {
     if (aiConsentQuery.isPending) return;
@@ -285,7 +267,7 @@ export default function DreamDecoder() {
       }
       const result = payload;
       setInterpretation(result);
-      recordAskPsyraInterpretation();
+      refreshInterpretationAllowance();
       trackEvent("psyra_interpretation_completed", {
         source: "saved_dream",
         tool_id: "ask_psyra",
@@ -306,17 +288,18 @@ export default function DreamDecoder() {
     } catch (error) {
       console.error("Psyra could not decode the saved dream:", error);
       toast({
-        title: "Psyra is temporarily unavailable",
-        description: "Your dream is safe. Please try the interpretation again in a moment.",
-        variant: "destructive",
+        title: dailyLimitMessage(error) ? INTERPRETATION_LIMIT_HEADING : "Psyra is temporarily unavailable",
+        description: dailyLimitMessage(error) ?? "Your dream is safe. Please try the interpretation again in a moment.",
+        variant: dailyLimitMessage(error) ? "default" : "destructive",
       });
     } finally {
+      refreshInterpretationAllowance();
       setIsDecoding(false);
     }
   };
 
   const decodeDream = () => {
-    if (!dream || !requestInterpretationAccess()) return;
+    if (!dream) return;
     requestDreamAiConsent(() => {
       void performSavedDreamDecode();
     });
@@ -350,6 +333,7 @@ export default function DreamDecoder() {
       
       let decodeResult = null;
       let decodeError = false;
+      let interpretationLimitReached = false;
       trackEvent("psyra_interpretation_started", {
         source: "new_dream",
         tool_id: "ask_psyra",
@@ -369,6 +353,7 @@ export default function DreamDecoder() {
       } catch (err) {
         console.error("Psyra could not decode the newly saved dream:", err);
         decodeError = true;
+        interpretationLimitReached = dailyLimitMessage(err) === DAILY_LIMIT_MESSAGES.interpretations;
       }
       
       return {
@@ -376,6 +361,7 @@ export default function DreamDecoder() {
         isFirstDream: savedDream.isFirstDream,
         interpretation: decodeResult,
         decodeError,
+        interpretationLimitReached,
       };
     },
     onSuccess: (result) => {
@@ -386,12 +372,14 @@ export default function DreamDecoder() {
       
       if (result.decodeError) {
         toast({
-          title: "Dream saved",
-          description: "Your dream was saved but decoding failed. You can try decoding again.",
+          title: result.interpretationLimitReached ? INTERPRETATION_LIMIT_HEADING : "Dream saved",
+          description: result.interpretationLimitReached
+            ? DAILY_LIMIT_MESSAGES.interpretations
+            : "Your dream was saved but decoding failed. You can try decoding again.",
         });
       } else {
         setInterpretation(result.interpretation);
-        recordAskPsyraInterpretation();
+        refreshInterpretationAllowance();
         trackEvent("psyra_interpretation_completed", {
           source: "new_dream",
           tool_id: "ask_psyra",
@@ -407,6 +395,7 @@ export default function DreamDecoder() {
       }
       navigate(`/decoder/${result.dreamId}`);
     },
+    onSettled: refreshInterpretationAllowance,
     onError: (error) => {
       console.error("Dream creation failed before Psyra could respond:", error);
       toast({
@@ -452,7 +441,6 @@ export default function DreamDecoder() {
       });
       return;
     }
-    if (!requestInterpretationAccess()) return;
     requestDreamAiConsent(() => {
       createAndDecodeMutation.mutate({
         title: newDreamTitle,
@@ -495,18 +483,19 @@ export default function DreamDecoder() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!hasPremiumEntitlement && (
+              {!interpretationAllowanceExempt && (
                 <p
                   className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground"
-                  data-testid="text-free-psyra-remaining"
+                  data-testid="text-interpretation-allowance"
                 >
-                  {freeAskPsyraRemaining > 0
-                    ? `${freeAskPsyraRemaining} free ${
-                        freeAskPsyraRemaining === 1
-                          ? "interpretation"
-                          : "interpretations"
-                      } remaining this month`
-                    : FREE_AI_LIMIT_MESSAGE}
+                  {interpretationsRemaining > 0
+                    ? `${interpretationsRemaining} dream ${
+                        interpretationsRemaining === 1 ? "interpretation" : "interpretations"
+                      } remaining today`
+                    : <>
+                        <strong className="block">{INTERPRETATION_LIMIT_HEADING}</strong>
+                        {DAILY_LIMIT_MESSAGES.interpretations}
+                      </>}
                 </p>
               )}
               <div>
@@ -545,7 +534,6 @@ export default function DreamDecoder() {
                 disabled={
                   createAndDecodeMutation.isPending ||
                   aiConsentQuery.isPending ||
-                  (!hasPremiumEntitlement && freeAskPsyraRemaining === 0) ||
                   !newDreamTitle.trim() ||
                   !newDreamContent.trim()
                 }

@@ -24,6 +24,9 @@ import { withDailyUsage } from "./daily-usage";
 import { DailyLimitError } from "@shared/daily-limits";
 import { dreams as dreamsTable } from "@shared/schema";
 import { preserveTarotCache } from "./tarot-service";
+import { and, eq } from "drizzle-orm";
+import { interpretationAllowance, withInterpretationAllowance } from "./interpretation-allowance";
+import { INTERPRETATION_LIMIT_HEADING } from "@shared/daily-limits";
 import { hasDemoPremium } from "@shared/demo";
 import {
   DemoSeedFailure,
@@ -105,6 +108,18 @@ export async function registerRoutes(
       });
     } catch {
       res.status(503).json({ error: "Unable to check AI consent" });
+    }
+  });
+
+  app.get("/api/account/interpretation-allowance", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      const user = await clerkClient.users.getUser(currentUserId(res));
+      res.json(await interpretationAllowance(
+        user, req.get("X-User-Time-Zone"), req.get("X-Psyra-Development-Entitlement"),
+      ));
+    } catch {
+      res.status(503).json({ error: "Unable to check interpretation allowance" });
     }
   });
 
@@ -417,9 +432,19 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Dream content is required" });
       }
       const phase: MoonPhase = moonPhase || "new_moon";
-      const decoding = await storage.decodeDream(content, phase);
+      const user = await clerkClient.users.getUser(currentUserId(res));
+      const decoding = await withInterpretationAllowance(user, req.get("X-User-Time-Zone"), async () => {
+        let successfulAi = true;
+        const value = await storage.decodeDream(content, phase, () => { successfulAi = false; });
+        return { value, successfulAi };
+      }, req.get("X-Psyra-Development-Entitlement"));
       res.json(decoding);
     } catch (error) {
+      if (error instanceof DailyLimitError) {
+        return res.status(429).json({
+          error: error.message, heading: INTERPRETATION_LIMIT_HEADING, code: "DAILY_INTERPRETATION_LIMIT",
+        });
+      }
       console.error("Basic dream decode failed:", error);
       res.status(500).json({ error: "Failed to decode dream" });
     }
@@ -432,9 +457,17 @@ export async function registerRoutes(
       if (!content) {
         return res.status(400).json({ error: "Dream content is required" });
       }
-      const interpretation = await storage.enhancedDecodeDream(content);
+      const user = await clerkClient.users.getUser(currentUserId(res));
+      const interpretation = await withInterpretationAllowance(user, req.get("X-User-Time-Zone"), async () => ({
+        value: await storage.enhancedDecodeDream(content),
+      }), req.get("X-Psyra-Development-Entitlement"));
       res.json(interpretation);
     } catch (error) {
+      if (error instanceof DailyLimitError) {
+        return res.status(429).json({
+          error: error.message, heading: INTERPRETATION_LIMIT_HEADING, code: "DAILY_INTERPRETATION_LIMIT",
+        });
+      }
       console.error("Enhanced dream decode failed:", error);
       res.status(500).json({ error: "Failed to decode dream" });
     }
@@ -450,24 +483,38 @@ export async function registerRoutes(
       }
 
       const startedAt = Date.now();
-      const interpretation = await storage.enhancedDecodeDream(dream.content);
-      const reflection =
-        typeof req.body?.reflection === "string" ? req.body.reflection : "";
-      const normalizedSymbols = new Map<string, string>();
-      interpretation.keySymbols.forEach(({ symbol }) => {
-        const display = symbol.trim().replace(/\s+/g, " ");
-        const normalized = display.normalize("NFKC").toLocaleLowerCase("en-US");
-        if (normalized && !normalizedSymbols.has(normalized)) {
-          normalizedSymbols.set(normalized, display);
-        }
-      });
-      await storage.updateDream(userId, dream.id, {
-        decodedInsights: JSON.stringify({ interpretation, reflection }),
-        symbols: Array.from(normalizedSymbols.values()),
-      });
+      const user = await clerkClient.users.getUser(userId);
+      const interpretation = await withInterpretationAllowance(user, req.get("X-User-Time-Zone"), async tx => {
+        const condition = and(eq(dreamsTable.userId, userId), eq(dreamsTable.id, dream.id));
+        const [currentDream] = await tx.select().from(dreamsTable).where(condition).for("update");
+        if (!currentDream) throw new Error("Dream no longer exists");
+        const interpretation = await storage.enhancedDecodeDream(currentDream.content);
+        const reflection =
+          typeof req.body?.reflection === "string" ? req.body.reflection : "";
+        const normalizedSymbols = new Map<string, string>();
+        interpretation.keySymbols.forEach(({ symbol }) => {
+          const display = symbol.trim().replace(/\s+/g, " ");
+          const normalized = display.normalize("NFKC").toLocaleLowerCase("en-US");
+          if (normalized && !normalizedSymbols.has(normalized)) {
+            normalizedSymbols.set(normalized, display);
+          }
+        });
+        await tx.update(dreamsTable).set({
+          decodedInsights: preserveTarotCache(
+            currentDream.decodedInsights, JSON.stringify({ interpretation, reflection }),
+          ),
+          symbols: Array.from(normalizedSymbols.values()),
+        }).where(condition);
+        return { value: interpretation };
+      }, req.get("X-Psyra-Development-Entitlement"));
       console.log(`Dream ${dream.id} decoded and saved in ${Date.now() - startedAt}ms`);
       res.json(interpretation);
     } catch (error) {
+      if (error instanceof DailyLimitError) {
+        return res.status(429).json({
+          error: error.message, heading: INTERPRETATION_LIMIT_HEADING, code: "DAILY_INTERPRETATION_LIMIT",
+        });
+      }
       console.error("Saved dream decode failed:", error);
       res.status(500).json({ error: "Failed to decode dream" });
     }

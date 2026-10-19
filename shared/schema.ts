@@ -25,6 +25,7 @@ export const dailyUsage = pgTable("daily_usage", {
   usageDay: text("usage_day").notNull().default(""),
   dreamCount: integer("dream_count").notNull().default(0),
   tarotCount: integer("tarot_count").notNull().default(0),
+  interpretationCount: integer("interpretation_count").notNull().default(0),
 });
 
 // Dreams table

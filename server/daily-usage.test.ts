@@ -15,6 +15,8 @@ test("allowances are exactly five dreams and three cards for all accounts", () =
   assert.throws(() => assertDailyAllowance("tarot", 3, 1), DailyLimitError);
   assert.throws(() => assertDailyAllowance("tarot", 1, 3), DailyLimitError);
   assert.throws(() => assertDailyAllowance("dreams", 0, -1));
+  assertDailyAllowance("interpretations", 4, 1);
+  assert.throws(() => assertDailyAllowance("interpretations", 5, 1), DailyLimitError);
 });
 
 test("exact friendly messages survive the API error format", () => {
@@ -65,6 +67,7 @@ test("database-backed quota concurrency, resets, isolation and rollback", async 
     await t.test("per-user counts and dream/Tarot allowances are independent", async () => {
       await withDailyUsage(ids[1], "America/New_York", quota => quota.consume("dreams", 5));
       await withDailyUsage(ids[1], "America/New_York", quota => quota.consume("tarot", 3));
+      await withDailyUsage(ids[1], "America/New_York", quota => quota.consume("interpretations", 5));
       await assert.rejects(withDailyUsage(ids[1], "UTC", quota => quota.consume("tarot", 1)), DailyLimitError);
       await withDailyUsage(ids[2], "UTC", quota => quota.consume("tarot", 3));
     });
@@ -82,10 +85,12 @@ test("database-backed quota concurrency, resets, isolation and rollback", async 
       await withDailyUsage(ids[1], "UTC", async quota => {
         await quota.consume("dreams", 5);
         await quota.consume("tarot", 3);
+        await quota.consume("interpretations", 5);
       });
       const [row] = await db.select().from(dailyUsage).where(eq(dailyUsage.userId, ids[1]));
       assert.equal(row.dreamCount, 5);
       assert.equal(row.tarotCount, 3);
+      assert.equal(row.interpretationCount, 5);
       assert.notEqual(row.usageDay, "2000-01-01");
     });
 
@@ -94,11 +99,13 @@ test("database-backed quota concurrency, resets, isolation and rollback", async 
       await assert.rejects(withDailyUsage(ids[4], "UTC", async quota => {
         await quota.consume("dreams", 1);
         await quota.consume("tarot", 1);
+        await quota.consume("interpretations", 1);
         throw new Error("Simulated save failure");
       }));
       await withDailyUsage(ids[4], "UTC", async quota => {
         await quota.consume("dreams", 5);
         await quota.consume("tarot", 3);
+        await quota.consume("interpretations", 5);
       });
     });
 

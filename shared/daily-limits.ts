@@ -1,9 +1,20 @@
-export const DAILY_LIMITS = { dreams: 5, tarot: 3 } as const;
+export const DAILY_LIMITS = { dreams: 5, tarot: 3, interpretations: 5 } as const;
 export type DailyUsageKind = keyof typeof DAILY_LIMITS;
 export const DAILY_LIMIT_MESSAGES = {
   dreams: "You've logged 5 dreams today. Your dream journal will be ready for more tomorrow. Sweet dreams ✨",
   tarot: "You've drawn your 3 cards for today. Come back tomorrow for new insight ✨",
+  interpretations: "You've received 5 dream interpretations today. Come back tomorrow for more insight ✨",
 } as const;
+export const INTERPRETATION_LIMIT_HEADING = "That's all for tonight";
+
+export interface InterpretationAllowance {
+  limit: number;
+  remaining: number | null;
+  exempt: boolean;
+  timeZone: string;
+  day: string;
+  resetsAt: string;
+}
 
 export class DailyLimitError extends Error {
   constructor(public readonly kind: DailyUsageKind) {

@@ -14,6 +14,6 @@ missing/invalid reports use UTC. IANA rules retain daylight-saving transitions.
 
 **How to apply:** Any future timezone/travel setting must explicitly preserve
 already-consumed allowance during a transition rather than silently starting
-a new day. Keep logging quotas distinct from AI interpretation allowances;
-the requested daily logging change was not permission to alter interpretation
-pricing or cost controls.
+a new day. Keep logging and interpretation allowances independent even when
+their numeric limits match: saving a journal entry is not proof that an AI
+interpretation succeeded. Failed AI calls must not consume an interpretation.

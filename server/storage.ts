@@ -173,7 +173,7 @@ export interface IStorage {
   updateDream(userId: string, id: string, updates: Partial<Dream>): Promise<Dream | undefined>;
   deleteDream(userId: string, id: string): Promise<boolean>;
   getDreamStats(userId: string): Promise<DreamStats>;
-  decodeDream(content: string, moonPhase: MoonPhase): Promise<DreamDecoding>;
+  decodeDream(content: string, moonPhase: MoonPhase, onAiFailure?: () => void): Promise<DreamDecoding>;
   enhancedDecodeDream(content: string): Promise<EnhancedDreamInterpretation>;
   
   getPrompts(): Promise<WritingPrompt[]>;
@@ -1030,7 +1030,7 @@ export class MemStorage implements IStorage {
     return getCurrentCelestialData();
   }
 
-  async decodeDream(content: string, moonPhase: MoonPhase): Promise<DreamDecoding> {
+  async decodeDream(content: string, moonPhase: MoonPhase, onAiFailure?: () => void): Promise<DreamDecoding> {
     const moonInfluence = moonPhaseInfluences[moonPhase];
     
     try {
@@ -1068,6 +1068,13 @@ Keep each symbol meaning to 1-2 sentences. Identify 3-5 key symbols, 2-4 themes,
       }
 
       const parsed = JSON.parse(jsonMatch[0]);
+      if (
+        !Array.isArray(parsed.symbols) || !Array.isArray(parsed.themes) ||
+        !Array.isArray(parsed.emotions) ||
+        typeof parsed.overallInsight !== "string" || !parsed.overallInsight.trim()
+      ) {
+        throw new Error("AI returned an incomplete interpretation");
+      }
       
       return {
         symbols: parsed.symbols || [],
@@ -1077,6 +1084,7 @@ Keep each symbol meaning to 1-2 sentences. Identify 3-5 key symbols, 2-4 themes,
         moonInfluence,
       };
     } catch (error) {
+      onAiFailure?.();
       console.error("AI dream analysis failed, falling back to keyword analysis:", error);
       return decodeDreamContent(content, moonPhase);
     }

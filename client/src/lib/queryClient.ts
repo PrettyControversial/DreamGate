@@ -50,6 +50,18 @@ export async function getApiRequestHeaders(
   data?: unknown,
 ): Promise<Record<string, string>> {
   const headers: Record<string, string> = {};
+  // Preserve the existing Mock Psyra preview only in development bundles.
+  // Production backends independently reject this simulation header.
+  if (import.meta.env.DEV) {
+    try {
+      const preview = JSON.parse(localStorage.getItem("dreamgate-development-subscription") || "{}");
+      if (preview.entitlement === "PSYRA_PLUS" || preview.entitlement === "DEVELOPMENT_PREMIUM") {
+        headers["X-Psyra-Development-Entitlement"] = preview.entitlement;
+      }
+    } catch {
+      // Unreadable preview state never grants an exemption.
+    }
+  }
   try {
     headers["X-User-Time-Zone"] = Intl.DateTimeFormat().resolvedOptions().timeZone;
   } catch {
