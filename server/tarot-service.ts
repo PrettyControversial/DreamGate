@@ -130,9 +130,14 @@ export function createTarotService(
       }
       return { dream: describe(dream), pulls, savedPull: spreadId ? pulls[spreadId] ?? null : null };
     },
-    async draw(userId: string, spreadId: TarotSpreadId): Promise<DreamTarotPull> {
+    async draw(
+      userId: string,
+      spreadId: TarotSpreadId,
+      beforeNewPull?: (cardCount: number) => Promise<void>,
+    ): Promise<DreamTarotPull> {
       const dream = latestInterpretedDream(await repository.listDreams(userId), userId);
       if (!dream) {
+        await beforeNewPull?.(TAROT_POSITIONS[spreadId].length);
         return { dream: null, spreadId, cards: randomSelection(spreadId), source: "random", cached: false, createdAt: new Date().toISOString() };
       }
       return repository.withDreamLock(userId, dream.id, async (lockedDream, save) => {
@@ -142,6 +147,8 @@ export function createTarotService(
         let saved = cachedPull(lockedDream, spreadId);
         const cached = Boolean(saved);
         if (!saved) {
+          // Outside the AI fallback: quota errors must never become random cards.
+          await beforeNewPull?.(TAROT_POSITIONS[spreadId].length);
           let cards: TarotSelection[];
           let source: SavedTarotPull["source"] = "dream";
           try {

@@ -22,3 +22,4 @@
 - [Descent Journey Note](descent-journey-note.md) — Tonight’s Intention is the editable saved note; reopen the latest record and update it instead of creating duplicates.
 - [ImageMagick contact sheets](image-magick-contact-sheets.md) — montage may fail without a usable font here; compose unlabeled previews with append instead.
 - [Native release boundaries](native-release-boundaries.md) — pull the active branch first; leave ios/ and the bundle identity under the user's Xcode control.
+- [Daily usage timezone](daily-usage-timezone.md) — keep each account's quota timezone stable; changing device zones must not create extra daily allowances.

@@ -19,7 +19,11 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { getLunarEventsForYear } from "./lunar-astronomy";
-import { tarotService } from "./tarot";
+import { tarotService, drawTarotWithDailyLimit } from "./tarot";
+import { withDailyUsage } from "./daily-usage";
+import { DailyLimitError } from "@shared/daily-limits";
+import { dreams as dreamsTable } from "@shared/schema";
+import { preserveTarotCache } from "./tarot-service";
 import { hasDemoPremium } from "@shared/demo";
 import {
   DemoSeedFailure,
@@ -141,8 +145,13 @@ export async function registerRoutes(
     const input = z.object({ spreadId: z.enum(["single", "past-present-future", "dream"]) }).safeParse(req.body);
     if (!input.success) return res.status(400).json({ error: "Unknown Tarot spread" });
     try {
-      res.json(await tarotService.draw(currentUserId(res), input.data.spreadId));
-    } catch {
+      res.json(await drawTarotWithDailyLimit(
+        currentUserId(res), input.data.spreadId, req.get("X-User-Time-Zone"),
+      ));
+    } catch (error) {
+      if (error instanceof DailyLimitError) {
+        return res.status(429).json({ error: error.message, code: "DAILY_TAROT_LIMIT" });
+      }
       res.status(503).json({ error: "Dream-based Tarot is temporarily unavailable" });
     }
   });
@@ -225,9 +234,22 @@ export async function registerRoutes(
       }
       const userId = currentUserId(res);
       const isFirstDream = (await storage.getDreams(userId)).length === 0;
-      const dream = await storage.createDream(userId, parsed.data);
+      const dream = await withDailyUsage(userId, req.get("X-User-Time-Zone"), async (quota, tx) => {
+        await quota.consume("dreams", 1);
+        // New dreams cannot inject preselected "cached" cards to skip metering.
+        const decodedInsights = parsed.data.decodedInsights
+          ? preserveTarotCache(null, parsed.data.decodedInsights)
+          : parsed.data.decodedInsights;
+        const [created] = await tx.insert(dreamsTable).values({
+          ...parsed.data, decodedInsights, userId,
+        }).returning();
+        return created;
+      });
       res.status(201).json({ ...dream, isFirstDream });
     } catch (error) {
+      if (error instanceof DailyLimitError) {
+        return res.status(429).json({ error: error.message, code: "DAILY_DREAM_LIMIT" });
+      }
       res.status(500).json({ error: "Failed to create dream" });
     }
   });

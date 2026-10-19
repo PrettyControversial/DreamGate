@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { type Dream, type CelestialData } from "@shared/schema";
 import { X, Plus, ArrowRight, Send, Sparkles } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { dailyLimitMessage } from "@shared/daily-limits";
 import {
   trackDiscoverToolCompleted,
   trackDreamSaved,
@@ -107,8 +108,8 @@ export default function DreamLog() {
     },
     onError: (error) => {
       toast({
-        title: "Error",
-        description: error.message,
+        title: dailyLimitMessage(error) ? "See you tomorrow" : "Error",
+        description: dailyLimitMessage(error) ?? error.message,
         variant: "destructive",
       });
     },

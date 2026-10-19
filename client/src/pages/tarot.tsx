@@ -3,7 +3,9 @@ import { useUser } from "@clerk/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
-import { TAROT_POSITIONS, type TarotSpreadId, type DreamTarotPull, type TarotContext } from "@shared/tarot";
+import { type TarotSpreadId, type DreamTarotPull, type TarotContext } from "@shared/tarot";
+import { dailyLimitMessage } from "@shared/daily-limits";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -385,8 +387,8 @@ function cardsForPull(pull: DreamTarotPull): DrawnCard[] {
 
 function UserTarot({ userId }: { userId: string }) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const {
-    canAccess,
     freeTarotPullsRemaining,
     isPremium,
     openPaywall,
@@ -454,16 +456,6 @@ function UserTarot({ userId }: { userId: string }) {
   const shuffleAndDraw = async (spreadId: string) => {
     if (pending.current || isRevealing || isLoadingContext) return;
     const savedPull = context?.pulls[spreadId as TarotSpreadId];
-    if (!savedPull && !isPremium && !canAccess("premiumTarot")) {
-      openPaywall({
-        feature: "premiumTarot",
-        eyebrow: "Psyra+ Tarot",
-        title: "Unlock Tarot Readings",
-        description:
-          "Draw from the Major Arcana and follow the symbols back into your dreaming mind with Psyra+.",
-      });
-      return;
-    }
 
     const spread = spreadTypes.find(s => s.id === spreadId);
     if (!spread) return;
@@ -485,20 +477,22 @@ function UserTarot({ userId }: { userId: string }) {
           },
         }));
       }
-    } catch {
+    } catch (error) {
+      const limitMessage = dailyLimitMessage(error);
+      if (limitMessage) {
+        toast({ title: "See you tomorrow", description: limitMessage });
+        return;
+      }
       if (savedPull) {
         pull = savedPull;
         drawn = cardsForPull(pull);
       } else {
-      const shuffled = [...majorArcana].sort(() => Math.random() - 0.5);
-      const cards = TAROT_POSITIONS[spreadId as TarotSpreadId].map((position, index) => ({
-        position, card_id: shuffled[index].id, reversed: Math.random() > 0.7, reason: "",
-      }));
-      pull = {
-        spreadId: spreadId as TarotSpreadId, cards, source: "random",
-        dream: null, cached: false, createdAt: new Date().toISOString(),
-      };
-      drawn = cardsForPull(pull);
+        // Never generate new cards locally after a backend rejection.
+        toast({
+          title: "Cards could not be drawn",
+          description: "Please try again in a moment.",
+        });
+        return;
       }
     } finally {
       pending.current = false;
@@ -680,13 +674,7 @@ function UserTarot({ userId }: { userId: string }) {
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {!PAYWALL_ENABLED
-                        ? isPremium
-                          ? "Choose a spread to begin a reflection."
-                          : freeTarotPullsRemaining > 0
-                            ? `${freeTarotPullsRemaining} free ${
-                                freeTarotPullsRemaining === 1 ? "pull" : "pulls"
-                              } remain.`
-                            : "Your free Tarot pulls are complete."
+                        ? "Draw up to 3 cards each day. Saved cards stay available."
                         : isPremium
                           ? "Mock Psyra+ is active. You can pull from the Major Arcana."
                           : freeTarotPullsRemaining > 0
@@ -702,11 +690,7 @@ function UserTarot({ userId }: { userId: string }) {
                   className="shrink-0"
                   disabled={
                     isChoosing ||
-                    isLoadingContext ||
-                    (!PAYWALL_ENABLED &&
-                      !isPremium &&
-                      freeTarotPullsRemaining === 0 &&
-                      !context?.pulls.single)
+                    isLoadingContext
                   }
                   onClick={() => {
                     if (!PAYWALL_ENABLED && !isPremium) {

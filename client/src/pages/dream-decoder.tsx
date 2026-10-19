@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/lib/subscription";
 import { AiDreamConsentDialog } from "@/components/ai-dream-consent-dialog";
 import { FREE_AI_LIMIT_MESSAGE, PAYWALL_ENABLED } from "@shared/subscription";
+import { dailyLimitMessage } from "@shared/daily-limits";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import {
   trackDiscoverToolCompleted,
@@ -410,7 +411,7 @@ export default function DreamDecoder() {
       console.error("Dream creation failed before Psyra could respond:", error);
       toast({
         title: "Dream could not be saved",
-        description: "Please check your connection and try again.",
+        description: dailyLimitMessage(error) ?? "Please check your connection and try again.",
         variant: "destructive",
       });
     },

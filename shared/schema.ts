@@ -17,6 +17,16 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+// Server-owned operational quota state. Client dates and deleted dreams never
+// determine the number of actions already performed in the current day.
+export const dailyUsage = pgTable("daily_usage", {
+  userId: varchar("user_id").primaryKey(),
+  timeZone: text("time_zone").notNull(),
+  usageDay: text("usage_day").notNull().default(""),
+  dreamCount: integer("dream_count").notNull().default(0),
+  tarotCount: integer("tarot_count").notNull().default(0),
+});
+
 // Dreams table
 export const dreams = pgTable("dreams", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

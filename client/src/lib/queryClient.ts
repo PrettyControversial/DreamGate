@@ -50,6 +50,11 @@ export async function getApiRequestHeaders(
   data?: unknown,
 ): Promise<Record<string, string>> {
   const headers: Record<string, string> = {};
+  try {
+    headers["X-User-Time-Zone"] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    headers["X-User-Time-Zone"] = "UTC";
+  }
   const token = await authTokenProvider?.();
   if (data !== undefined) {
     headers["Content-Type"] = "application/json";

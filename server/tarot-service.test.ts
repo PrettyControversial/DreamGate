@@ -7,6 +7,7 @@ import {
   createTarotService, latestInterpretedDream, savedInterpretation,
   preserveTarotCache, randomSelection, validateAISelection, type TarotRepository,
 } from "./tarot-service";
+import { DailyLimitError } from "../shared/daily-limits";
 
 const interpretation = {
   dreamOverview: "A doorway opens into a forest.",
@@ -46,6 +47,51 @@ function repository(initial: Dream[]) {
   };
   return { repo, dreams };
 }
+
+test("quota applies to new cards, not reopening cached spreads", async () => {
+  const { repo } = repository([dream("quota")]);
+  let consumed = 0;
+  const service = createTarotService(repo, async (_input, spread) => valid(spread));
+  const consume = async (count: number) => { consumed += count; };
+  await service.draw("alice", "single", consume);
+  assert.equal(consumed, 1);
+  await service.draw("alice", "single", consume);
+  assert.equal(consumed, 1);
+  await service.draw("alice", "dream", consume);
+  assert.equal(consumed, 4);
+});
+
+test("quota rejection never calls AI, saves a spread, or falls back to random", async () => {
+  const { repo } = repository([dream("quota")]);
+  let calls = 0;
+  const service = createTarotService(repo, async (_input, spread) => { calls++; return valid(spread); });
+  await assert.rejects(service.draw("alice", "dream", async count => {
+    assert.equal(count, 3);
+    throw new DailyLimitError("tarot");
+  }), DailyLimitError);
+  assert.equal(calls, 0);
+  assert.deepEqual((await service.context("alice")).pulls, {});
+});
+
+test("new dream payloads cannot inject cached cards to bypass daily limits", () => {
+  const payload = JSON.stringify({
+    interpretation,
+    tarotPulls: { single: { spreadId: "single", cards: valid("single").cards } },
+    tarotLastSpread: "single",
+  });
+  const sanitized = JSON.parse(preserveTarotCache(null, payload));
+  assert.deepEqual(sanitized.interpretation, interpretation);
+  assert.equal(sanitized.tarotPulls, undefined);
+  assert.equal(sanitized.tarotLastSpread, undefined);
+});
+
+test("random draws without an interpreted dream are also server-metered", async () => {
+  const { repo } = repository([]);
+  const service = createTarotService(repo, async () => { throw new Error("Should never call AI"); });
+  await assert.rejects(service.draw("alice", "single", async () => {
+    throw new DailyLimitError("tarot");
+  }), DailyLimitError);
+});
 
 test("latest interpreted dream is current-user only, skips newer uninterpreted and corrupt records", () => {
   const records = [

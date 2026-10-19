@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { dailyLimitMessage } from "@shared/daily-limits";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,10 +63,10 @@ export default function DreamPage() {
         navigate(`/decoder/${data.id}`);
       }
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to save dream. Please try again.",
+        description: dailyLimitMessage(error) ?? "Failed to save dream. Please try again.",
         variant: "destructive",
       });
     },
